@@ -5,7 +5,7 @@ if __name__ == '__main__':
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # Bind the socket to the address and port
-    server_address = ('192.168.56.15', 10000)
+    server_address = ('192.168.56.115', 10000)
     print('Starting up on {}:{}'.format(*server_address))
     sock.bind(server_address)
 
