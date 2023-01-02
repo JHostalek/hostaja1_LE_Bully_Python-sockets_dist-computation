@@ -27,7 +27,8 @@ try:
         try:
             data, server = sock.recvfrom(16)
         except socket.timeout:
-            print('timed out, no more responses')
+            pass
+        except KeyboardInterrupt:
             break
         else:
             print(f'received {data} from {server}')
