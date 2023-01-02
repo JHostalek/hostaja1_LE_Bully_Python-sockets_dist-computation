@@ -13,7 +13,7 @@ sock.bind(bind_address)
 
 # Set timeout for socket to 1 second
 sock.settimeout(20)
-
+sock.sendto(b'Keepalive', ('192.168.56.255', 10000))
 try:
     while True:
         print('Listening for messages...')
