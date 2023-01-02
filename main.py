@@ -1,8 +1,10 @@
 import socket
 import struct
 import sys
+import time
 
 if __name__ == '__main__':
+    message = time.ctime().encode('ascii')
 
     # Create the socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -17,8 +19,10 @@ if __name__ == '__main__':
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
 
     # Bind to the server address
-    server_address = ('', 10000)
+    server_address = ('', 5555)
     sock.bind(server_address)
+
+    multicast_group = ('224.3.29.71', 5555)
 
     # Tell the operating system to add the socket to the multicast group
     # on all interfaces.
@@ -39,6 +43,7 @@ if __name__ == '__main__':
             sock.sendto(b'ACK', address)
         except socket.timeout:
             print('Timed out, trying again')
+            sock.sendto(message, multicast_group)
             continue
         except KeyboardInterrupt:
             print('Exiting program')
