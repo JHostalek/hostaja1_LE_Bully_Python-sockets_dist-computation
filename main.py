@@ -30,7 +30,7 @@ try:
     while True:
         print('Listening for messages...')
         data, address = sock.recvfrom(1024)
-        if address == ip_address: continue
+        if address[0] == ip_address: continue
         print(f'Received message from {address} {ip_address}: {data}')
 
         time.sleep(1)
