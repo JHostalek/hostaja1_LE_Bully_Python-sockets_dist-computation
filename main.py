@@ -1,51 +1,27 @@
 import socket
 import struct
-import sys
 import time
 
 # Create the socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-ip_address = sys.argv[1]
-
 # Set the IP and port to listen on
-bind_address = (ip_address, 5555)
+bind_address = ('192.168.56.255', 10000)
 
 # Bind to the specific IP address and port
 sock.bind(bind_address)
 
 # Set timeout for socket to 1 second
-sock.settimeout(10)
+sock.settimeout(20)
 
-# Tell the operating system to add the socket to the multicast group
-# on all interfaces.
-multicast_group = ('224.3.29.71', 5555)
-group = socket.inet_aton(multicast_group[0])
-mreq = struct.pack('4sL', group, socket.INADDR_ANY)
-sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-
-# Receive messages
-message = f'Keepalive from {bind_address}'
-sock.sendto(message.encode('utf-8'), multicast_group)
-while True:
-    try:
+try:
+    while True:
         print('Listening for messages...')
         data, address = sock.recvfrom(1024)
         print(f'Received message from {address}: {data}')
-
-        # Send a message to the multicast group every 5 seconds
         time.sleep(5)
-        message = f'Keepalive from {bind_address}'
-        sock.sendto(message.encode('utf-8'), multicast_group)
-    except KeyboardInterrupt:
-        print('Exiting...')
-        break
-    except socket.timeout:
-        print('Timed out waiting for a message')
-        sock.sendto('Keepalive AFTER TIMEOUT from {}'.format(bind_address).encode('utf-8'), multicast_group)
-
-
-
-# Leave the multicast group and close the socket
-sock.setsockopt(socket.IPPROTO_IP, socket.IP_DROP_MEMBERSHIP, mreq)
-sock.close()
+        sock.sendto(b'Keepalive', ('192.168.56.255', 10000))
+except KeyboardInterrupt:
+    print('Exiting...')
+finally:
+    sock.close()
