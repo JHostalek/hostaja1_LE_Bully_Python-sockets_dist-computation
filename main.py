@@ -16,18 +16,13 @@ def get_IP():
     matches = re.findall(address_pattern, output)
     return matches[2]
 
-
 ip_address = get_IP()
 PORT = 5555
-# Set the IP and port to listen on
 bind_address = ('192.168.56.255', PORT)
-
-# Bind to the specific IP address and port
 sock.bind(bind_address)
-
-# Set timeout for socket to 1 second
 sock.settimeout(20)
 sock.sendto(b'Keepalive', ('192.168.56.255', PORT))
+
 try:
     while True:
         print('Listening for messages...')
