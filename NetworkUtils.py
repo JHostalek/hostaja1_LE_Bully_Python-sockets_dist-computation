@@ -34,7 +34,7 @@ class NetworkUtils:
             if address == (self.ip, self.BROADCAST_PORT): continue
             print(f'{self.ip} - Received message from {address} : {data}')
 
-    def sendBroadcast(self, message:str):
+    def sendBroadcast(self, message: str):
         # TODO: ALLOW LOCALHOST
         self.broadcastSock.sendto(message.encode(), ('192.168.56.255', self.BROADCAST_PORT))
 
@@ -50,6 +50,3 @@ class NetworkUtils:
         address_pattern = r"inet (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
         matches = re.findall(address_pattern, output)
         return matches[2]
-
-    def terminate(self):
-        self.terminate.set()
