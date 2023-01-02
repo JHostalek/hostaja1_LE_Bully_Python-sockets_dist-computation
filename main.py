@@ -15,7 +15,7 @@ bind_address = (ip_address, 10000)
 sock.bind(bind_address)
 
 # Set timeout for socket to 1 second
-sock.settimeout(1)
+sock.settimeout(10)
 
 # Tell the operating system to add the socket to the multicast group
 # on all interfaces.
@@ -25,7 +25,8 @@ mreq = struct.pack('4sL', group, socket.INADDR_ANY)
 sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
 # Receive messages
-
+message = f'Keepalive from {bind_address}'
+sock.sendto(message, multicast_group)
 while True:
     try:
         print('Listening for messages...')
@@ -41,7 +42,7 @@ while True:
         break
     except socket.timeout:
         print('Timed out waiting for a message')
-        sock.sendto('Keepalive from {}'.format(bind_address).encode('utf-8'), multicast_group)
+        sock.sendto('Keepalive AFTER TIMEOUT from {}'.format(bind_address).encode('utf-8'), multicast_group)
 
 
 
