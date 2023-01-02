@@ -3,7 +3,7 @@ import struct
 import sys
 
 message = 'Hello, world!'
-multicast_group = ('224.3.29.71', 10000)
+multicast_group = ('224.3.29.71', 5555)
 
 # Create the datagram socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -14,7 +14,7 @@ sock.settimeout(1)
 
 # Set the time-to-live for messages to 1 so they do not go past the
 # local network segment.
-ttl = struct.pack('b', 1)
+ttl = struct.pack('b', 2)
 sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
 
 try:
