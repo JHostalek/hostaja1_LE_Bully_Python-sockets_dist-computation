@@ -25,8 +25,9 @@ mreq = struct.pack('4sL', group, socket.INADDR_ANY)
 sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
 # Receive messages
-try:
-    while True:
+
+while True:
+    try:
         print('Listening for messages...')
         data, address = sock.recvfrom(1024)
         print(f'Received message from {address}: {data}')
@@ -35,9 +36,14 @@ try:
         time.sleep(5)
         message = f'Keepalive from {bind_address}'
         sock.sendto(message, multicast_group)
-except KeyboardInterrupt:
-    print('Exiting...')
-finally:
-    # Leave the multicast group and close the socket
-    sock.setsockopt(socket.IPPROTO_IP, socket.IP_DROP_MEMBERSHIP, mreq)
-    sock.close()
+    except KeyboardInterrupt:
+        print('Exiting...')
+        break
+    except socket.timeout:
+        print('Timed out waiting for a message')
+
+
+
+# Leave the multicast group and close the socket
+sock.setsockopt(socket.IPPROTO_IP, socket.IP_DROP_MEMBERSHIP, mreq)
+sock.close()
