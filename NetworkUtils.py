@@ -7,7 +7,7 @@ class NetworkUtils:
         self.ip = self.parseIp()
         self.BROADCAST_PORT = 5555
         self.broadcastSock = self.initBroadcast()
-        self.terminate: threading.Event = threading.Event()
+        self.terminationEvent: threading.Event = threading.Event()
 
     def initBroadcast(self):
         # Create the socket
@@ -27,7 +27,7 @@ class NetworkUtils:
         return sock
 
     def listenBroadcast(self):
-        while not self.terminate.is_set():
+        while not self.terminationEvent.is_set():
             print('Listening for messages...')
             data, address = self.broadcastSock.recvfrom(1024)
             if address == (self.ip, self.BROADCAST_PORT): continue
@@ -51,4 +51,4 @@ class NetworkUtils:
         return matches[2]
 
     def terminate(self):
-        self.terminate.set()
+        self.terminationEvent.set()
