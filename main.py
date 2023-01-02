@@ -1,40 +1,45 @@
 import socket
 import struct
-if __name__ == '__main__':
-    # Create the socket
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+import time
 
-    # Set timeout for socket to 1 second
-    sock.settimeout(1)
+# Create the socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    # Set the IP and port to listen on
-    multicast_group = ('224.3.29.71', 10000)
+# Set timeout for socket to 1 second
+sock.settimeout(1)
 
-    # Bind to the multicast group and port
-    sock.bind(multicast_group)
+# Set the IP and port to listen on
+multicast_group = ('224.3.29.71', 10000)
 
-    # Tell the operating system to add the socket to the multicast group
-    # on all interfaces.
-    group = socket.inet_aton(multicast_group[0])
-    mreq = struct.pack('4sL', group, socket.INADDR_ANY)
-    sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+# Bind to the multicast group and port
+sock.bind(multicast_group)
 
-    # Listen for incoming connections
-    sock.listen()
+# Tell the operating system to add the socket to the multicast group
+# on all interfaces.
+group = socket.inet_aton(multicast_group[0])
+mreq = struct.pack('4sL', group, socket.INADDR_ANY)
+sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
-    # Receive messages
-    try:
-        while True:
-            print('Listening for incoming connections...')
-            connection, address = sock.accept()
-            print(f'Received connection from {address}')
-            data = connection.recv(1024)
-            print(f'Received message from {address}: {data}')
-            connection.send(b'Hello, World!')
-            connection.close()
-    except KeyboardInterrupt:
-        print('Exiting...')
-    finally:
-        # Leave the multicast group and close the socket
-        sock.setsockopt(socket.IPPROTO_IP, socket.IP_DROP_MEMBERSHIP, mreq)
-        sock.close()
+# Receive messages
+try:
+    while True:
+        # print('Listening for messages...')
+        # data, address = sock.recvfrom(1024)
+        # print(f'Received message from {address}: {data}')
+        message = b'Hello, World!'
+        sock.sendto(message, multicast_group)
+        time.sleep(5)
+        print('Listening for incoming connections...')
+        connection, address = sock.accept()
+        print(f'Received connection from {address}')
+        data = connection.recv(1024)
+        print(f'Received message from {address}: {data}')
+        connection.send(b'Hello, World!')
+        connection.close()
+
+except KeyboardInterrupt:
+    print('Exiting...')
+finally:
+    # Leave the multicast group and close the socket
+    sock.setsockopt(socket.IPPROTO_IP, socket.IP_DROP_MEMBERSHIP, mreq)
+    sock.close()
