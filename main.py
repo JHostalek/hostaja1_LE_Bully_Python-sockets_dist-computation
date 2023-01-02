@@ -39,8 +39,8 @@ if __name__ == '__main__':
             print(f'Received {len(data)} bytes from {address}')
             print(data)
 
-            print(f'Sending acknowledgement to {address}')
-            sock.sendto(b'ACK', address)
+            # print(f'Sending acknowledgement to {address}')
+            # sock.sendto(b'ACK', address)
         except socket.timeout:
             print('Timed out, trying again')
             sock.sendto(message, multicast_group)
