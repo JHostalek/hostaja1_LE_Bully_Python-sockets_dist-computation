@@ -4,6 +4,8 @@ import time
 
 # Create the socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
 
 # Set the IP and port to listen on
 bind_address = ('192.168.56.255', 10000)
