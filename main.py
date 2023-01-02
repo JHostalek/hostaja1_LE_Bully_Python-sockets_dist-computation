@@ -20,7 +20,7 @@ sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
 try:
     # Send data to the multicast group
     print(f'sending {message}')
-    sent = sock.sendto(message, multicast_group)
+    sent = sock.sendto(message.encode(), multicast_group)
     # Look for responses from all recipients
     while True:
         print('waiting to receive')
