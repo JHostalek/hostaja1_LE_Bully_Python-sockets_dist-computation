@@ -4,7 +4,7 @@ import sys
 import time
 
 if __name__ == '__main__':
-    message = socket.gethostname().encode('ascii')
+    message = time.ctime().encode('ascii')
 
     # Create the socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
