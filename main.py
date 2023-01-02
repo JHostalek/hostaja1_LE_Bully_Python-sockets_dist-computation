@@ -17,7 +17,6 @@ matches = re.findall(address_pattern, output)
 
 ip_address = matches[2]
 
-
 # Set the IP and port to listen on
 bind_address = ('192.168.56.255', 10000)
 
@@ -31,9 +30,10 @@ try:
     while True:
         print('Listening for messages...')
         data, address = sock.recvfrom(1024)
-        print(f'Received message from {address} {ip_address}: {data}')
         if address == ip_address: continue
-        time.sleep(5)
+        print(f'Received message from {address} {ip_address}: {data}')
+
+        time.sleep(1)
         sock.sendto(b'Keepalive', ('192.168.56.255', 10000))
 except KeyboardInterrupt:
     print('Exiting...')
