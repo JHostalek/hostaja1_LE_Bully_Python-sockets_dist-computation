@@ -41,6 +41,7 @@ while True:
         break
     except socket.timeout:
         print('Timed out waiting for a message')
+        sock.sendto('Keepalive from {}'.format(bind_address).encode('utf-8'), multicast_group)
 
 
 
