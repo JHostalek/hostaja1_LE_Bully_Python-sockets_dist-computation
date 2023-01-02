@@ -34,8 +34,7 @@ while True:
         sock.sendto(message, multicast_group)
     except KeyboardInterrupt:
         print('Exiting...')
-        exit(0)
-    finally:
-        # Leave the multicast group and close the socket
         sock.setsockopt(socket.IPPROTO_IP, socket.IP_DROP_MEMBERSHIP, mreq)
         sock.close()
+        exit(0)
+
