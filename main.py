@@ -20,6 +20,8 @@ group = socket.inet_aton(multicast_group[0])
 mreq = struct.pack('4sL', group, socket.INADDR_ANY)
 sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
+message = f'Keepalive + node IP: '.encode()
+sock.sendto(message, multicast_group)
 # Receive messages
 while True:
     try:
