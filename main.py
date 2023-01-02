@@ -31,6 +31,7 @@ def main():
 
     global ip_address
     ip_address = get_ip()
+    global PORT
     PORT = 5555
     # Set the IP and port to listen on
     bind_address = ('192.168.56.255', PORT)
