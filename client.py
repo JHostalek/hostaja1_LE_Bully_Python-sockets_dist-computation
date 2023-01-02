@@ -1,14 +1,20 @@
 if __name__ == '__main__':
-    # echo-client.py
-
     import socket
 
-    HOST = "127.0.0.1"  # The server's hostname or IP address
-    PORT = 65432  # The port used by the server
+    # Create a TCP/IP socket
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((HOST, PORT))
-        s.sendall(b"Hello, world")
-        data = s.recv(1024)
+    # Connect the socket to the address and port of the server
+    server_address = ('192.168.56.15', 10000)
+    print('Connecting to {}:{}'.format(*server_address))
+    sock.connect(server_address)
 
-    print(f"Received {data!r}")
+    # Send the "Hello, World!" message
+    sock.sendall(b'Hello, World!')
+
+    # Receive the response from the server and print it
+    response = sock.recv(16)
+    print('Received: {!r}'.format(response))
+
+    # Close the connection
+    sock.close()
