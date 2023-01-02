@@ -23,19 +23,13 @@ sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 # Receive messages
 try:
     while True:
-        # print('Listening for messages...')
-        # data, address = sock.recvfrom(1024)
-        # print(f'Received message from {address}: {data}')
-        message = b'Hello, World!'
-        sock.sendto(message, multicast_group)
-        time.sleep(5)
-        print('Listening for incoming connections...')
-        connection, address = sock.accept()
-        print(f'Received connection from {address}')
-        data = connection.recv(1024)
+        print('Listening for messages...')
+        data, address = sock.recvfrom(1024)
         print(f'Received message from {address}: {data}')
-        connection.send(b'Hello, World!')
-        connection.close()
+        # Send message every 5 seconds
+        time.sleep(5)
+        message = f'Keepalive + node IP: '.encode()
+        sock.sendto(message, multicast_group)
 
 except KeyboardInterrupt:
     print('Exiting...')
