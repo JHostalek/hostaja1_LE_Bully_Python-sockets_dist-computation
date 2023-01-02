@@ -1,12 +1,15 @@
 import socket
 import struct
+import sys
 import time
 
 # Create the socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+ip_address = sys.argv[1]
+
 # Set the IP and port to listen on
-bind_address = ('192.168.56.1', 10000)
+bind_address = (ip_address, 10000)
 
 # Bind to the specific IP address and port
 sock.bind(bind_address)
