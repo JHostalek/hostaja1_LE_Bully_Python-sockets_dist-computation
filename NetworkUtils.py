@@ -22,7 +22,7 @@ class NetworkUtils:
         # Bind to the specific IP address and port
         sock.bind(bind_address)
         # Create threads for sending and receiving messages
-        receive_thread = threading.Thread(target=self.listenBroadcast, args=(sock,))
+        receive_thread = threading.Thread(target=self.listenBroadcast)
         receive_thread.start()
         return sock
 
