@@ -6,7 +6,7 @@ import time
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 # Set timeout for socket to 1 second
-sock.settimeout(1)
+sock.settimeout(20)
 
 # Set the IP and port to listen on
 multicast_group = ('224.3.29.71', 10000)
@@ -30,7 +30,6 @@ try:
         time.sleep(5)
         message = f'Keepalive + node IP: '.encode()
         sock.sendto(message, multicast_group)
-
 except KeyboardInterrupt:
     print('Exiting...')
 finally:
