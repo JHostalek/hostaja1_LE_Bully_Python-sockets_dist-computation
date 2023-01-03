@@ -76,7 +76,7 @@ class NetworkUtils:
         self.broadcastSock.sendto(RequestingConnection().toBytes(), ('192.168.56.255', self.BROADCAST_PORT))
 
     def sendConnectionAcceptance(self, address: Address):
-        self.send(TestMessage("TCP DEBUG MESSAGE").toBytes(), address)
+        self.send(TestMessage("TCP DEBUG MESSAGE"), address)
 
     def initListeningSocket(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
