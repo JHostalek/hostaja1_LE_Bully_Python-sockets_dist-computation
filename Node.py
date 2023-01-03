@@ -11,12 +11,12 @@ class Node:
         self.nu = NetworkUtils(self)
         self.neighbors = set()
         self.leader = None
-
+        self.MINIMUM_NEIGHBORS = 2
         self.WAIT_TIME = 5
 
     def handleNewConnection(self, neighbor: Address):
         self.neighbors.add(neighbor.ip)
-        if len(self.neighbors) >= 2:
+        if len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
             print("Minimum number of neighbors reached")
             if self.leader is None:
                 print("I don't have a leader, initiating election")
@@ -35,6 +35,7 @@ class Node:
             # This node is the coordinator, send Victory message to the node that sent the Election message
             self.nu.send(VictoryMessage(), Address((address.ip, self.nu.PORT)))
         else:
+            self.state = "ELECTION"
             self.bullyElection()
 
     def handleVictoryMessage(self, message, address):
@@ -56,6 +57,9 @@ class Node:
         """
         Implementation of the Bully Algorithm
         """
+        if len(self.neighbors) <= self.MINIMUM_NEIGHBORS:
+            print("Not enough neighbors to start election")
+            return
         highest_id = self.findHighestID(self.neighbors)
         if self.nu.ip == highest_id:
             # Send Victory message to all other processes and become the coordinator
