@@ -52,9 +52,10 @@ class NetworkUtils:
         while not self.terminate.is_set():
             data, address = self.broadcastSock.recvfrom(1024)
             address = Address(address)
+            print(message)
+
             if address != self.broadcastAddress:
                 message = pickle.loads(data)
-                print(message)
                 if isinstance(message, RequestingConnection):
                     print(f"{self.broadcastAddress} - Received connection request from {address}")
                     self.processConnectionRequest(address)
