@@ -61,11 +61,11 @@ class NetworkUtils:
             if address != self.broadcastAddress:
                 if isinstance(message, RequestingConnection):
                     print(f"{self.broadcastAddress} - Received connection request from {address}")
-                    self.processConnectionRequest(address)
+                    self.handleConnectionRequest(address)
                 else:
                     print(f"Received unknown broadcast message: {message}")
 
-    def processConnectionRequest(self, sender: Address):
+    def handleConnectionRequest(self, sender: Address):
         self.node.neighbors.add(sender)
         self.sendAcceptingConnection(Address((sender.ip, self.PORT)))
 
@@ -97,14 +97,12 @@ class NetworkUtils:
                 data = client.recv(1024)
                 if data:
                     print(f"{self.broadcastAddress} - Received message from {address}")
-                    # message: TestMessage = pickle.loads(data)
-                    # self.node.processMessage(message, address)
             except:
+                print(f"{self.broadcastAddress} - Connection to {address} lost")
                 pass
 
     def send(self, payload: bytes, address: Address):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print(f'DEBUG: {self.ip} - Sending message to {address.address}')
         client.connect(address.address)
         client.send(payload)
         client.close()
