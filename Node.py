@@ -16,13 +16,13 @@ class Node:
         self.MINIMUM_NEIGHBORS = 2
         self.WAIT_TIME = 5
 
-    def handleNewConnection(self, neighbor: Address):
+    def handleNewConnection(self, message: AcceptConnectionMessage, neighbor: Address):
+        self.leader = message.leader
         with self.neighbors_lock:
             self.neighbors.add(neighbor.ip)
-        if len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
-            if self.leader is None:
-                print(f'I dont have a leader, initiating election. Neighbors: {self.neighbors}')
-                self.bullyElection()
+        if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
+            print(f'{self.nu.ip} - STARTING ELECTIONS - neighbors: {self.neighbors}')
+            self.bullyElection()
 
     def handleElectionMessage(self, message, address):
         """

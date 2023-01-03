@@ -1,6 +1,5 @@
 import socket
 import threading
-import time
 
 import Node
 from Address import Address
@@ -32,16 +31,13 @@ class NetworkUtils:
         self.ip = parseIp()
 
         self.neighborSocks = []
+        self.sock = None
+        self.initListeningSocket()
 
         self.broadcastAddress = Address((self.ip, self.BROADCAST_PORT))
         self.broadcastSock = None
         self.initBroadcast()
         self.broadcastRequestConnection()
-
-        time.sleep(5)
-
-        self.sock = None
-        self.initListeningSocket()
 
     def initBroadcast(self):
         self.broadcastSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -76,7 +72,7 @@ class NetworkUtils:
         self.broadcastSock.sendto(RequestConnectionMessage().toBytes(), ('192.168.56.255', self.BROADCAST_PORT))
 
     def sendConnectionAcceptance(self, address: Address):
-        self.send(AcceptConnectionMessage(), address)
+        self.send(AcceptConnectionMessage(Address((self.node.leader, self.PORT))), address)
 
     def initListeningSocket(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -104,7 +100,7 @@ class NetworkUtils:
                     message = pickle.loads(message)
                     if isinstance(message, AcceptConnectionMessage):
                         print(f"{self.broadcastAddress} - Received connection acceptance from {address}")
-                        self.node.handleNewConnection(address)
+                        self.node.handleNewConnection(message, address)
                     elif isinstance(message, ElectionMessage):
                         print(f"{self.broadcastAddress} - Received election message from {address}")
                         self.node.handleElectionMessage(message, address)

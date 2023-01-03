@@ -1,6 +1,8 @@
 import abc
 import pickle
 
+import Address
+
 
 class Message(abc.ABC):
     def __init__(self):
@@ -17,9 +19,10 @@ class RequestConnectionMessage(Message):
 
 
 class AcceptConnectionMessage(Message):
-    def __init__(self):
+    def __init__(self, leader: Address = None):
         super().__init__()
         self.message = "Accepting connection"
+        self.leader = leader
 
 
 class ElectionMessage(Message):
