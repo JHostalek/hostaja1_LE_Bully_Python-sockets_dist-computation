@@ -1,7 +1,6 @@
 import threading
 import time
 
-from Address import Address
 from Message import *
 from NetworkUtils import NetworkUtils
 
@@ -16,10 +15,10 @@ class Node:
         self.MINIMUM_NEIGHBORS = 2
         self.WAIT_TIME = 5
 
-    def handleNewConnection(self, message: AcceptConnectionMessage, neighbor: Address):
+    def handleNewConnection(self, message, address):
         self.leader = message.leader
         with self.neighbors_lock:
-            self.neighbors.add(neighbor.ip)
+            self.neighbors.add(address.ip)
         if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
             print(f'{self.nu.ip} - STARTING ELECTIONS - neighbors: {self.neighbors}')
             self.bullyElection()
