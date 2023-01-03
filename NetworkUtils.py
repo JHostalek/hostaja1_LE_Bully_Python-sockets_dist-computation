@@ -3,17 +3,20 @@ import socket
 import threading
 
 import Node
+from Address import Address
 from Message import NotifyAllMessage
 
 
 class NetworkUtils:
     def __init__(self, node: Node):
+
         self.terminate: threading.Event = threading.Event()
         self.node = node
         self.ip = self.parseIp()
         self.BROADCAST_PORT = 5555
         self.broadcastSock = None
         self.initBroadcast()
+        self.broadcastAddress = Address((self.ip, self.BROADCAST_PORT))
 
     def initBroadcast(self):
         # Create the socket
@@ -34,9 +37,11 @@ class NetworkUtils:
     def listenBroadcast(self):
         while not self.terminate.is_set():
             data, address = self.broadcastSock.recvfrom(1024)
-            if address == (self.ip, self.BROADCAST_PORT): continue
-            message: NotifyAllMessage = pickle.loads(data)
-            self.node.processBroadcast(message)
+            address = Address(address)
+            # Ignore broadcast messages from self
+            if address != self.broadcastAddress:
+                message: NotifyAllMessage = pickle.loads(data)
+                self.node.processBroadcast(message, address)
 
     def sendBroadcast(self, payload: bytes):
         # TODO: ALLOW LOCALHOST
