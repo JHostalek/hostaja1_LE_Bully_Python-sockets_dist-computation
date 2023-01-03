@@ -56,7 +56,7 @@ class Node:
         """
         Implementation of the Bully Algorithm
         """
-        highest_id = max(self.neighbors)
+        highest_id = self.findHighestID(self.neighbors)
         if self.nu.ip == highest_id:
             # Send Victory message to all other processes and become the coordinator
             self.sendVictoryMessage()
@@ -92,3 +92,7 @@ class Node:
         self.leader = self.nu.ip
         for neighbor in self.neighbors:
             self.nu.send(VictoryMessage(), Address((neighbor, self.nu.PORT)))
+
+    def findHighestID(self, ips: set[str]) -> str:
+        sorted_ips = sorted(list(ips))
+        return sorted_ips[-1]
