@@ -1,5 +1,6 @@
 import socket
 import threading
+import time
 
 import Node
 from Address import Address
@@ -31,13 +32,16 @@ class NetworkUtils:
         self.ip = parseIp()
 
         self.neighborSocks = []
-        self.sock = None
-        self.initListeningSocket()
 
         self.broadcastAddress = Address((self.ip, self.BROADCAST_PORT))
         self.broadcastSock = None
         self.initBroadcast()
         self.broadcastRequestConnection()
+
+        time.sleep(5)
+
+        self.sock = None
+        self.initListeningSocket()
 
     def initBroadcast(self):
         self.broadcastSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

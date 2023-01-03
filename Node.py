@@ -19,10 +19,10 @@ class Node:
     def handleNewConnection(self, neighbor: Address):
         with self.neighbors_lock:
             self.neighbors.add(neighbor.ip)
-            if len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
-                if self.leader is None:
-                    print(f'I dont have a leader, initiating election. Neighbors: {self.neighbors}')
-                    self.bullyElection()
+        if len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
+            if self.leader is None:
+                print(f'I dont have a leader, initiating election. Neighbors: {self.neighbors}')
+                self.bullyElection()
 
     def handleElectionMessage(self, message, address):
         """
@@ -80,9 +80,10 @@ class Node:
         Sends an Election message to all processes with higher IDs
         """
         self.state = "ELECTION"
-        for neighbor in self.neighbors:
-            if neighbor > self.nu.ip:
-                self.nu.send(ElectionMessage(), Address((neighbor, self.nu.PORT)))
+        with self.neighbors_lock:
+            for neighbor in self.neighbors:
+                if neighbor > self.nu.ip:
+                    self.nu.send(ElectionMessage(), Address((neighbor, self.nu.PORT)))
 
     def sendVictoryMessage(self):
         """
@@ -91,8 +92,9 @@ class Node:
         self.state = "COORDINATOR"
         self.leader = self.nu.ip
         print(f"I AM THE NEW LEADER")
-        for neighbor in self.neighbors:
-            self.nu.send(VictoryMessage(), Address((neighbor, self.nu.PORT)))
+        with self.neighbors_lock:
+            for neighbor in self.neighbors:
+                self.nu.send(VictoryMessage(), Address((neighbor, self.nu.PORT)))
 
     def findHighestID(self, ips: set[str]) -> str:
         sorted_ips = sorted(list(ips))
