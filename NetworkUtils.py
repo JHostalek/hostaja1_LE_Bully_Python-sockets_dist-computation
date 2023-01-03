@@ -70,6 +70,7 @@ class NetworkUtils:
     def processConnectionAcceptance(self, address):
         self.node.neighbors.add(address)
         self.initSock(address)
+        self.send(TestMessage(Address((self.ip, self.PORT)), address).toBytes(), address)
 
     def broadcastRequestConnection(self):
         self.broadcastSock.sendto(RequestingConnection(self.broadcastAddress).toBytes(), ('192.168.56.255', self.BROADCAST_PORT))

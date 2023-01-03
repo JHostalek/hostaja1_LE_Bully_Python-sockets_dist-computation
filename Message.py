@@ -14,18 +14,18 @@ class Message(abc.ABC):
 
 
 class RequestingConnection(Message):
-    def __init__(self, sender: Node):
-        super().__init__(sender)
+    def __init__(self):
+        super().__init__()
         self.message = "Requesting connection"
 
 
 class AcceptingConnection(Message):
-    def __init__(self, sender: Node):
-        super().__init__(sender)
+    def __init__(self):
+        super().__init__()
         self.message = "Accepting connection"
 
 
 class TestMessage(Message):
     def __init__(self, sender: Node, receiver: Address):
-        super().__init__(sender)
+        super().__init__()
         self.message = f'TCP test message from {sender.nu.ip} to {receiver}'
