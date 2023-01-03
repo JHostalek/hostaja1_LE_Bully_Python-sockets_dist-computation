@@ -64,7 +64,7 @@ class NetworkUtils:
                 pass
 
     def handleConnectionRequest(self, sender: Address):
-        self.node.handleNewConnection(sender)
+        self.node.handleNewConnection(None, sender)
         self.sendConnectionAcceptance(Address((sender.ip, self.PORT)))
 
     def broadcastRequestConnection(self):
@@ -103,6 +103,7 @@ class NetworkUtils:
                     message = pickle.loads(message)
                     if isinstance(message, AcceptConnectionMessage):
                         print(f"{self.broadcastAddress} - Received connection acceptance from {address}")
+
                         self.node.handleNewConnection(message, address)
                     elif isinstance(message, ElectionMessage):
                         print(f"{self.broadcastAddress} - Received election message from {address}")
