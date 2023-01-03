@@ -64,14 +64,10 @@ class Node:
         if len(self.neighbors) < self.MINIMUM_NEIGHBORS:
             print("Not enough neighbors to start election")
             return
-        highest_id = self.findHighestID(self.neighbors)
-        if self.nu.ip == highest_id:
+        self.sendElectionMessage()
+        time.sleep(self.WAIT_TIME)
+        if self.state == "ELECTION":
             self.sendVictoryMessage()
-        else:
-            self.sendElectionMessage()
-            time.sleep(self.WAIT_TIME)
-            if self.state == "ELECTION":
-                self.sendVictoryMessage()
 
     def sendAliveMessage(self, address: Address):
         """
