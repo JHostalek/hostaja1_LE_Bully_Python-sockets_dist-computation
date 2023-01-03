@@ -24,4 +24,4 @@ class NotifyAllMessage(Message):
 class TestMessage(Message):
     def __init__(self, sender: Node, receiver: Address):
         super().__init__(sender)
-        self.message = f'TCP test message from {sender.nu.Address} to {receiver}'
+        self.message = f'TCP test message from {sender.nu.ip} to {receiver}'
