@@ -18,6 +18,9 @@ class Node:
     def handleNewConnection(self, message, address):
         if message is not None:
             self.leader = message.leader
+            print(f'Established connection with {address.ip}, leader is {self.leader}')
+        else:
+            print(f'Established connection with {address.ip}')
         with self.neighbors_lock:
             self.neighbors.add(address.ip)
         if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
