@@ -57,7 +57,7 @@ class Node:
         """
         Implementation of the Bully Algorithm
         """
-        if len(self.neighbors) <= self.MINIMUM_NEIGHBORS:
+        if len(self.neighbors) < self.MINIMUM_NEIGHBORS:
             print("Not enough neighbors to start election")
             return
         highest_id = self.findHighestID(self.neighbors)
