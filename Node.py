@@ -19,7 +19,7 @@ class Node:
 
     def handleNewConnection(self, message, address):
         if message is not None:
-            self.leader = message.leader
+            self.leader = message.leader.ip
             print(f'{self.TAG}Established connection with {address}, leader is {self.leader}')
         else:
             print(f'{self.TAG}Established connection with {address}')
