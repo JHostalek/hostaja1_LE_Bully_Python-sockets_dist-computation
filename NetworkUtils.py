@@ -87,10 +87,16 @@ class NetworkUtils:
 
     def listen(self):
         while not self.terminate.is_set():
-            client, address = self.sock.accept()
-            address = Address(address)
-            receive_thread = threading.Thread(target=self.receive, args=(client, address))
-            receive_thread.start()
+            try:
+                client, address = self.sock.accept()
+                address = Address(address)
+                receive_thread = threading.Thread(target=self.receive, args=(client, address))
+                receive_thread.start()
+            except socket.timeout:
+                pass
+            except Exception as e:
+                print(e)
+                break
 
     def receive(self, client, address: Address):
         while not self.terminate.is_set():
