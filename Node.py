@@ -1,4 +1,4 @@
-import Address
+from Address import Address
 from Message import NotifyAllMessage, Message, TestMessage
 from NetworkUtils import NetworkUtils
 
