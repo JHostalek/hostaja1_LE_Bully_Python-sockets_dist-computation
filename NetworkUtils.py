@@ -36,6 +36,7 @@ class NetworkUtils:
         self.broadcastAddress = Address((self.ip, self.BROADCAST_PORT))
         self.broadcastSock = None
         self.initBroadcast()
+        self.broadcastRequestConnection()
 
     def initBroadcast(self):
         self.broadcastSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
