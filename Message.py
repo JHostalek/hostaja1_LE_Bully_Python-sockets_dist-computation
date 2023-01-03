@@ -1,9 +1,6 @@
 import abc
 import pickle
 
-import Address
-import Node
-
 
 class Message(abc.ABC):
     def __init__(self):
@@ -26,6 +23,6 @@ class AcceptingConnection(Message):
 
 
 class TestMessage(Message):
-    def __init__(self, sender: Node, receiver: Address):
+    def __init__(self, message: str):
         super().__init__()
-        self.message = f'TCP test message from {sender.nu.ip} to {receiver}'
+        self.message = message
