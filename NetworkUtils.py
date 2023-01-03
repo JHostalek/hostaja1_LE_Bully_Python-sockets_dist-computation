@@ -73,10 +73,10 @@ class NetworkUtils:
         self.send(TestMessage(Address((self.ip, self.PORT)), address).toBytes(), address)
 
     def broadcastRequestConnection(self):
-        self.broadcastSock.sendto(RequestingConnection(self.broadcastAddress).toBytes(), ('192.168.56.255', self.BROADCAST_PORT))
+        self.broadcastSock.sendto(RequestingConnection().toBytes(), ('192.168.56.255', self.BROADCAST_PORT))
 
     def sendAcceptingConnection(self, address: Address):
-        self.broadcastSock.sendto(AcceptingConnection(self.broadcastAddress).toBytes(), address.address)
+        self.broadcastSock.sendto(AcceptingConnection().toBytes(), address.address)
 
     def initSock(self, address: Address):
         self.neighborSocks.append(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
