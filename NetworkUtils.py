@@ -1,5 +1,8 @@
+import pickle
 import socket
 import threading
+
+from Message import NotifyAllMessage
 
 
 class NetworkUtils:
@@ -32,7 +35,8 @@ class NetworkUtils:
             print('Listening for messages...')
             data, address = self.broadcastSock.recvfrom(1024)
             if address == (self.ip, self.BROADCAST_PORT): continue
-            print(f'{self.ip} - Received message from {address} : {data}')
+            message: NotifyAllMessage = pickle.loads(data)
+            print(f'{self.ip} - Received message from {address} : {message.clock} ({message.timestamp}) {message.message}')
 
     def sendBroadcast(self, payload: bytes):
         # TODO: ALLOW LOCALHOST
