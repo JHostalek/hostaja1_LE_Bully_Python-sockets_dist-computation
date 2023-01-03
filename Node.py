@@ -1,3 +1,4 @@
+import threading
 import time
 
 from Address import Address
@@ -9,13 +10,15 @@ class Node:
     def __init__(self):
         self.state = None
         self.nu = NetworkUtils(self)
+        self.neighbors_lock = threading.Lock()
         self.neighbors = set()
         self.leader = None
         self.MINIMUM_NEIGHBORS = 2
         self.WAIT_TIME = 5
 
     def handleNewConnection(self, neighbor: Address):
-        self.neighbors.add(neighbor.ip)
+        with self.neighbors_lock:
+            self.neighbors.add(neighbor.ip)
         if len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
             print("Minimum number of neighbors reached")
             if self.leader is None:
