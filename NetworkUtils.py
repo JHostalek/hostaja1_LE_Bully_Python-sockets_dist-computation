@@ -24,6 +24,7 @@ class NetworkUtils:
         self.BROADCAST_PORT = 5555
         self.PORT = 5556
         self.MAX_CONNECTIONS = 10
+        self.SOCKET_TIMEOUT = 0.1
 
         self.terminate: threading.Event = threading.Event()
         self.node = node
@@ -44,7 +45,7 @@ class NetworkUtils:
         self.broadcastSock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         self.broadcastSock.setsockopt(socket.IPPROTO_IP, socket.IP_TTL, 1)
         bind_address = ('192.168.56.255', self.BROADCAST_PORT)
-        self.broadcastSock.settimeout(1)
+        self.broadcastSock.settimeout(self.SOCKET_TIMEOUT)
         self.broadcastSock.bind(bind_address)
         receive_thread = threading.Thread(target=self.listenBroadcast)
         receive_thread.start()
@@ -57,7 +58,7 @@ class NetworkUtils:
                 message = pickle.loads(data)
                 if address != self.broadcastAddress:
                     if isinstance(message, RequestConnectionMessage):
-                        print(f"{self.broadcastAddress} - Received connection request from {address}")
+                        print(f"{self.TAG}Received connection request from {address}")
                         self.handleConnectionRequest(address)
                     else:
                         print(f"Received unknown broadcast message: {message}")
@@ -82,7 +83,7 @@ class NetworkUtils:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.bind((self.ip, self.PORT))
         self.sock.listen(self.MAX_CONNECTIONS)
-        self.sock.settimeout(1)
+        self.sock.settimeout(self.SOCKET_TIMEOUT)
         receive_thread = threading.Thread(target=self.listen)
         receive_thread.start()
 
