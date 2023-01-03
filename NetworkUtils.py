@@ -80,7 +80,7 @@ class NetworkUtils:
 
     def sendAcceptingConnection(self, address: Address):
         print(f"{self.broadcastAddress} - Sending connection acceptance to {address}")
-        self.broadcastSock.sendto(AcceptingConnection().toBytes(), address.address)
+        print(self.broadcastSock.sendto(AcceptingConnection().toBytes(), address.address))
 
     def initSock(self, address: Address):
         self.neighborSocks.append(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
