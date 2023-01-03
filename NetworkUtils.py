@@ -17,9 +17,7 @@ class NetworkUtils:
         self.node = node
         self.ip = self.parseIp()
 
-        self.sock = None
-        self.initSock()
-        self.Address = Address((self.ip, self.PORT))
+        self.neighborSocks = []
 
         self.broadcastSock = None
         self.initBroadcast()
@@ -67,18 +65,18 @@ class NetworkUtils:
         matches = re.findall(address_pattern, output)
         return matches[2]
 
-    def initSock(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.bind((self.ip, self.PORT))
-        self.sock.listen(self.MAX_CONNECTIONS)
-        receive_thread = threading.Thread(target=self.listen)
+    def initSock(self, address: Address):
+        self.neighborSocks.append(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
+        self.neighborSocks[-1].bind(address.address)
+        self.neighborSocks[-1].listen(self.MAX_CONNECTIONS)
+        receive_thread = threading.Thread(target=self.listen, args=(self.neighborSocks[-1],))
         receive_thread.start()
 
-    def listen(self):
+    def listen(self, sock):
         while not self.terminate.is_set():
-            client, address = self.sock.accept()
+            client, address = sock.accept()
             address = Address(address)
-            receive_thread = threading.Thread(target=self.receive, args=(client, address,))
+            receive_thread = threading.Thread(target=self.receive, args=(client, address))
             receive_thread.start()
 
     def receive(self, client, address: Address):
