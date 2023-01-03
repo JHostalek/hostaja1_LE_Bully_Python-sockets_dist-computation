@@ -68,7 +68,7 @@ class NetworkUtils:
                 break
 
     def handleConnectionRequest(self, sender: Address):
-        self.node.addNeighbor(sender)
+        self.node.handleNewConnection(sender)
         self.sendConnectionAcceptance(Address((sender.ip, self.PORT)))
 
     def broadcastRequestConnection(self):
@@ -106,7 +106,16 @@ class NetworkUtils:
                     message = pickle.loads(message)
                     if isinstance(message, AcceptConnectionMessage):
                         print(f"{self.broadcastAddress} - Received connection acceptance from {address}")
-                        self.node.addNeighbor(address)
+                        self.node.handleNewConnection(address)
+                    elif isinstance(message, ElectionMessage):
+                        print(f"{self.broadcastAddress} - Received election message from {address}")
+                        self.node.handleElectionMessage(message, address)
+                    elif isinstance(message, VictoryMessage):
+                        print(f"{self.broadcastAddress} - Received victory message from {address}")
+                        self.node.handleVictoryMessage(message, address)
+                    elif isinstance(message, AliveMessage):
+                        print(f"{self.broadcastAddress} - Received alive message from {address}")
+                        self.node.handleAliveMessage(message, address)
                     else:
                         print(f"Received unknown message: {message}")
             except socket.timeout:

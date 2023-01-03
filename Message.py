@@ -22,6 +22,24 @@ class AcceptConnectionMessage(Message):
         self.message = "Accepting connection"
 
 
+class ElectionMessage(Message):
+    def __init__(self):
+        super().__init__()
+        self.message = "Election"
+
+
+class AliveMessage(Message):
+    def __init__(self):
+        super().__init__()
+        self.message = "Alive"
+
+
+class VictoryMessage(Message):
+    def __init__(self):
+        super().__init__()
+        self.message = "Victory"
+
+
 class TestMessage(Message):
     def __init__(self, message: str):
         super().__init__()
