@@ -2,6 +2,7 @@ import pickle
 import socket
 import threading
 
+import Message
 import Node
 from Address import Address
 from Message import RequestingConnection, TestMessage
@@ -33,7 +34,7 @@ class NetworkUtils:
 
         self.neighborSocks = []
         self.sock = None
-        self.initSock()
+        self.initListeningSocket()
 
         self.broadcastAddress = Address((self.ip, self.BROADCAST_PORT))
         self.broadcastSock = None
@@ -67,15 +68,17 @@ class NetworkUtils:
 
     def handleConnectionRequest(self, sender: Address):
         self.node.neighbors.add(sender)
-        self.sendAcceptingConnection(Address((sender.ip, self.PORT)))
+        print(f"{self.broadcastAddress} - Accepting connection from {sender}")
+        print(f"{self.broadcastAddress} - {self.node.neighbors}")
+        self.sendConnectionAcceptance(Address((sender.ip, self.PORT)))
 
     def broadcastRequestConnection(self):
         self.broadcastSock.sendto(RequestingConnection().toBytes(), ('192.168.56.255', self.BROADCAST_PORT))
 
-    def sendAcceptingConnection(self, address: Address):
+    def sendConnectionAcceptance(self, address: Address):
         self.send(TestMessage("TCP DEBUG MESSAGE").toBytes(), address)
 
-    def initSock(self):
+    def initListeningSocket(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.bind((self.ip, self.PORT))
         self.sock.listen(self.MAX_CONNECTIONS)
@@ -101,8 +104,8 @@ class NetworkUtils:
                 print(f"{self.broadcastAddress} - Connection to {address} lost")
                 pass
 
-    def send(self, payload: bytes, address: Address):
+    def send(self, message: Message, address: Address):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(address.address)
-        client.send(payload)
+        client.send(message.toBytes())
         client.close()
