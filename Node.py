@@ -1,5 +1,4 @@
 import Address
-
 from Message import NotifyAllMessage, Message, TestMessage
 from NetworkUtils import NetworkUtils
 
@@ -17,7 +16,8 @@ class Node:
         self.neighbors |= {sender}
         print(f"{self.nu.broadcastAddress} - My neighbors are {self.neighbors}")
         for neighbor in self.neighbors:
-            self.nu.send(TestMessage(self, neighbor).toBytes(), neighbor)
+            target = Address((neighbor.ip, self.nu.PORT))
+            self.nu.send(TestMessage(self, neighbor).toBytes(), target)
 
     def processMessage(self, message: Message, sender: Address):
         pass
