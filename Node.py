@@ -33,15 +33,14 @@ class Node:
         """
         Handles an Election message
         """
-        if address.ip < self.nu.ip:
-            self.sendAliveMessage(address)
-        if self.state == "ELECTION":
-            pass
-        elif self.state == "COORDINATOR":
+        if self.leader is not None:
             self.nu.send(LeaderExistsMessage(), Address((address.ip, self.nu.PORT)))
-        else:
+            return
+        if self.state != "ELECTION":
             self.state = "ELECTION"
             self.bullyElection()
+        if address.ip < self.nu.ip:
+            self.sendAliveMessage(address)
 
     def handleLeaderExistsMessage(self, message, address):
         self.state = "FOLLOWER"
