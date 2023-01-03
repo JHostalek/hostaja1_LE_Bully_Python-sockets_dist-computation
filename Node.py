@@ -28,7 +28,7 @@ class Node:
         Handles an Election message
         """
         if address.ip < self.nu.ip:
-            self.sendAliveMessage()
+            self.sendAliveMessage(address)
         if self.state == "ELECTION":
             pass
         elif self.state == "COORDINATOR":
@@ -69,11 +69,11 @@ class Node:
             if self.state == "ELECTION":
                 self.sendVictoryMessage()
 
-    def sendAliveMessage(self):
+    def sendAliveMessage(self, address: Address):
         """
         Sends an Alive message to the node that sent the Election message
         """
-        self.nu.send(AliveMessage(), Address((self.leader, self.nu.PORT)))
+        self.nu.send(AliveMessage(), Address((address.ip, self.nu.PORT)))
 
     def sendElectionMessage(self):
         """
