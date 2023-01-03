@@ -2,6 +2,7 @@ import abc
 import pickle
 import time
 
+import Address
 import Node
 
 
@@ -18,3 +19,9 @@ class NotifyAllMessage(Message):
     def __init__(self, sender: Node):
         super().__init__(sender)
         self.message = "Notifying others of my existence"
+
+
+class TestMessage(Message):
+    def __init__(self, sender: Node, receiver: Address):
+        super().__init__(sender)
+        self.message = f'TCP test message from {sender.nu.Address} to {receiver}'

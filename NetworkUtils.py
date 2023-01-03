@@ -90,3 +90,9 @@ class NetworkUtils:
                     self.node.processMessage(message, address)
             except:
                 pass
+
+    def send(self, payload: bytes, address: Address):
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect(address.address)
+        client.send(payload)
+        client.close()
