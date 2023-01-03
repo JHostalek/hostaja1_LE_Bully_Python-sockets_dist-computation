@@ -15,16 +15,18 @@ class Node:
         self.MINIMUM_NEIGHBORS = 2
         self.WAIT_TIME = 5
 
+        self.TAG = self.nu.ip + " - "
+
     def handleNewConnection(self, message, address):
         if message is not None:
             self.leader = message.leader
-            print(f'Established connection with {address.ip}, leader is {self.leader}')
+            print(f'{self.TAG}Established connection with {address}, leader is {self.leader}')
         else:
-            print(f'Established connection with {address.ip}')
+            print(f'{self.TAG}Established connection with {address}')
         with self.neighbors_lock:
             self.neighbors.add(address.ip)
         if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
-            print(f'{self.nu.ip} - STARTING ELECTIONS - neighbors: {self.neighbors}')
+            print(f'{self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
             self.bullyElection()
 
     def handleElectionMessage(self, message, address):
@@ -44,7 +46,7 @@ class Node:
     def handleLeaderExistsMessage(self, message, address):
         self.state = "FOLLOWER"
         self.leader = address.ip
-        print(f"FOLLOWER, ALREADY EXISTING LEADER: {self.leader}")
+        print(f"{self.TAG}FOLLOWER, ALREADY EXISTING LEADER: {self.leader}")
 
     def handleVictoryMessage(self, message, address):
         """
@@ -52,7 +54,7 @@ class Node:
         """
         self.state = "FOLLOWER"
         self.leader = address.ip
-        print(f"FOLLOWER, NEW LEADER IS: {self.leader}")
+        print(f"{self.TAG}FOLLOWER, NEW LEADER IS: {self.leader}")
 
     def handleAliveMessage(self, message, address):
         """
@@ -65,7 +67,7 @@ class Node:
         Implementation of the Bully Algorithm
         """
         if len(self.neighbors) < self.MINIMUM_NEIGHBORS:
-            print("Not enough neighbors to start election")
+            print(f"{self.TAG}Not enough neighbors to start election")
             return
         self.sendElectionMessage()
         time.sleep(self.WAIT_TIME)
@@ -94,7 +96,7 @@ class Node:
         """
         self.state = "COORDINATOR"
         self.leader = self.nu.ip
-        print(f"I AM THE NEW LEADER")
+        print(f"{self.TAG}I AM THE NEW LEADER")
         with self.neighbors_lock:
             for neighbor in self.neighbors:
                 self.nu.send(VictoryMessage(), Address((neighbor, self.nu.PORT)))

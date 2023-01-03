@@ -28,6 +28,7 @@ class NetworkUtils:
         self.terminate: threading.Event = threading.Event()
         self.node = node
         self.ip = parseIp()
+        self.TAG = self.ip + " - "
 
         self.neighborSocks = []
         self.sock = None
@@ -72,9 +73,9 @@ class NetworkUtils:
 
     def sendConnectionAcceptance(self, address: Address):
         if self.node.leader is not None:
-            print(f"{self.ip} - Sending connection acceptance to {address}, with leader {self.node.leader}")
+            print(f"{self.TAG}Sending connection acceptance to {address}, with leader {self.node.leader}")
         else:
-            print(f"{self.ip} - Sending connection acceptance to {address}, without leader")
+            print(f"{self.TAG}Sending connection acceptance to {address}, without leader")
         self.send(AcceptConnectionMessage(Address((self.node.leader, self.PORT))), address)
 
     def initListeningSocket(self):
@@ -102,22 +103,22 @@ class NetworkUtils:
                 if message:
                     message = pickle.loads(message)
                     if isinstance(message, AcceptConnectionMessage):
-                        print(f"{self.broadcastAddress} - Received connection acceptance from {address}")
+                        print(f"{self.TAG}Received connection acceptance from {address}")
                         self.node.handleNewConnection(message, address)
                     elif isinstance(message, ElectionMessage):
-                        print(f"{self.broadcastAddress} - Received election message from {address}")
+                        print(f"{self.TAG}Received election message from {address}")
                         self.node.handleElectionMessage(message, address)
                     elif isinstance(message, VictoryMessage):
-                        print(f"{self.broadcastAddress} - Received victory message from {address}")
+                        print(f"{self.TAG}Received victory message from {address}")
                         self.node.handleVictoryMessage(message, address)
                     elif isinstance(message, AliveMessage):
-                        print(f"{self.broadcastAddress} - Received alive message from {address}")
+                        print(f"{self.TAG}Received alive message from {address}")
                         self.node.handleAliveMessage(message, address)
                     elif isinstance(message, LeaderExistsMessage):
-                        print(f"{self.broadcastAddress} - Received leader exists message from {address}")
+                        print(f"{self.TAG}Received leader exists message from {address}")
                         self.node.handleLeaderExistsMessage(message, address)
                     else:
-                        print(f"Received unknown message: {message}")
+                        print(f"{self.TAG}Received unknown message: {message}")
             except socket.timeout:
                 pass
 
