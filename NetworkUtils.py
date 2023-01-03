@@ -4,7 +4,7 @@ import threading
 
 import Node
 from Address import Address
-from Message import RequestingConnection, TestMessage, AcceptingConnection
+from Message import RequestingConnection, TestMessage
 
 
 def parseIp() -> str:
@@ -62,9 +62,6 @@ class NetworkUtils:
                 if isinstance(message, RequestingConnection):
                     print(f"{self.broadcastAddress} - Received connection request from {address}")
                     self.processConnectionRequest(address)
-                elif isinstance(message, AcceptingConnection):
-                    print(f"{self.broadcastAddress} - Received connection acceptance from {address}")
-                    self.processConnectionAcceptance(address)
                 else:
                     print(f"Received unknown broadcast message: {message}")
 
@@ -72,14 +69,11 @@ class NetworkUtils:
         self.node.neighbors.add(sender)
         self.sendAcceptingConnection(sender)
 
-    def processConnectionAcceptance(self, address):
-        self.send(TestMessage(Address((self.ip, self.PORT)), address).toBytes(), address)
-
     def broadcastRequestConnection(self):
         self.broadcastSock.sendto(RequestingConnection().toBytes(), ('192.168.56.255', self.BROADCAST_PORT))
 
     def sendAcceptingConnection(self, address: Address):
-        self.send(AcceptingConnection().toBytes(), address)
+        self.send(TestMessage(Address((self.ip, self.PORT)), address).toBytes(), address)
 
     def initSock(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -110,7 +104,7 @@ class NetworkUtils:
 
     def send(self, payload: bytes, address: Address):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print(f'DEBUG: {self.ip} - Sending message to {address}')
+        print(f'DEBUG: {self.ip} - Sending message to {address.address}')
         client.connect(address.address)
         client.send(payload)
         client.close()
