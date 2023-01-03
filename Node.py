@@ -17,7 +17,7 @@ class Node:
         self.neighbors |= {sender}
         print(f"{self.nu.broadcastAddress} - My neighbors are {self.neighbors}")
         for neighbor in self.neighbors:
-            self.nu.send(neighbor, TestMessage(self, neighbor).toBytes())
+            self.nu.send(TestMessage(self, neighbor).toBytes(), neighbor)
 
     def processMessage(self, message: Message, sender: Address):
         pass
