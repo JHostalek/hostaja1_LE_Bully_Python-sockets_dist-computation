@@ -110,6 +110,9 @@ class NetworkUtils:
                     elif isinstance(message, AliveMessage):
                         print(f"{self.broadcastAddress} - Received alive message from {address}")
                         self.node.handleAliveMessage(message, address)
+                    elif isinstance(message, LeaderExistsMessage):
+                        print(f"{self.broadcastAddress} - Received leader exists message from {address}")
+                        self.node.handleLeaderExistsMessage(message, address)
                     else:
                         print(f"Received unknown message: {message}")
             except socket.timeout:

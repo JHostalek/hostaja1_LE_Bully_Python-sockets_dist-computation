@@ -2,7 +2,7 @@ import threading
 import time
 
 from Address import Address
-from Message import ElectionMessage, VictoryMessage, AliveMessage
+from Message import *
 from NetworkUtils import NetworkUtils
 
 
@@ -20,10 +20,8 @@ class Node:
         with self.neighbors_lock:
             self.neighbors.add(neighbor.ip)
             if len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
-                print("Minimum number of neighbors reached")
                 if self.leader is None:
-                    print("I don't have a leader, initiating election")
-                    print(f'Neighbors: {self.neighbors}')
+                    print(f'I dont have a leader, initiating election. Neighbors: {self.neighbors}')
                     self.bullyElection()
 
     def handleElectionMessage(self, message, address):
@@ -35,11 +33,15 @@ class Node:
         if self.state == "ELECTION":
             pass
         elif self.state == "COORDINATOR":
-            # This node is the coordinator, send Victory message to the node that sent the Election message
-            self.nu.send(VictoryMessage(), Address((address.ip, self.nu.PORT)))
+            self.nu.send(LeaderExistsMessage(), Address((address.ip, self.nu.PORT)))
         else:
             self.state = "ELECTION"
             self.bullyElection()
+
+    def handleLeaderExistsMessage(self, message, address):
+        self.state = "FOLLOWER"
+        self.leader = address.ip
+        print(f"NEW LEADER HAS BEEN ELECTED: {self.leader}")
 
     def handleVictoryMessage(self, message, address):
         """
@@ -47,7 +49,7 @@ class Node:
         """
         self.state = "FOLLOWER"
         self.leader = address.ip
-        print(f"New leader: {self.leader}")
+        print(f"NEW LEADER HAS BEEN ELECTED: {self.leader}")
 
     def handleAliveMessage(self, message, address):
         """
@@ -65,14 +67,10 @@ class Node:
             return
         highest_id = self.findHighestID(self.neighbors)
         if self.nu.ip == highest_id:
-            # Send Victory message to all other processes and become the coordinator
             self.sendVictoryMessage()
         else:
-            # Broadcast Election message to all processes with higher IDs
             self.sendElectionMessage()
-            # Wait for a period of time for an Answer message
             time.sleep(self.WAIT_TIME)
-            # If no Answer message received, broadcast Victory message and become coordinator
             if self.state == "ELECTION":
                 self.sendVictoryMessage()
 

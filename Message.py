@@ -40,6 +40,12 @@ class VictoryMessage(Message):
         self.message = "Victory"
 
 
+class LeaderExistsMessage(Message):
+    def __init__(self):
+        super().__init__()
+        self.message = "Leader exists"
+
+
 class TestMessage(Message):
     def __init__(self, message: str):
         super().__init__()
