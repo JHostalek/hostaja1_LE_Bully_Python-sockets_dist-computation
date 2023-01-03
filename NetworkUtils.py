@@ -4,7 +4,7 @@ import threading
 
 import Node
 from Address import Address
-from Message import NotifyAllMessage
+from Message import NotifyAllMessage, TestMessage
 
 
 class NetworkUtils:
@@ -86,7 +86,7 @@ class NetworkUtils:
             try:
                 data = client.recv(1024)
                 if data:
-                    message = pickle.loads(data)
+                    message: TestMessage = pickle.loads(data)
                     self.node.processMessage(message, address)
             except:
                 pass
