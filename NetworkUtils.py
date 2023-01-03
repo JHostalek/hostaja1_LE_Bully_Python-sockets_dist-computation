@@ -51,15 +51,21 @@ class NetworkUtils:
 
     def listenBroadcast(self):
         while not self.terminate.is_set():
-            data, address = self.broadcastSock.recvfrom(1024)
-            address = Address(address)
-            message = pickle.loads(data)
-            if address != self.broadcastAddress:
-                if isinstance(message, RequestConnectionMessage):
-                    print(f"{self.broadcastAddress} - Received connection request from {address}")
-                    self.handleConnectionRequest(address)
-                else:
-                    print(f"Received unknown broadcast message: {message}")
+            try:
+                data, address = self.broadcastSock.recvfrom(1024)
+                address = Address(address)
+                message = pickle.loads(data)
+                if address != self.broadcastAddress:
+                    if isinstance(message, RequestConnectionMessage):
+                        print(f"{self.broadcastAddress} - Received connection request from {address}")
+                        self.handleConnectionRequest(address)
+                    else:
+                        print(f"Received unknown broadcast message: {message}")
+            except socket.timeout:
+                pass
+            except Exception as e:
+                print(e)
+                break
 
     def handleConnectionRequest(self, sender: Address):
         self.node.addNeighbor(sender)
@@ -97,9 +103,11 @@ class NetworkUtils:
                         self.node.addNeighbor(address)
                     else:
                         print(f"Received unknown message: {message}")
-            except:
-                print(f"{self.broadcastAddress} - Connection to {address} lost")
+            except socket.timeout:
                 pass
+            except Exception as e:
+                print(e)
+                break
 
     def send(self, message: Message, address: Address):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
