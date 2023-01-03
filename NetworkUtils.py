@@ -32,6 +32,8 @@ class NetworkUtils:
         self.ip = parseIp()
 
         self.neighborSocks = []
+        self.sock = None
+        self.initSock()
 
         self.broadcastAddress = Address((self.ip, self.BROADCAST_PORT))
         self.broadcastSock = None
@@ -71,27 +73,24 @@ class NetworkUtils:
         self.sendAcceptingConnection(sender)
 
     def processConnectionAcceptance(self, address):
-        self.node.neighbors.add(address)
-        self.initSock(address)
         self.send(TestMessage(Address((self.ip, self.PORT)), address).toBytes(), address)
 
     def broadcastRequestConnection(self):
         self.broadcastSock.sendto(RequestingConnection().toBytes(), ('192.168.56.255', self.BROADCAST_PORT))
 
     def sendAcceptingConnection(self, address: Address):
-        print(f"{self.broadcastAddress} - Sending connection acceptance to {address}")
-        print(self.broadcastSock.sendto(AcceptingConnection().toBytes(), address.address))
+        self.send(AcceptingConnection().toBytes(), address)
 
-    def initSock(self, address: Address):
-        self.neighborSocks.append(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
-        self.neighborSocks[-1].bind(address.address)
-        self.neighborSocks[-1].listen(self.MAX_CONNECTIONS)
-        receive_thread = threading.Thread(target=self.listen, args=(self.neighborSocks[-1],))
+    def initSock(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.bind((self.ip, self.PORT))
+        self.sock.listen(self.MAX_CONNECTIONS)
+        receive_thread = threading.Thread(target=self.listen)
         receive_thread.start()
 
-    def listen(self, sock):
+    def listen(self):
         while not self.terminate.is_set():
-            client, address = sock.accept()
+            client, address = self.sock.accept()
             address = Address(address)
             receive_thread = threading.Thread(target=self.receive, args=(client, address))
             receive_thread.start()
