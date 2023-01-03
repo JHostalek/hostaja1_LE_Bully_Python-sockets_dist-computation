@@ -93,12 +93,14 @@ class NetworkUtils:
     def receive(self, client, address: Address):
         while not self.terminate.is_set():
             try:
-                message = pickle.loads(client.recv(1024))
-                if isinstance(message, AcceptConnectionMessage):
-                    print(f"{self.broadcastAddress} - Received connection acceptance from {address}")
-                    self.node.addNeighbor(address)
-                else:
-                    print(f"Received unknown message: {message}")
+                message = client.recv(1024)
+                if message:
+                    message = pickle.loads(message)
+                    if isinstance(message, AcceptConnectionMessage):
+                        print(f"{self.broadcastAddress} - Received connection acceptance from {address}")
+                        self.node.addNeighbor(address)
+                    else:
+                        print(f"Received unknown message: {message}")
             except:
                 print(f"{self.broadcastAddress} - Connection to {address} lost")
                 pass
