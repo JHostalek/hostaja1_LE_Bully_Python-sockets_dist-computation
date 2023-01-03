@@ -36,7 +36,7 @@ class NetworkUtils:
             data, address = self.broadcastSock.recvfrom(1024)
             if address == (self.ip, self.BROADCAST_PORT): continue
             message: NotifyAllMessage = pickle.loads(data)
-            node.processBroadcast(message)
+            self.node.processBroadcast(message)
 
     def sendBroadcast(self, payload: bytes):
         # TODO: ALLOW LOCALHOST
