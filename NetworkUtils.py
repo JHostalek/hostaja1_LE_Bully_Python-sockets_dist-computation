@@ -63,9 +63,6 @@ class NetworkUtils:
                         print(f"Received unknown broadcast message: {message}")
             except socket.timeout:
                 pass
-            except Exception as e:
-                print(e)
-                break
 
     def handleConnectionRequest(self, sender: Address):
         self.node.handleNewConnection(sender)
@@ -94,9 +91,6 @@ class NetworkUtils:
                 receive_thread.start()
             except socket.timeout:
                 pass
-            except Exception as e:
-                print(e)
-                break
 
     def receive(self, client, address: Address):
         while not self.terminate.is_set():
@@ -120,9 +114,6 @@ class NetworkUtils:
                         print(f"Received unknown message: {message}")
             except socket.timeout:
                 pass
-            except Exception as e:
-                print(e)
-                break
 
     def send(self, message: Message, address: Address):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
