@@ -1,7 +1,7 @@
 import abc
 import pickle
 
-import Address
+from Address import Address
 
 
 class Message(abc.ABC):
