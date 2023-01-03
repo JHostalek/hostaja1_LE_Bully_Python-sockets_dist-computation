@@ -14,3 +14,4 @@ class Node:
             print("Minimum number of neighbors reached")
             if self.leader is None:
                 print("I don't have a leader, initiating election")
+                print(f'Neighbors: {self.neighbors}')
