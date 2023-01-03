@@ -9,11 +9,18 @@ from Message import NotifyAllMessage
 
 class NetworkUtils:
     def __init__(self, node: Node):
+        self.BROADCAST_PORT = 5555
+        self.PORT = 5556
+        self.MAX_CONNECTIONS = 10
 
         self.terminate: threading.Event = threading.Event()
         self.node = node
         self.ip = self.parseIp()
-        self.BROADCAST_PORT = 5555
+
+        self.sock = None
+        self.initSock()
+        self.Address = Address((self.ip, self.PORT))
+
         self.broadcastSock = None
         self.initBroadcast()
         self.broadcastAddress = Address((self.ip, self.BROADCAST_PORT))
@@ -59,3 +66,27 @@ class NetworkUtils:
         address_pattern = r"inet (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
         matches = re.findall(address_pattern, output)
         return matches[2]
+
+    def initSock(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.bind((self.ip, self.PORT))
+        self.sock.listen(self.MAX_CONNECTIONS)
+        receive_thread = threading.Thread(target=self.listen)
+        receive_thread.start()
+
+    def listen(self):
+        while not self.terminate.is_set():
+            client, address = self.sock.accept()
+            address = Address(address)
+            receive_thread = threading.Thread(target=self.receive, args=(client, address,))
+            receive_thread.start()
+
+    def receive(self, client, address: Address):
+        while not self.terminate.is_set():
+            try:
+                data = client.recv(1024)
+                if data:
+                    message = pickle.loads(data)
+                    self.node.processMessage(message, address)
+            except:
+                pass

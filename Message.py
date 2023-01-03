@@ -1,14 +1,20 @@
+import abc
 import pickle
 import time
 
 import Node
 
 
-class NotifyAllMessage:
+class Message(abc.ABC):
     def __init__(self, sender: Node):
-        self.message = "Notifying other nodes of my existence"
+        self.timestamp = time.time()
         self.clock = sender.clock
-        self.timestamp = time.strftime("%H:%M:%S", time.localtime(time.time()))
 
     def toBytes(self):
         return pickle.dumps(self)
+
+
+class NotifyAllMessage(Message):
+    def __init__(self, sender: Node):
+        super().__init__(sender)
+        self.message = "Notifying others of my existence"
