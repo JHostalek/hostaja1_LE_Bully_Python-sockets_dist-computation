@@ -41,7 +41,7 @@ class Node:
     def handleLeaderExistsMessage(self, message, address):
         self.state = "FOLLOWER"
         self.leader = address.ip
-        print(f"NEW LEADER HAS BEEN ELECTED: {self.leader}")
+        print(f"FOLLOWER, ALREADY EXISTING LEADER: {self.leader}")
 
     def handleVictoryMessage(self, message, address):
         """
@@ -49,14 +49,13 @@ class Node:
         """
         self.state = "FOLLOWER"
         self.leader = address.ip
-        print(f"NEW LEADER HAS BEEN ELECTED: {self.leader}")
+        print(f"FOLLOWER, NEW LEADER IS: {self.leader}")
 
     def handleAliveMessage(self, message, address):
         """
         Handles an Alive message
         """
         self.state = "WAITING"
-        print(f"Received Alive message from {address.ip}, waiting for victory message")
 
     def bullyElection(self):
         """
@@ -95,7 +94,7 @@ class Node:
         """
         self.state = "COORDINATOR"
         self.leader = self.nu.ip
-        print(f"New leader: {self.leader}")
+        print(f"I AM THE NEW LEADER")
         for neighbor in self.neighbors:
             self.nu.send(VictoryMessage(), Address((neighbor, self.nu.PORT)))
 
