@@ -43,10 +43,10 @@ class NetworkUtils:
         self.broadcastSock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         self.broadcastSock.setsockopt(socket.IPPROTO_IP, socket.IP_TTL, 1)
         bind_address = ('192.168.56.255', self.BROADCAST_PORT)
-        with self.broadcastSock:
-            self.broadcastSock.bind(bind_address)
-            receive_thread = threading.Thread(target=self.listenBroadcast)
-            receive_thread.start()
+
+        self.broadcastSock.bind(bind_address)
+        receive_thread = threading.Thread(target=self.listenBroadcast)
+        receive_thread.start()
 
     def listenBroadcast(self):
         while not self.terminate.is_set():
