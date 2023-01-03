@@ -15,10 +15,16 @@ class Message(abc.ABC):
         return pickle.dumps(self)
 
 
-class NotifyAllMessage(Message):
+class RequestingConnection(Message):
     def __init__(self, sender: Node):
         super().__init__(sender)
-        self.message = "Notifying others of my existence"
+        self.message = "Requesting connection"
+
+
+class AcceptingConnection(Message):
+    def __init__(self, sender: Node):
+        super().__init__(sender)
+        self.message = "Accepting connection"
 
 
 class TestMessage(Message):

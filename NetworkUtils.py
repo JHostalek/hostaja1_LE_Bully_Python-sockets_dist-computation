@@ -4,7 +4,21 @@ import threading
 
 import Node
 from Address import Address
-from Message import NotifyAllMessage, TestMessage
+from Message import RequestingConnection, TestMessage, AcceptingConnection
+
+
+def parseIp() -> str:
+    """
+    Parse the IP address from the output of ifconfig
+    Works on Linux only (requires bash ip -a call)
+    :return: ip address as string (e.g. "192.168.56.xxx")
+    """
+    import re
+    import subprocess
+    output = subprocess.run(["ip", "a"], stdout=subprocess.PIPE).stdout.decode()
+    address_pattern = r"inet (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
+    matches = re.findall(address_pattern, output)
+    return matches[2]
 
 
 class NetworkUtils:
@@ -15,55 +29,52 @@ class NetworkUtils:
 
         self.terminate: threading.Event = threading.Event()
         self.node = node
-        self.ip = self.parseIp()
+        self.ip = parseIp()
 
         self.neighborSocks = []
 
+        self.broadcastAddress = Address((self.ip, self.BROADCAST_PORT))
         self.broadcastSock = None
         self.initBroadcast()
-        self.broadcastAddress = Address((self.ip, self.BROADCAST_PORT))
 
     def initBroadcast(self):
-        # Create the socket
         self.broadcastSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.broadcastSock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         self.broadcastSock.setsockopt(socket.IPPROTO_IP, socket.IP_TTL, 1)
-
-        # Set the IP and port to listen on
-        # TODO: ALLOW LOCALHOST
         bind_address = ('192.168.56.255', self.BROADCAST_PORT)
-
-        # Bind to the specific IP address and port
-        self.broadcastSock.bind(bind_address)
-        # Create threads for sending and receiving messages
-        receive_thread = threading.Thread(target=self.listenBroadcast)
-        receive_thread.start()
+        with self.broadcastSock:
+            self.broadcastSock.bind(bind_address)
+            receive_thread = threading.Thread(target=self.listenBroadcast)
+            receive_thread.start()
 
     def listenBroadcast(self):
         while not self.terminate.is_set():
             data, address = self.broadcastSock.recvfrom(1024)
             address = Address(address)
-            # Ignore broadcast messages from self
             if address != self.broadcastAddress:
-                message: NotifyAllMessage = pickle.loads(data)
-                self.node.processBroadcast(message, address)
+                message = pickle.loads(data)
+                if isinstance(message, RequestingConnection):
+                    print(f"{self.broadcastAddress} - Received connection request from {address}")
+                    self.processConnectionRequest(address)
+                elif isinstance(message, AcceptingConnection):
+                    print(f"{self.broadcastAddress} - Received connection acceptance from {address}")
+                    self.processConnectionAcceptance(address)
+                else:
+                    print(f"Received unknown broadcast message: {message}")
 
-    def sendBroadcast(self, payload: bytes):
-        # TODO: ALLOW LOCALHOST
-        self.broadcastSock.sendto(payload, ('192.168.56.255', self.BROADCAST_PORT))
+    def processConnectionRequest(self, sender: Address):
+        self.node.neighbors.add(sender)
+        self.sendAcceptingConnection(sender)
 
-    def parseIp(self) -> str:
-        """
-        Parse the IP address from the output of ifconfig
-        Works on Linux only (requires bash ip -a call)
-        :return: ip address as string (e.g. "192.168.56.xxx")
-        """
-        import re
-        import subprocess
-        output = subprocess.run(["ip", "a"], stdout=subprocess.PIPE).stdout.decode()
-        address_pattern = r"inet (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
-        matches = re.findall(address_pattern, output)
-        return matches[2]
+    def processConnectionAcceptance(self, address):
+        self.node.neighbors.add(address)
+        self.initSock(address)
+
+    def broadcastRequestConnection(self):
+        self.broadcastSock.sendto(RequestingConnection(self.broadcastAddress).toBytes(), ('192.168.56.255', self.BROADCAST_PORT))
+
+    def sendAcceptingConnection(self, address: Address):
+        self.broadcastSock.sendto(AcceptingConnection(self.broadcastAddress).toBytes(), address.address)
 
     def initSock(self, address: Address):
         self.neighborSocks.append(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
