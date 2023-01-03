@@ -90,6 +90,7 @@ class Node:
         """
         self.state = "COORDINATOR"
         self.leader = self.nu.ip
+        print(f"New leader: {self.leader}")
         for neighbor in self.neighbors:
             self.nu.send(VictoryMessage(), Address((neighbor, self.nu.PORT)))
 
