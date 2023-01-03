@@ -7,7 +7,7 @@ import Node
 
 class Message(abc.ABC):
     def __init__(self, sender: Node):
-        self.timestamp = time.time()
+        self.timestamp = time.strftime("%H:%M:%S", time.localtime())
         self.clock = sender.clock
 
     def toBytes(self):
