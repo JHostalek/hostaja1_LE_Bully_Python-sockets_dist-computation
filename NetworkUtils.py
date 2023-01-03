@@ -34,9 +34,9 @@ class NetworkUtils:
             if address == (self.ip, self.BROADCAST_PORT): continue
             print(f'{self.ip} - Received message from {address} : {data}')
 
-    def sendBroadcast(self, message: str):
+    def sendBroadcast(self, payload: bytes):
         # TODO: ALLOW LOCALHOST
-        self.broadcastSock.sendto(message.encode(), ('192.168.56.255', self.BROADCAST_PORT))
+        self.broadcastSock.sendto(payload, ('192.168.56.255', self.BROADCAST_PORT))
 
     def parseIp(self) -> str:
         """
