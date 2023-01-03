@@ -1,5 +1,5 @@
 from Address import Address
-from Message import NotifyAllMessage, Message, TestMessage
+from Message import NotifyAllMessage, TestMessage
 from NetworkUtils import NetworkUtils
 
 
@@ -10,7 +10,7 @@ class Node:
         self.neighbors = set()
         self.nu.sendBroadcast(NotifyAllMessage(self).toBytes())
 
-    def processBroadcast(self, message: Message, sender: Address):
+    def processBroadcast(self, message: NotifyAllMessage, sender: Address):
         print(f"{self.nu.broadcastAddress} - Received message from {sender} : {message.message} at logical time {message.clock} - {message.timestamp}")
         self.clock = max(self.clock, message.clock) + 1
         self.neighbors |= {sender}
@@ -19,5 +19,6 @@ class Node:
             target = Address((neighbor.ip, self.nu.PORT))
             self.nu.send(TestMessage(self, neighbor).toBytes(), target)
 
-    def processMessage(self, message: Message, sender: Address):
-        pass
+    def processMessage(self, message: TestMessage, sender: Address):
+        print(f"{self.nu.broadcastAddress} - Received message from {sender} : {message.message} at logical time {message.clock} - {message.timestamp}")
+        self.clock = max(self.clock, message.clock) + 1
