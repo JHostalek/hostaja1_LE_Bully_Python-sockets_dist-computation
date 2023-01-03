@@ -9,7 +9,7 @@ class Node:
         self.leader = None
 
     def addNeighbor(self, neighbor: Address):
-        self.neighbors.add(neighbor)
+        self.neighbors.add(neighbor.ip)
         if len(self.neighbors) >= 2:
             print("Minimum number of neighbors reached")
             if self.leader is None:
