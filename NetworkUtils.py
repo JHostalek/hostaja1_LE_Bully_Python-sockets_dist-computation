@@ -85,6 +85,7 @@ class NetworkUtils:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.bind((self.ip, self.PORT))
         self.sock.listen(self.MAX_CONNECTIONS)
+        print(f"Listening on {self.ip}:{self.PORT}")
         receive_thread = threading.Thread(target=self.listen)
         receive_thread.start()
 
@@ -92,6 +93,7 @@ class NetworkUtils:
         while not self.terminate.is_set():
             client, address = self.sock.accept()
             address = Address(address)
+            print(f"{self.broadcastAddress} - Received connection from {address}")
             receive_thread = threading.Thread(target=self.receive, args=(client, address))
             receive_thread.start()
 
@@ -100,8 +102,9 @@ class NetworkUtils:
             try:
                 data = client.recv(1024)
                 if data:
-                    message: TestMessage = pickle.loads(data)
-                    self.node.processMessage(message, address)
+                    print(f"{self.broadcastAddress} - Received message from {address}")
+                    # message: TestMessage = pickle.loads(data)
+                    # self.node.processMessage(message, address)
             except:
                 pass
 
