@@ -10,13 +10,13 @@ class Message(abc.ABC):
         return pickle.dumps(self)
 
 
-class RequestingConnection(Message):
+class RequestConnectionMessage(Message):
     def __init__(self):
         super().__init__()
         self.message = "Requesting connection"
 
 
-class AcceptingConnection(Message):
+class AcceptConnectionMessage(Message):
     def __init__(self):
         super().__init__()
         self.message = "Accepting connection"

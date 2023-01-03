@@ -1,11 +1,9 @@
-import pickle
 import socket
 import threading
 
-import Message
 import Node
 from Address import Address
-from Message import RequestingConnection, TestMessage
+from Message import *
 
 
 def parseIp() -> str:
@@ -60,23 +58,21 @@ class NetworkUtils:
             print(message)
 
             if address != self.broadcastAddress:
-                if isinstance(message, RequestingConnection):
+                if isinstance(message, RequestConnectionMessage):
                     print(f"{self.broadcastAddress} - Received connection request from {address}")
                     self.handleConnectionRequest(address)
                 else:
                     print(f"Received unknown broadcast message: {message}")
 
     def handleConnectionRequest(self, sender: Address):
-        self.node.neighbors.add(sender)
-        print(f"{self.broadcastAddress} - Accepting connection from {sender}")
-        print(f"{self.broadcastAddress} - {self.node.neighbors}")
+        self.node.addNeighbor(sender)
         self.sendConnectionAcceptance(Address((sender.ip, self.PORT)))
 
     def broadcastRequestConnection(self):
-        self.broadcastSock.sendto(RequestingConnection().toBytes(), ('192.168.56.255', self.BROADCAST_PORT))
+        self.broadcastSock.sendto(RequestConnectionMessage().toBytes(), ('192.168.56.255', self.BROADCAST_PORT))
 
     def sendConnectionAcceptance(self, address: Address):
-        self.send(TestMessage("TCP DEBUG MESSAGE"), address)
+        self.send(AcceptConnectionMessage(), address)
 
     def initListeningSocket(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -97,9 +93,12 @@ class NetworkUtils:
     def receive(self, client, address: Address):
         while not self.terminate.is_set():
             try:
-                data = client.recv(1024)
-                if data:
-                    print(f"{self.broadcastAddress} - Received message from {address}")
+                message = pickle.loads(client.recv(1024))
+                if isinstance(message, AcceptConnectionMessage):
+                    print(f"{self.broadcastAddress} - Received connection acceptance from {address}")
+                    self.node.addNeighbor(address)
+                else:
+                    print(f"Received unknown message: {message}")
             except:
                 print(f"{self.broadcastAddress} - Connection to {address} lost")
                 pass
