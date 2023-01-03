@@ -77,6 +77,7 @@ class NetworkUtils:
         self.broadcastSock.sendto(RequestingConnection().toBytes(), ('192.168.56.255', self.BROADCAST_PORT))
 
     def sendAcceptingConnection(self, address: Address):
+        print(f"{self.broadcastAddress} - Sending connection acceptance to {address}")
         self.broadcastSock.sendto(AcceptingConnection().toBytes(), address.address)
 
     def initSock(self, address: Address):
