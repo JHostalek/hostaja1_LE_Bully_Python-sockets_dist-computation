@@ -93,6 +93,7 @@ class NetworkUtils:
 
     def send(self, payload: bytes, address: Address):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print(f'DEBUG: {self.Address} - Sending message to {address}')
         client.connect(address.address)
         client.send(payload)
         client.close()
