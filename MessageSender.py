@@ -28,9 +28,11 @@ class MessageSender:
     def sendMessages(self):
         while not self.terminate.is_set():
             while not self.broadcast_q.empty():
+                print(self.TAG + "Sending broadcast message")
                 message = self.broadcast_q.get()
                 receiver_address = (self.network.BROADCAST_IP, self.network.BROADCAST_PORT)
                 self.network.broadcastSocket.sendto(message.toBytes(), receiver_address)
+                print(self.TAG + "Sending broadcast message DONE")
 
             while not self.q.empty():
                 message, address = self.q.get()
@@ -44,31 +46,33 @@ class MessageSender:
     def sendConnectionRequest(self):
         # BROADCAST CONNECTION REQUEST
         message = RequestConnectionMessage()
-        self.broadcast_q.put_nowait(message)
+        print(self.TAG + "Putting into queue " + str(message) + " to " + str(self.network.BROADCAST_IP))
+        self.broadcast_q.put(message)
+        print(self.TAG + "Putting into queue " + str(message) + " to " + str(self.network.BROADCAST_IP) + " DONE")
 
     def sendConnectionAcceptance(self, receiver_address: Address):
         message = ConnectionAcceptanceMessage(self.node.leader)
-        self.q.put_nowait((message, receiver_address))
+        self.q.put((message, receiver_address))
 
     def sendConnectionEstablished(self, receiver_address: Address):
         message = ConnectionEstablishedMessage()
-        self.q.put_nowait((message, receiver_address))
+        self.q.put((message, receiver_address))
 
     # --------------------------------------------------------------------------------------------------------------
     def sendAliveMessage(self, receiver_address: Address):
         message = AliveMessage()
-        self.q.put_nowait((message, receiver_address))
+        self.q.put((message, receiver_address))
 
     def sendElectionMessage(self):
         for neighbor in self.node.neighbors:
             if neighbor > self.network.IP:
                 message = ElectionMessage()
                 receiver_address = Address((neighbor, self.network.PORT))
-                self.q.put_nowait((message, receiver_address))
+                self.q.put((message, receiver_address))
 
     def sendVictoryMessage(self):
         for neighbor in self.node.neighbors:
             message = VictoryMessage()
             receiver_address = Address((neighbor, self.network.PORT))
-            self.q.put_nowait((message, receiver_address))
+            self.q.put((message, receiver_address))
     # --------------------------------------------------------------------------------------------------------------

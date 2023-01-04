@@ -44,7 +44,7 @@ class MessageReceiver:
                 address = Address(address)
                 message = pickle.loads(data)
                 if address != Address((self.network.IP, self.network.BROADCAST_PORT)):
-                    self.connection_q.put_nowait((message, address))
+                    self.connection_q.put((message, address))
             except socket.timeout:
                 pass
 
@@ -66,11 +66,11 @@ class MessageReceiver:
                     message = pickle.loads(message)
                     print(f"{self.TAG}Received message from {address.id}: {message.message}")
                     if message.category == "connection":
-                        self.connection_q.put_nowait((message, address))
+                        self.connection_q.put((message, address))
                     elif message.category == "election":
-                        self.election_q.put_nowait((message, address))
+                        self.election_q.put((message, address))
                     elif message.category == "task":
-                        self.task_q.put_nowait((message, address))
+                        self.task_q.put((message, address))
                     else:
                         print(f"{self.TAG}Received unknown message: {message}")
                     self.consume()
