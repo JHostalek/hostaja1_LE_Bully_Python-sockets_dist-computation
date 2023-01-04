@@ -4,13 +4,12 @@ import threading
 
 import Network
 from Message import *
-from Node import Node
 
 
 class MessageReceiver:
-    def __init__(self, node: Node, network: Network):
+    def __init__(self, network: Network):
         self.network = network
-        self.node = node
+        self.node = network.node
         self.broadcastSocket = self.network.broadcastSocket
         self.socket = self.network.socket
 
