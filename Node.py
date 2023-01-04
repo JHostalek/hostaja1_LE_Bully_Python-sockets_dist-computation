@@ -20,7 +20,7 @@ class Node:
         self.WAIT_TIME = 5
         self.TAG = self.network.IP + " - "
         self.terminate = threading.Event()
-
+        self.lock = threading.Lock()
         self.receiver.start()
         self.sender.sendConnectionRequest()
 
@@ -50,8 +50,6 @@ class Node:
         receiver_address = Address((address.ip, self.network.PORT))
         self.sender.sendConnectionEstablished(receiver_address)
 
-
-
     def handleConnectionEstablished(self, address):
         # existing network member
         self.neighbors.add(address.ip)
@@ -59,16 +57,20 @@ class Node:
 
         # handshake with the incoming node finished check if we can start an election
         self.checkElection()
+
     # --------------------------------------------------------------------------------------------------------------
     def startElection(self):
-        self.state = "ELECTION"
+        with self.lock:
+            self.state = "ELECTION"
         self.sender.sendElectionMessage()
         time.sleep(self.WAIT_TIME)
         if self.state == "ELECTION" and self.leader is None:
             print(f"{self.TAG}I AM THE NEW LEADER")
-            self.state = "COORDINATOR"
-            self.setLeader(self.network.IP)
+            with self.lock:
+                self.state = "COORDINATOR"
+                self.setLeader(self.network.IP)
             self.sender.sendVictoryMessage()
+            time.sleep(5)
 
     def handleElectionMessage(self, message, sender_address):
         if self.leader is not None:
@@ -82,9 +84,33 @@ class Node:
             self.sender.sendAliveMessage(receiver_address)
 
     def handleVictoryMessage(self, message, address):
-        self.state = "FOLLOWER"
-        self.setLeader(address.ip)
-        print(f"{self.TAG}NEW LEADER IS: {self.leader}")
+        with self.lock:
+            self.state = "FOLLOWER"
+            self.setLeader(address.ip)
+            print(f"{self.TAG}NEW LEADER IS: {self.leader}")
+            thread = threading.Thread(target=self.startWorking)
+            thread.start()
 
     def handleAliveMessage(self, message, address):
-        self.state = "WAITING"
+        with self.lock:
+            self.state = "WAITING"
+
+    # --------------------------------------------------------------------------------------------------------------
+    def createTasks(self):
+        pass
+
+    def askForTask(self):
+        receiver_address = Address((self.leader, self.network.PORT))
+        self.sender.sendTaskRequestMessage(receiver_address)
+
+    def startWorking(self):
+        while not self.terminate.is_set():
+            self.askForTask()
+            time.sleep(5)
+
+    def handleTaskRequestMessage(self, message, address):
+        receiver_address = Address((address.ip, self.network.PORT))
+        self.sender.sendTaskMessage(receiver_address)
+
+    def handleTaskMessage(self, message, address):
+        print(f"{self.TAG}Received task: {message.task}")

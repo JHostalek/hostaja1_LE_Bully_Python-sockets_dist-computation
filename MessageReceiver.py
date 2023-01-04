@@ -84,5 +84,11 @@ class MessageReceiver:
         elif isinstance(message, AliveMessage):
             print(f"{self.TAG}Processed alive message from {address.id}")
             self.node.handleAliveMessage(message, address)
+        elif isinstance(message, TaskRequestMessage):
+            print(f"{self.TAG}Processed task request message from {address.id}")
+            self.node.handleTaskRequestMessage(message, address)
+        elif isinstance(message, TaskMessage):
+            print(f"{self.TAG}Processed task message from {address.id}")
+            self.node.handleTaskMessage(message, address)
         else:
             print(f"{self.TAG}Processed unknown election message: {message}")

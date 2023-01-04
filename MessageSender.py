@@ -56,3 +56,10 @@ class MessageSender:
             self.send(message, receiver_address)
 
     # --------------------------------------------------------------------------------------------------------------
+    def sendTaskRequestMessage(self, receiver_address: Address):
+        message = TaskRequestMessage()
+        self.send(message, receiver_address)
+
+    def sendTaskMessage(self, receiver_address: Address):
+        message = TaskMessage()
+        self.send(message, receiver_address)
