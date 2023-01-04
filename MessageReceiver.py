@@ -43,6 +43,7 @@ class MessageReceiver:
                 data, address = self.broadcastSocket.recvfrom(1024)
                 address = Address(address)
                 message = pickle.loads(data)
+                print(f"{self.TAG}Received broadcast message from {address.id}: {message.message}")
                 if address != Address((self.network.IP, self.network.BROADCAST_PORT)):
                     self.connection_q.put((message, address))
             except socket.timeout:
@@ -53,6 +54,7 @@ class MessageReceiver:
             try:
                 client, address = self.socket.accept()
                 address = Address(address)
+                print(f"{self.TAG}Received connection from {address.id}")
                 receive_thread = threading.Thread(target=self.listen, args=(client, address))
                 receive_thread.start()
             except socket.timeout:
