@@ -15,47 +15,48 @@ class Message(abc.ABC):
 class RequestConnectionMessage(Message):
     def __init__(self):
         super().__init__()
+        self.category = "connection"
         self.message = "Requesting connection"
-
-
-class ConnectionEstablishedMessage(Message):
-    def __init__(self, leader: Address = None):
-        super().__init__()
-        self.message = "Established connection"
-        self.leader = leader
 
 
 class AcceptConnectionMessage(Message):
     def __init__(self):
         super().__init__()
+        self.category = "connection"
         self.message = "Accepting connection"
+
+
+class ConnectionEstablishedMessage(Message):
+    def __init__(self, leader: Address = None):
+        super().__init__()
+        self.category = "connection"
+        self.message = "Established connection"
+        self.leader = leader
 
 
 class ElectionMessage(Message):
     def __init__(self):
         super().__init__()
+        self.category = "election"
         self.message = "Election"
 
 
 class AliveMessage(Message):
     def __init__(self):
         super().__init__()
+        self.category = "election"
         self.message = "Alive"
 
 
 class VictoryMessage(Message):
     def __init__(self):
         super().__init__()
+        self.category = "election"
         self.message = "Victory"
 
 
 class LeaderExistsMessage(Message):
     def __init__(self):
         super().__init__()
+        self.category = "election"
         self.message = "Leader exists"
-
-
-class TestMessage(Message):
-    def __init__(self, message: str):
-        super().__init__()
-        self.message = message

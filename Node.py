@@ -2,6 +2,8 @@ import threading
 import time
 
 from Message import *
+from MessageReceiver import MessageReceiver
+from MessageSender import MessageSender
 from Network import Network
 
 
@@ -9,13 +11,22 @@ class Node:
     def __init__(self):
         self.state = None
         self.nu = Network(self)
+        self.sender = MessageSender(self.nu)
+        self.receiver = MessageReceiver(self.nu, self)
         self.lock = threading.Lock()
         self.neighbors = set()
         self.leader = None
         self.MINIMUM_NEIGHBORS = 2
         self.WAIT_TIME = 5
+        self.TAG = self.nu.IP + " - "
 
-        self.TAG = self.nu.ip + " - "
+        self.terminate = threading.Event()
+
+    def start(self):
+        self.receiver.start()
+        self.sender.start()
+        while not self.terminate.is_set():
+            self.receiver.consume()
 
     def handleNewConnection(self, message, address):
         if message is not None:
@@ -69,10 +80,6 @@ class Node:
         """
         Implementation of the Bully Algorithm
         """
-
-        if len(self.neighbors) < self.MINIMUM_NEIGHBORS:
-            print(f"{self.TAG}Not enough neighbors to start election")
-            return
         self.sendElectionMessage()
         time.sleep(self.WAIT_TIME)
 

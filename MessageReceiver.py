@@ -15,7 +15,10 @@ class MessageReceiver:
         self.socket = self.network.socket
 
         self.TAG = self.network.ip + " - "
-        self.q = queue.Queue()
+
+        self.connection_q = queue.Queue()
+        self.election_q = queue.Queue()
+        self.task_q = queue.Queue()
 
         self.listenThread = None
         self.broadcastThread = None
@@ -41,7 +44,7 @@ class MessageReceiver:
                 address = Address(address)
                 message = pickle.loads(data)
                 if address != Address((self.network.ip, self.network.BROADCAST_PORT)):
-                    self.q.put((message, address))
+                    self.connection_q.put((message, address))
             except socket.timeout:
                 pass
 
@@ -62,30 +65,43 @@ class MessageReceiver:
                 if message:
                     message = pickle.loads(message)
                     print(f"{self.TAG}Received message from {address.id}: {message.message}")
-                    self.q.put((message, address))
+                    if message.category == "connection":
+                        self.connection_q.put((message, address))
+                    elif message.category == "election":
+                        self.election_q.put((message, address))
+                    elif message.category == "task":
+                        self.task_q.put((message, address))
+                    else:
+                        print(f"{self.TAG}Received unknown message: {message}")
             except socket.timeout:
                 pass
 
     def consume(self):
-        message, address = self.q.get()
-        if isinstance(message, ConnectionEstablishedMessage):
-            print(f"{self.TAG}Processed connection established from {address.id}")
-            self.handleConnectionEstablished(message=message, sender=address)
-        elif isinstance(message, AcceptConnectionMessage):
-            print(f"{self.TAG}Processed connection acceptance from {address.id}")
-            self.sendConnectionEstablished(address)
-            self.handleConnectionEstablished(address)
-        elif isinstance(message, ElectionMessage):
-            print(f"{self.TAG}Processed election message from {address.id}")
-            self.node.handleElectionMessage(message, address)
-        elif isinstance(message, VictoryMessage):
-            print(f"{self.TAG}Processed victory message from {address.id}")
-            self.node.handleVictoryMessage(message, address)
-        elif isinstance(message, AliveMessage):
-            print(f"{self.TAG}Processed alive message from {address.id}")
-            self.node.handleAliveMessage(message, address)
-        elif isinstance(message, LeaderExistsMessage):
-            print(f"{self.TAG}Processed leader exists message from {address.id}")
-            self.node.handleLeaderExistsMessage(message, address)
-        else:
-            print(f"{self.TAG}Processed unknown message: {message}")
+        while not self.connection_q.empty():
+            message, address = self.connection_q.get()
+            if isinstance(message, ConnectionEstablishedMessage):
+                print(f"{self.TAG}Processed connection established from {address.id}")
+                self.node.handleNewConnection(message, address)
+            elif isinstance(message, AcceptConnectionMessage):
+                print(f"{self.TAG}Processed connection acceptance from {address.id}")
+                self.sendConnectionEstablished(address)
+                self.node.handleNewConnection(None, address)
+            else:
+                print(f"{self.TAG}Processed unknown connection message: {message}")
+
+        while not self.election_q.empty():
+            message, address = self.election_q.get()
+            if isinstance(message, ElectionMessage):
+                print(f"{self.TAG}Processed election message from {address.id}")
+                self.node.handleElectionMessage(message, address)
+            elif isinstance(message, VictoryMessage):
+                print(f"{self.TAG}Processed victory message from {address.id}")
+                self.node.handleVictoryMessage(message, address)
+            elif isinstance(message, AliveMessage):
+                print(f"{self.TAG}Processed alive message from {address.id}")
+                self.node.handleAliveMessage(message, address)
+            elif isinstance(message, LeaderExistsMessage):
+                print(f"{self.TAG}Processed leader exists message from {address.id}")
+                self.node.handleLeaderExistsMessage(message, address)
+            else:
+                print(f"{self.TAG}Processed unknown election message: {message}")

@@ -1,8 +1,6 @@
 import socket
 
 import Node
-from MessageReceiver import MessageReceiver
-from MessageSender import MessageSender
 
 
 def parseIp() -> str:
@@ -32,8 +30,6 @@ class Network:
         self.node = node
 
         self.socket, self.broadcastSocket = self.initSockets()
-        sender = MessageSender(self)
-        receiver = MessageReceiver(self, node)
         # self.broadcastRequestConnection()
 
     def initSockets(self):

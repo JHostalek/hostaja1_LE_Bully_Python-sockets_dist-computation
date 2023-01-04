@@ -1,7 +1,9 @@
 import queue
+import socket
 import threading
 
 import Network
+from Message import *
 
 
 class MessageSender:
@@ -11,11 +13,7 @@ class MessageSender:
         self.q = queue.Queue()
         self.terminate = threading.Event()
 
-    def send(self, message: Message, address: Address):
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect(address.address)
-        client.send(message.toBytes())
-        client.close()
+
 
     def handleConnectionRequest(self, sender: Address):
         self.sendConnectionAcceptance(Address((sender.ip, self.PORT)))
@@ -30,9 +28,15 @@ class MessageSender:
         print(f"{self.TAG}Sending connection acceptance to {address.id}")
         self.send(AcceptConnectionMessage(), address)
 
-    def sendConnectionEstablished(self, address):
+    def sendConnectionEstablished(self, address: Address):
         if self.node.leader is not None:
             print(f"{self.TAG}Sending connection established to {address.id}, with leader {self.node.leader}")
         else:
             print(f"{self.TAG}Sending connection established to {address.id}, without leader")
         self.send(ConnectionEstablishedMessage(Address((self.node.leader, self.PORT))), Address((address.ip, self.PORT)))
+
+    def send(self, message: Message, address: Address):
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect(address.address)
+        client.send(message.toBytes())
+        client.close()
