@@ -23,7 +23,7 @@ class Network:
         self.BROADCAST_PORT = 5555
         self.IP = parseIp()
         self.PORT = 5556
-        self.SOCKET_TIMEOUT = 0.5
+        self.SOCKET_TIMEOUT = 0.1
         self.MAX_CONNECTIONS = 10
 
         self.TAG = self.IP + " - "

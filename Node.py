@@ -2,6 +2,7 @@ import threading
 import time
 
 from Address import Address
+from Message import ElectionMessage
 from MessageReceiver import MessageReceiver
 from MessageSender import MessageSender
 from Network import Network
@@ -17,7 +18,7 @@ class Node:
         self.leader = None
         self.leader_address = None
         self.MINIMUM_NEIGHBORS = 2
-        self.WAIT_TIME = 10
+        self.WAIT_TIME = 15
         self.TAG = self.network.IP + " - "
         self.terminate = threading.Event()
         self.lock = threading.Lock()
@@ -66,6 +67,10 @@ class Node:
 
         # handshake with the incoming node finished check if we can start an election
         self.checkElection()
+        if self.state == 'ELECTION':
+            message = ElectionMessage()
+            receiver_address = Address((address.ip, self.network.PORT))
+            self.sender.send(message, receiver_address)
 
     # --------------------------------------------------------------------------------------------------------------
     def startElection(self):
