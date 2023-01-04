@@ -51,6 +51,7 @@ class Node:
         receiver_address = Address((address.ip, self.network.PORT))
         self.sender.sendConnectionEstablished(receiver_address)
 
+        time.sleep(self.WAIT_TIME)
         self.checkElection()
 
 
