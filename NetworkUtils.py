@@ -24,7 +24,7 @@ class NetworkUtils:
         self.BROADCAST_PORT = 5555
         self.PORT = 5556
         self.MAX_CONNECTIONS = 10
-        self.SOCKET_TIMEOUT = 0.5
+        self.SOCKET_TIMEOUT = 0.1
 
         self.terminate: threading.Event = threading.Event()
         self.node = node
