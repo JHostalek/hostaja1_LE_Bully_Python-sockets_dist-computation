@@ -4,7 +4,20 @@ import threading
 
 from Address import Address
 from Message import *
-from Network import parseIp
+
+
+def parseIp() -> str:
+    """
+    Parse the IP address from the output of ifconfig
+    Works on Linux only (requires bash ip -a call)
+    :return: ip address as string (e.g. "192.168.56.xxx")
+    """
+    import re
+    import subprocess
+    output = subprocess.run(["ip", "a"], stdout=subprocess.PIPE).stdout.decode()
+    address_pattern = r"inet (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
+    matches = re.findall(address_pattern, output)
+    return matches[2]
 
 
 class DataCenter:
