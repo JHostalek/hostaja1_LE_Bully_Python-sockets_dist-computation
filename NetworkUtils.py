@@ -112,6 +112,7 @@ class NetworkUtils:
         self.send(AcceptConnectionMessage(Address((self.node.leader, self.PORT))), address)
 
     def sendConnectionEstablished(self, address):
+        print(f"{self.TAG}Sending connection established to {address}")
         self.send(ConnectionEstablishedMessage(), address)
 
     def initListeningSocket(self):
