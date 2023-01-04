@@ -48,7 +48,6 @@ class MessageReceiver:
             try:
                 client, address = self.socket.accept()
                 address = Address(address)
-                print(f"{self.TAG}Received connection from {address.id}")
                 receive_thread = threading.Thread(target=self.listen, args=(client, address))
                 receive_thread.start()
             except socket.timeout:

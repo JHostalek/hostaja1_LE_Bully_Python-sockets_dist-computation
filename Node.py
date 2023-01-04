@@ -77,7 +77,9 @@ class Node:
             return
         if self.state != "ELECTION":
             self.startElection()
+
         if sender_address.ip < self.network.IP:
+            print(f'{self.TAG}I have a higher IP than {sender_address.ip}, sending election message')
             receiver_address = Address((sender_address.ip, self.network.PORT))
             self.sender.sendAliveMessage(receiver_address)
 
