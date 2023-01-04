@@ -51,10 +51,11 @@ class NetworkUtils:
                 message, address = self.messageQueue.get()
                 if isinstance(message, ConnectionEstablishedMessage):
                     print(f"{self.TAG}Received connection established from {address}")
-                    self.node.handleNewConnection(message, address)
+                    self.handleConnectionEstablished(message=message, sender=address)
                 elif isinstance(message, AcceptConnectionMessage):
                     print(f"{self.TAG}Received connection acceptance from {address}")
                     self.sendConnectionEstablished(address)
+                    self.handleConnectionEstablished(address)
                 elif isinstance(message, ElectionMessage):
                     print(f"{self.TAG}Received election message from {address}")
                     self.node.handleElectionMessage(message, address)
@@ -98,8 +99,8 @@ class NetworkUtils:
     def handleConnectionRequest(self, sender: Address):
         self.sendConnectionAcceptance(Address((sender.ip, self.PORT)))
 
-    def handleConnectionEstablished(self, sender: Address):
-        self.node.handleNewConnection(None, sender)
+    def handleConnectionEstablished(self, sender: Address, message=None):
+        self.node.handleNewConnection(message, sender)
 
     def broadcastRequestConnection(self):
         self.broadcastSock.sendto(RequestConnectionMessage().toBytes(), ('192.168.56.255', self.BROADCAST_PORT))
