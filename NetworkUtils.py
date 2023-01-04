@@ -113,7 +113,7 @@ class NetworkUtils:
 
     def sendConnectionEstablished(self, address):
         print(f"{self.TAG}Sending connection established to {address}")
-        self.send(ConnectionEstablishedMessage(), address)
+        self.send(ConnectionEstablishedMessage(), Address((address.ip, self.PORT)))
 
     def initListeningSocket(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
