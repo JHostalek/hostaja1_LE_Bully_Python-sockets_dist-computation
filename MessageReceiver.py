@@ -69,7 +69,6 @@ class MessageReceiver:
                 pass
 
     def consume(self, message, address):
-        print(f"{self.TAG}Consuming messages. Queue sizes: {self.connection_q.qsize()}, {self.election_q.qsize()}, {self.task_q.qsize()}")
         if isinstance(message, RequestConnectionMessage):
             self.node.handleConnectionRequest(address)
         elif isinstance(message, ConnectionAcceptanceMessage):
