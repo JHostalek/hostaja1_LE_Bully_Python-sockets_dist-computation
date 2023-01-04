@@ -77,7 +77,7 @@ class MessageReceiver:
                 pass
 
     def consume(self):
-        print(f"{self.TAG}Consuming messages")
+        print(f"{self.TAG}Consuming messages. Queue sizes: {self.connection_q.qsize()}, {self.election_q.qsize()}, {self.task_q.qsize()}")
         if not self.connection_q.empty():
             message, address = self.connection_q.get()
             if isinstance(message, RequestConnectionMessage):
