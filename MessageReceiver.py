@@ -43,8 +43,8 @@ class MessageReceiver:
                 data, address = self.broadcastSocket.recvfrom(1024)
                 address = Address(address)
                 message = pickle.loads(data)
-                print(f"{self.TAG}Received broadcast message from {address.id}: {message.message}")
                 if address != Address((self.network.IP, self.network.BROADCAST_PORT)):
+                    print(f"{self.TAG}Received broadcast message from {address.id}: {message.message}")
                     self.connection_q.put((message, address))
             except socket.timeout:
                 pass
