@@ -48,7 +48,8 @@ class Node:
         self.neighbors.add(address.ip)
         print(f'{self.TAG}Established connection with {address.id}, leader is {self.leader}')
         # finish handshake with the existing network member
-        self.sender.sendConnectionEstablished(address)
+        receiver_address = Address((address.ip, self.network.PORT))
+        self.sender.sendConnectionEstablished(receiver_address)
 
         # incoming node is ready
         self.checkElection()
