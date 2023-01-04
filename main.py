@@ -1,9 +1,10 @@
 from Node import Node
 
 
-def main():
-    node = Node()
-
-
 if __name__ == '__main__':
-    main()
+    node = Node()
+    try:
+        node.start()
+    except KeyboardInterrupt:
+        node.stop()
+        exit(0)

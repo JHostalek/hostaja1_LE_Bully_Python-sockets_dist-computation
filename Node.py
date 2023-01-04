@@ -33,6 +33,11 @@ class Node:
         while not self.terminate.is_set():
             self.receiver.consume()
 
+    def stop(self):
+        self.terminate.set()
+        self.sender.stop()
+        self.receiver.stop()
+
     def checkElection(self):
         if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
             print(f'{self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
