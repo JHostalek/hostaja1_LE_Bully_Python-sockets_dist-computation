@@ -106,14 +106,14 @@ class NetworkUtils:
         self.broadcastSock.sendto(RequestConnectionMessage().toBytes(), ('192.168.56.255', self.BROADCAST_PORT))
 
     def sendConnectionAcceptance(self, address: Address):
-        if self.node.leader is not None:
-            print(f"{self.TAG}Sending connection acceptance to {address.id}, with leader {self.node.leader}")
-        else:
-            print(f"{self.TAG}Sending connection acceptance to {address.id}, without leader")
+        print(f"{self.TAG}Sending connection acceptance to {address.id}")
         self.send(AcceptConnectionMessage(), address)
 
     def sendConnectionEstablished(self, address):
-        print(f"{self.TAG}Sending connection established to {address.id}")
+        if self.node.leader is not None:
+            print(f"{self.TAG}Sending connection established to {address.id}, with leader {self.node.leader}")
+        else:
+            print(f"{self.TAG}Sending connection established to {address.id}, without leader")
         self.send(ConnectionEstablishedMessage(Address((self.node.leader, self.PORT))), Address((address.ip, self.PORT)))
 
     def initListeningSocket(self):
