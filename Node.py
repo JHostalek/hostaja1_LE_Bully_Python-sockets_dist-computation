@@ -28,10 +28,13 @@ class Node:
     def setLeader(self, leader):
         self.leader = leader
         self.leader_address = Address((leader, self.network.PORT))
-        if self.work_thread is not None:
-            self.work_thread.join()
-        self.work_thread = threading.Thread(target=self.startWorking)
-        self.work_thread.start()
+        if self.network.IP == leader:
+            pass
+        else:
+            if self.work_thread is not None:
+                self.work_thread.join()
+            self.work_thread = threading.Thread(target=self.startWorking)
+            self.work_thread.start()
 
     def checkElection(self):
         if self.leader is None and self.state != 'ELECTION' and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
