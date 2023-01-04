@@ -31,8 +31,6 @@ class Node:
         self.sender.start()
         self.sender.sendConnectionRequest()
         while not self.terminate.is_set():
-            # time as hh:mm:ss
-            print(f'{self.TAG}TIME: {time.strftime("%H:%M:%S", time.localtime())}')
             self.receiver.consume()
 
     def stop(self):
