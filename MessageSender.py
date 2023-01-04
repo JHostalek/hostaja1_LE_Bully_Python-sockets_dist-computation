@@ -49,45 +49,39 @@ class MessageSender:
         # BROADCAST CONNECTION REQUEST
         message = RequestConnectionMessage()
         print(self.TAG + "Putting into queue " + str(message) + " to " + str(self.network.BROADCAST_IP))
-        self.lock.acquire()
-        self.broadcast_q.put(message)
-        self.lock.release()
+        with self.lock:
+            self.broadcast_q.put(message)
         print(self.TAG + "Putting into queue " + str(message) + " to " + str(self.network.BROADCAST_IP) + " DONE")
 
     def sendConnectionAcceptance(self, receiver_address: Address):
         message = ConnectionAcceptanceMessage(self.node.leader)
-        self.lock.acquire()
-        self.q.put((message, receiver_address))
-        self.lock.release()
+        with self.lock:
+            self.q.put((message, receiver_address))
 
     def sendConnectionEstablished(self, receiver_address: Address):
         message = ConnectionEstablishedMessage()
-        self.lock.acquire()
-        self.q.put((message, receiver_address))
-        self.lock.release()
+        with self.lock:
+            self.q.put((message, receiver_address))
 
     # --------------------------------------------------------------------------------------------------------------
     def sendAliveMessage(self, receiver_address: Address):
         message = AliveMessage()
-        self.lock.acquire()
-        self.q.put((message, receiver_address))
-        self.lock.release()
+        with self.lock:
+            self.q.put((message, receiver_address))
 
     def sendElectionMessage(self):
         for neighbor in self.node.neighbors:
             if neighbor > self.network.IP:
                 message = ElectionMessage()
                 receiver_address = Address((neighbor, self.network.PORT))
-                self.lock.acquire()
-                self.q.put((message, receiver_address))
-                self.lock.release()
+                with self.lock:
+                    self.q.put((message, receiver_address))
 
     def sendVictoryMessage(self):
         for neighbor in self.node.neighbors:
             message = VictoryMessage()
             receiver_address = Address((neighbor, self.network.PORT))
-            self.lock.acquire()
-            self.q.put((message, receiver_address))
-            self.lock.release()
+            with self.lock:
+                self.q.put((message, receiver_address))
 
     # --------------------------------------------------------------------------------------------------------------

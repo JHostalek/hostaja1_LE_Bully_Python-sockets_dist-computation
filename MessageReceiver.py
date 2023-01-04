@@ -46,9 +46,8 @@ class MessageReceiver:
                 message = pickle.loads(data)
                 if address != Address((self.network.IP, self.network.BROADCAST_PORT)):
                     print(f"{self.TAG}Received broadcast message from {address.id}: {message.message}")
-                    self.lock.acquire()
-                    self.connection_q.put((message, address))
-                    self.lock.release()
+                    with self.lock:
+                        self.connection_q.put((message, address))
             except socket.timeout:
                 pass
 
@@ -70,20 +69,15 @@ class MessageReceiver:
                 if message:
                     message = pickle.loads(message)
                     print(f"{self.TAG}Received message from {address.id}: {message.message}")
-                    if message.category == "connection":
-                        self.lock.acquire()
-                        self.connection_q.put((message, address))
-                        self.lock.release()
-                    elif message.category == "election":
-                        self.lock.acquire()
-                        self.election_q.put((message, address))
-                        self.lock.release()
-                    elif message.category == "task":
-                        self.lock.acquire()
-                        self.task_q.put((message, address))
-                        self.lock.release()
-                    else:
-                        print(f"{self.TAG}Received unknown message: {message}")
+                    with self.lock:
+                        if message.category == "connection":
+                            self.connection_q.put((message, address))
+                        elif message.category == "election":
+                            self.election_q.put((message, address))
+                        elif message.category == "task":
+                            self.task_q.put((message, address))
+                        else:
+                            print(f"{self.TAG}Received unknown message: {message}")
                     self.consume()
             except socket.timeout:
                 pass
