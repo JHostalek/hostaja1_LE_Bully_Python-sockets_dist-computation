@@ -23,7 +23,6 @@ class Node:
         self.terminate = threading.Event()
 
         self.receiver.start()
-        self.sender.start()
         self.sender.sendConnectionRequest()
 
     def setLeader(self, leader):
