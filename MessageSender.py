@@ -1,6 +1,7 @@
 import queue
 import socket
 import threading
+import time
 
 import Network
 from Address import Address
@@ -27,6 +28,7 @@ class MessageSender:
 
     def sendMessages(self):
         while not self.terminate.is_set():
+            time.sleep(0.1)
             while not self.broadcast_q.empty():
                 message = self.broadcast_q.get()
                 receiver_address = (self.network.BROADCAST_IP, self.network.BROADCAST_PORT)
