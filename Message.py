@@ -1,8 +1,6 @@
 import abc
 import pickle
 
-from Address import Address
-
 
 class Message(abc.ABC):
     def __init__(self):
@@ -19,19 +17,19 @@ class RequestConnectionMessage(Message):
         self.message = "Requesting connection"
 
 
-class AcceptConnectionMessage(Message):
-    def __init__(self):
+class ConnectionAcceptanceMessage(Message):
+    def __init__(self, leader: str):
         super().__init__()
         self.category = "connection"
         self.message = "Accepting connection"
+        self.leader = leader
 
 
 class ConnectionEstablishedMessage(Message):
-    def __init__(self, leader: Address = None):
+    def __init__(self):
         super().__init__()
         self.category = "connection"
         self.message = "Established connection"
-        self.leader = leader
 
 
 class ElectionMessage(Message):
@@ -53,10 +51,3 @@ class VictoryMessage(Message):
         super().__init__()
         self.category = "election"
         self.message = "Victory"
-
-
-class LeaderExistsMessage(Message):
-    def __init__(self):
-        super().__init__()
-        self.category = "election"
-        self.message = "Leader exists"

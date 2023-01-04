@@ -4,39 +4,70 @@ import threading
 
 import Network
 from Message import *
+from Node import Node
 
 
 class MessageSender:
-    def __init__(self, network: Network):
+    def __init__(self, node: Node, network: Network):
         self.network = network
+        self.node = node
         self.TAG = self.network.ip + " - "
+        self.broadcast_q = queue.Queue()
         self.q = queue.Queue()
+        self.sendThread = None
         self.terminate = threading.Event()
 
+    def start(self):
+        self.sendThread = threading.Thread(target=self.sendMessages)
+        self.sendThread.start()
 
+    def stop(self):
+        self.terminate.set()
+        self.sendThread.join()
 
-    def handleConnectionRequest(self, sender: Address):
-        self.sendConnectionAcceptance(Address((sender.ip, self.PORT)))
+    def sendMessages(self):
+        while not self.terminate.is_set():
+            while not self.broadcast_q.empty():
+                message = RequestConnectionMessage()
+                receiver_address = (self.network.BROADCAST_IP, self.network.BROADCAST_PORT)
+                self.network.broadcastSocket.sendto(message.toBytes(), receiver_address)
 
-    def handleConnectionEstablished(self, sender: Address, message=None):
-        self.node.handleNewConnection(message, sender)
+            while not self.q.empty():
+                message, address = self.q.get()
+                client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                client.connect(address.address)
+                client.send(message.toBytes())
+                client.close()
 
-    def broadcastRequestConnection(self):
-        self.broadcastSock.sendto(RequestConnectionMessage().toBytes(), ('192.168.56.255', self.BROADCAST_PORT))
+    # --------------------------------------------------------------------------------------------------------------
+    def sendConnectionRequest(self):
+        # BROADCAST CONNECTION REQUEST
+        message = RequestConnectionMessage()
+        self.broadcast_q.put(message)
 
-    def sendConnectionAcceptance(self, address: Address):
-        print(f"{self.TAG}Sending connection acceptance to {address.id}")
-        self.send(AcceptConnectionMessage(), address)
+    def sendConnectionAcceptance(self, receiver_address: Address):
+        message = ConnectionAcceptanceMessage(self.node.leader)
+        self.q.put((message, receiver_address))
 
-    def sendConnectionEstablished(self, address: Address):
-        if self.node.leader is not None:
-            print(f"{self.TAG}Sending connection established to {address.id}, with leader {self.node.leader}")
-        else:
-            print(f"{self.TAG}Sending connection established to {address.id}, without leader")
-        self.send(ConnectionEstablishedMessage(Address((self.node.leader, self.PORT))), Address((address.ip, self.PORT)))
+    def sendConnectionEstablished(self, receiver_address: Address):
+        message = ConnectionEstablishedMessage()
+        self.q.put((message, receiver_address))
 
-    def send(self, message: Message, address: Address):
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect(address.address)
-        client.send(message.toBytes())
-        client.close()
+    # --------------------------------------------------------------------------------------------------------------
+    def sendAliveMessage(self, receiver_address: Address):
+        message = AliveMessage()
+        self.q.put((message, receiver_address))
+
+    def sendElectionMessage(self):
+        for neighbor in self.node.neighbors:
+            if neighbor > self.network.IP:
+                message = ElectionMessage()
+                receiver_address = Address((neighbor, self.network.PORT))
+                self.q.put((message, receiver_address))
+
+    def sendVictoryMessage(self):
+        for neighbor in self.node.neighbors:
+            message = VictoryMessage()
+            receiver_address = Address((neighbor, self.network.PORT))
+            self.q.put((message, receiver_address))
+    # --------------------------------------------------------------------------------------------------------------

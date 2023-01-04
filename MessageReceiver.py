@@ -8,7 +8,7 @@ from Node import Node
 
 
 class MessageReceiver:
-    def __init__(self, network: Network, node: Node):
+    def __init__(self, node: Node, network: Network):
         self.network = network
         self.node = node
         self.broadcastSocket = self.network.broadcastSocket
@@ -77,19 +77,20 @@ class MessageReceiver:
                 pass
 
     def consume(self):
-        while not self.connection_q.empty():
+        if not self.connection_q.empty():
             message, address = self.connection_q.get()
-            if isinstance(message, ConnectionEstablishedMessage):
-                print(f"{self.TAG}Processed connection established from {address.id}")
-                self.node.handleNewConnection(message, address)
-            elif isinstance(message, AcceptConnectionMessage):
+            if isinstance(message, RequestConnectionMessage):
+                self.node.handleConnectionRequest(address)
+            elif isinstance(message, ConnectionAcceptanceMessage):
                 print(f"{self.TAG}Processed connection acceptance from {address.id}")
-                self.sendConnectionEstablished(address)
-                self.node.handleNewConnection(None, address)
+                self.node.handleConnectionAcceptance(message, address)
+            elif isinstance(message, ConnectionEstablishedMessage):
+                print(f"{self.TAG}Processed connection established from {address.id}")
+                self.node.handleConnectionEstablished(address)
             else:
                 print(f"{self.TAG}Processed unknown connection message: {message}")
 
-        while not self.election_q.empty():
+        elif not self.election_q.empty():
             message, address = self.election_q.get()
             if isinstance(message, ElectionMessage):
                 print(f"{self.TAG}Processed election message from {address.id}")
@@ -100,8 +101,5 @@ class MessageReceiver:
             elif isinstance(message, AliveMessage):
                 print(f"{self.TAG}Processed alive message from {address.id}")
                 self.node.handleAliveMessage(message, address)
-            elif isinstance(message, LeaderExistsMessage):
-                print(f"{self.TAG}Processed leader exists message from {address.id}")
-                self.node.handleLeaderExistsMessage(message, address)
             else:
                 print(f"{self.TAG}Processed unknown election message: {message}")
