@@ -25,7 +25,8 @@ class Node:
             print(f'{self.TAG}Established connection with {address.id}')
 
         self.neighbors.add(address.ip)
-        if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
+
+        if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS and self.nu.messageQueue.empty():
             print(f'{self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
             self.bullyElection()
 
