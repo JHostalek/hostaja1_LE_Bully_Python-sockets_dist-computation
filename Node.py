@@ -50,8 +50,6 @@ class Node:
         receiver_address = Address((address.ip, self.network.PORT))
         self.sender.sendConnectionEstablished(receiver_address)
 
-        # incoming node is ready
-        self.checkElection()
 
     def handleConnectionEstablished(self, address):
         # existing network member
