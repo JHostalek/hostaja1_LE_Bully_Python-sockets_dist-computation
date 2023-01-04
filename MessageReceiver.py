@@ -77,6 +77,7 @@ class MessageReceiver:
                 pass
 
     def consume(self):
+        print(f"{self.TAG}Consuming messages")
         if not self.connection_q.empty():
             message, address = self.connection_q.get()
             if isinstance(message, RequestConnectionMessage):
@@ -103,3 +104,5 @@ class MessageReceiver:
                 self.node.handleAliveMessage(message, address)
             else:
                 print(f"{self.TAG}Processed unknown election message: {message}")
+
+        print(f"{self.TAG}Processed all messages")
