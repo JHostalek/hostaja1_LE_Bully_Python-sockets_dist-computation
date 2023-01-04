@@ -23,7 +23,6 @@ class MessageReceiver:
         self.listenThread = None
         self.broadcastThread = None
         self.terminate = threading.Event()
-        self.lock = threading.Lock()
 
     def start(self):
         self.broadcastThread = threading.Thread(target=self.listenBroadcast)
@@ -46,8 +45,7 @@ class MessageReceiver:
                 message = pickle.loads(data)
                 if address != Address((self.network.IP, self.network.BROADCAST_PORT)):
                     print(f"{self.TAG}Received broadcast message from {address.id}: {message.message}")
-                    with self.lock:
-                        self.connection_q.put((message, address))
+                    self.connection_q.put((message, address))
                     print(f"{self.TAG}Received broadcast message from {address.id}: {message.message} DONE")
                     self.consume()
             except socket.timeout:
@@ -71,15 +69,15 @@ class MessageReceiver:
                 if message:
                     message = pickle.loads(message)
                     print(f"{self.TAG}Received message from {address.id}: {message.message}")
-                    with self.lock:
-                        if message.category == "connection":
-                            self.connection_q.put((message, address))
-                        elif message.category == "election":
-                            self.election_q.put((message, address))
-                        elif message.category == "task":
-                            self.task_q.put((message, address))
-                        else:
-                            print(f"{self.TAG}Received unknown message: {message}")
+
+                    if message.category == "connection":
+                        self.connection_q.put((message, address))
+                    elif message.category == "election":
+                        self.election_q.put((message, address))
+                    elif message.category == "task":
+                        self.task_q.put((message, address))
+                    else:
+                        print(f"{self.TAG}Received unknown message: {message}")
                     self.consume()
             except socket.timeout:
                 pass

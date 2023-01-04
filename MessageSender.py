@@ -1,4 +1,3 @@
-import queue
 import socket
 import threading
 
@@ -12,77 +11,54 @@ class MessageSender:
         self.network = network
         self.node = network.node
         self.TAG = self.network.IP + " - "
-        self.broadcast_q = queue.Queue()
-        self.q = queue.Queue()
-        self.lock = threading.Lock()
-        self.sendThread = None
         self.terminate = threading.Event()
 
-    def start(self):
-        self.sendThread = threading.Thread(target=self.sendMessages)
-        self.sendThread.start()
+    def sendBroadcast(self, message: Message):
+        print(self.TAG + "Sending broadcast message")
+        receiver_address = (self.network.BROADCAST_IP, self.network.BROADCAST_PORT)
+        self.network.broadcastSocket.sendto(message.toBytes(), receiver_address)
+        print(self.TAG + "Sending broadcast message DONE")
 
-    def stop(self):
-        self.terminate.set()
-        self.sendThread.join()
-
-    def sendMessages(self):
-        while not self.terminate.is_set():
-            with self.lock:
-                while not self.broadcast_q.empty():
-                    print(self.TAG + "Sending broadcast message")
-                    message = self.broadcast_q.get()
-                    receiver_address = (self.network.BROADCAST_IP, self.network.BROADCAST_PORT)
-                    self.network.broadcastSocket.sendto(message.toBytes(), receiver_address)
-                    print(self.TAG + "Sending broadcast message DONE")
-
-                while not self.q.empty():
-                    message, address = self.q.get()
-                    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    print(self.TAG + "Sending " + str(message) + " to " + str(address))
-                    client.connect(address.address)
-                    client.send(message.toBytes())
-                    client.close()
-                    print(self.TAG + "Sending " + str(message) + " to " + str(address) + " DONE")
+    def send(self, message: Message, receiver_address: Address):
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print(self.TAG + "Sending " + str(message) + " to " + str(receiver_address))
+        client.connect(receiver_address.address)
+        client.send(message.toBytes())
+        client.close()
+        print(self.TAG + "Sending " + str(message) + " to " + str(receiver_address) + " DONE")
 
     # --------------------------------------------------------------------------------------------------------------
     def sendConnectionRequest(self):
         # BROADCAST CONNECTION REQUEST
         message = RequestConnectionMessage()
         print(self.TAG + "Putting into queue " + str(message) + " to " + str(self.network.BROADCAST_IP))
-        with self.lock:
-            self.broadcast_q.put(message)
+        self.sendBroadcast(message)
         print(self.TAG + "Putting into queue " + str(message) + " to " + str(self.network.BROADCAST_IP) + " DONE")
 
     def sendConnectionAcceptance(self, receiver_address: Address):
         message = ConnectionAcceptanceMessage(self.node.leader)
-        with self.lock:
-            self.q.put((message, receiver_address))
+        self.send(message, receiver_address)
 
     def sendConnectionEstablished(self, receiver_address: Address):
         message = ConnectionEstablishedMessage()
-        with self.lock:
-            self.q.put((message, receiver_address))
+        self.send(message, receiver_address)
 
     # --------------------------------------------------------------------------------------------------------------
     def sendAliveMessage(self, receiver_address: Address):
         message = AliveMessage()
-        with self.lock:
-            self.q.put((message, receiver_address))
+        self.send(message, receiver_address)
 
     def sendElectionMessage(self):
         for neighbor in self.node.neighbors:
             if neighbor > self.network.IP:
                 message = ElectionMessage()
                 receiver_address = Address((neighbor, self.network.PORT))
-                with self.lock:
-                    self.q.put((message, receiver_address))
+                self.send(message, receiver_address)
 
     def sendVictoryMessage(self):
         for neighbor in self.node.neighbors:
             message = VictoryMessage()
             receiver_address = Address((neighbor, self.network.PORT))
-            with self.lock:
-                self.q.put((message, receiver_address))
+            self.send(message, receiver_address)
 
     # --------------------------------------------------------------------------------------------------------------
