@@ -26,6 +26,7 @@ class Node:
         self.work_thread = None
 
     def setLeader(self, leader):
+        if self.leader == leader: return
         self.leader = leader
         self.leader_address = Address((leader, self.network.PORT))
         if self.network.IP == leader:
