@@ -28,7 +28,7 @@ class MessageSender:
 
     def sendMessages(self):
         while not self.terminate.is_set():
-            print(self.TAG + "Sending messages at " + time.strftime("%H:%M:%S", time.localtime()))
+            print(self.TAG + "Sending messages queue size: " + str(self.q.qsize()) + " at " + time.strftime("%H:%M:%S", time.localtime()))
             time.sleep(1)
             while not self.broadcast_q.empty():
                 message = self.broadcast_q.get()
