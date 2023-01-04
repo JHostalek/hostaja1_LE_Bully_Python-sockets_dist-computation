@@ -34,7 +34,6 @@ class DataCenter:
 
     def listenForNewConnections(self):
         while not self.terminate.is_set():
-            print(f"{self.TAG}Waiting for new connections...")
             try:
                 client, address = self.socket.accept()
                 address = Address(address)
