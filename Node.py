@@ -69,10 +69,6 @@ class Node:
         """
         Implementation of the Bully Algorithm
         """
-
-        if len(self.neighbors) < self.MINIMUM_NEIGHBORS:
-            print(f"{self.TAG}Not enough neighbors to start election")
-            return
         self.sendElectionMessage()
         time.sleep(self.WAIT_TIME)
 

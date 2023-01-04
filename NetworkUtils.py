@@ -40,15 +40,6 @@ class NetworkUtils:
         self.initBroadcast()
         self.broadcastRequestConnection()
 
-        # self.messageQueue = Queue()
-        # self.processMessageThread = threading.Thread(target=self.processMessages)
-        # self.processMessageThread.start()
-
-    # def processMessages(self):
-    #     while not self.terminate.is_set():
-    #         if not self.messageQueue.empty():
-    #             message, address = self.messageQueue.get()
-
     def initBroadcast(self):
         self.broadcastSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.broadcastSock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -118,8 +109,6 @@ class NetworkUtils:
                 message = client.recv(1024)
                 if message:
                     message = pickle.loads(message)
-                    # print(f"{self.TAG}Received message from {address.id}: {message.message}")
-                    # self.messageQueue.put((message, address))
                     if isinstance(message, ConnectionEstablishedMessage):
                         print(f"{self.TAG}Processed connection established from {address.id}")
                         self.handleConnectionEstablished(message=message, sender=address)
