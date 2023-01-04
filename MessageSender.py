@@ -28,7 +28,7 @@ class MessageSender:
     def sendMessages(self):
         while not self.terminate.is_set():
             while not self.broadcast_q.empty():
-                message = RequestConnectionMessage()
+                message = self.broadcast_q.get()
                 receiver_address = (self.network.BROADCAST_IP, self.network.BROADCAST_PORT)
                 self.network.broadcastSocket.sendto(message.toBytes(), receiver_address)
 
