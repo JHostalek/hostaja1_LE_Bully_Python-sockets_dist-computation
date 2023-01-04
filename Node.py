@@ -26,7 +26,7 @@ class Node:
 
         self.neighbors.add(address.ip)
 
-        if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS and self.nu.messageQueue.empty():
+        if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
             print(f'{self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
             self.bullyElection()
 
@@ -76,7 +76,7 @@ class Node:
         self.sendElectionMessage()
         time.sleep(self.WAIT_TIME)
 
-        if self.state == "ELECTION" and self.nu.messageQueue.empty():
+        if self.state == "ELECTION":
             self.sendVictoryMessage()
 
     def sendAliveMessage(self, address: Address):
