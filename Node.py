@@ -25,52 +25,58 @@ class Node:
             print(f'{self.TAG}Established connection with {address}')
         with self.lock:
             self.neighbors.add(address.ip)
-        if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
-            print(f'{self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
-            self.bullyElection()
+            if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
+                print(f'{self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
+                self.bullyElection()
 
     def handleElectionMessage(self, message, address):
         """
         Handles an Election message
         """
-        if self.leader is not None:
-            self.nu.send(LeaderExistsMessage(), Address((address.ip, self.nu.PORT)))
-            return
-        if self.state != "ELECTION":
-            self.bullyElection()
-        if address.ip < self.nu.ip:
-            self.sendAliveMessage(address)
+        with self.lock:
+            if self.leader is not None:
+                self.nu.send(LeaderExistsMessage(), Address((address.ip, self.nu.PORT)))
+                return
+            if self.state != "ELECTION":
+                self.bullyElection()
+            if address.ip < self.nu.ip:
+                self.sendAliveMessage(address)
 
     def handleLeaderExistsMessage(self, message, address):
-        self.state = "FOLLOWER"
-        self.leader = address.ip
-        print(f"{self.TAG}FOLLOWER, ALREADY EXISTING LEADER: {self.leader}")
+        with self.lock:
+            self.state = "FOLLOWER"
+            self.leader = address.ip
+            print(f"{self.TAG}FOLLOWER, ALREADY EXISTING LEADER: {self.leader}")
 
     def handleVictoryMessage(self, message, address):
         """
         Handles a Victory message
         """
-        self.state = "FOLLOWER"
-        self.leader = address.ip
-        print(f"{self.TAG}FOLLOWER, NEW LEADER IS: {self.leader}")
+        with self.lock:
+            self.state = "FOLLOWER"
+            self.leader = address.ip
+            print(f"{self.TAG}FOLLOWER, NEW LEADER IS: {self.leader}")
 
     def handleAliveMessage(self, message, address):
         """
         Handles an Alive message
         """
-        self.state = "WAITING"
+        with self.lock:
+            self.state = "WAITING"
 
     def bullyElection(self):
         """
         Implementation of the Bully Algorithm
         """
-        if len(self.neighbors) < self.MINIMUM_NEIGHBORS:
-            print(f"{self.TAG}Not enough neighbors to start election")
-            return
-        self.sendElectionMessage()
+        with self.lock:
+            if len(self.neighbors) < self.MINIMUM_NEIGHBORS:
+                print(f"{self.TAG}Not enough neighbors to start election")
+                return
+            self.sendElectionMessage()
         time.sleep(self.WAIT_TIME)
-        if self.state == "ELECTION":
-            self.sendVictoryMessage()
+        with self.lock:
+            if self.state == "ELECTION":
+                self.sendVictoryMessage()
 
     def sendAliveMessage(self, address: Address):
         """

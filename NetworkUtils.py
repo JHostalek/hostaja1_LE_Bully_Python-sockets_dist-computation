@@ -1,5 +1,6 @@
 import socket
 import threading
+from queue import Queue
 
 import Node
 from Message import *
@@ -39,6 +40,32 @@ class NetworkUtils:
         self.broadcastSock = None
         self.initBroadcast()
         self.broadcastRequestConnection()
+
+        self.messageQueue = Queue()
+        self.processMessageThread = threading.Thread(target=self.processMessages)
+        self.processMessageThread.start()
+
+    def processMessages(self):
+        while not self.terminate.is_set():
+            if not self.messageQueue.empty():
+                message, address = self.messageQueue.get()
+                if isinstance(message, AcceptConnectionMessage):
+                    print(f"{self.TAG}Received connection acceptance from {address}")
+                    self.node.handleNewConnection(message, address)
+                elif isinstance(message, ElectionMessage):
+                    print(f"{self.TAG}Received election message from {address}")
+                    self.node.handleElectionMessage(message, address)
+                elif isinstance(message, VictoryMessage):
+                    print(f"{self.TAG}Received victory message from {address}")
+                    self.node.handleVictoryMessage(message, address)
+                elif isinstance(message, AliveMessage):
+                    print(f"{self.TAG}Received alive message from {address}")
+                    self.node.handleAliveMessage(message, address)
+                elif isinstance(message, LeaderExistsMessage):
+                    print(f"{self.TAG}Received leader exists message from {address}")
+                    self.node.handleLeaderExistsMessage(message, address)
+                else:
+                    print(f"{self.TAG}Received unknown message: {message}")
 
     def initBroadcast(self):
         self.broadcastSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -103,23 +130,7 @@ class NetworkUtils:
                 message = client.recv(1024)
                 if message:
                     message = pickle.loads(message)
-                    if isinstance(message, AcceptConnectionMessage):
-                        print(f"{self.TAG}Received connection acceptance from {address}")
-                        self.node.handleNewConnection(message, address)
-                    elif isinstance(message, ElectionMessage):
-                        print(f"{self.TAG}Received election message from {address}")
-                        self.node.handleElectionMessage(message, address)
-                    elif isinstance(message, VictoryMessage):
-                        print(f"{self.TAG}Received victory message from {address}")
-                        self.node.handleVictoryMessage(message, address)
-                    elif isinstance(message, AliveMessage):
-                        print(f"{self.TAG}Received alive message from {address}")
-                        self.node.handleAliveMessage(message, address)
-                    elif isinstance(message, LeaderExistsMessage):
-                        print(f"{self.TAG}Received leader exists message from {address}")
-                        self.node.handleLeaderExistsMessage(message, address)
-                    else:
-                        print(f"{self.TAG}Received unknown message: {message}")
+                    self.messageQueue.put((message, address))
             except socket.timeout:
                 pass
 
