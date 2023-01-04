@@ -19,16 +19,16 @@ class RequestConnectionMessage(Message):
 
 
 class ConnectionEstablishedMessage(Message):
-    def __init__(self):
+    def __init__(self, leader: Address = None):
         super().__init__()
         self.message = "Established connection"
+        self.leader = leader
 
 
 class AcceptConnectionMessage(Message):
-    def __init__(self, leader: Address = None):
+    def __init__(self):
         super().__init__()
         self.message = "Accepting connection"
-        self.leader = leader
 
 
 class ElectionMessage(Message):

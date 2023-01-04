@@ -109,11 +109,11 @@ class NetworkUtils:
             print(f"{self.TAG}Sending connection acceptance to {address}, with leader {self.node.leader}")
         else:
             print(f"{self.TAG}Sending connection acceptance to {address}, without leader")
-        self.send(AcceptConnectionMessage(Address((self.node.leader, self.PORT))), address)
+        self.send(AcceptConnectionMessage(), address)
 
     def sendConnectionEstablished(self, address):
         print(f"{self.TAG}Sending connection established to {address}")
-        self.send(ConnectionEstablishedMessage(), Address((address.ip, self.PORT)))
+        self.send(ConnectionEstablishedMessage(Address((self.node.leader, self.PORT))), Address((address.ip, self.PORT)))
 
     def initListeningSocket(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
