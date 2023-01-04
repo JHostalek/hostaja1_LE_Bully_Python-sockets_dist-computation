@@ -23,60 +23,60 @@ class Node:
             print(f'{self.TAG}Established connection with {address}, leader is {self.leader}')
         else:
             print(f'{self.TAG}Established connection with {address}')
-        with self.lock:
-            self.neighbors.add(address.ip)
-            if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
-                print(f'{self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
-                self.bullyElection()
+
+        self.neighbors.add(address.ip)
+        if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
+            print(f'{self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
+            self.bullyElection()
 
     def handleElectionMessage(self, message, address):
         """
         Handles an Election message
         """
-        with self.lock:
-            if self.leader is not None:
-                self.nu.send(LeaderExistsMessage(), Address((address.ip, self.nu.PORT)))
-                return
-            if self.state != "ELECTION":
-                self.bullyElection()
-            if address.ip < self.nu.ip:
-                self.sendAliveMessage(address)
+
+        if self.leader is not None:
+            self.nu.send(LeaderExistsMessage(), Address((address.ip, self.nu.PORT)))
+            return
+        if self.state != "ELECTION":
+            self.bullyElection()
+        if address.ip < self.nu.ip:
+            self.sendAliveMessage(address)
 
     def handleLeaderExistsMessage(self, message, address):
-        with self.lock:
-            self.state = "FOLLOWER"
-            self.leader = address.ip
-            print(f"{self.TAG}FOLLOWER, ALREADY EXISTING LEADER: {self.leader}")
+
+        self.state = "FOLLOWER"
+        self.leader = address.ip
+        print(f"{self.TAG}FOLLOWER, ALREADY EXISTING LEADER: {self.leader}")
 
     def handleVictoryMessage(self, message, address):
         """
         Handles a Victory message
         """
-        with self.lock:
-            self.state = "FOLLOWER"
-            self.leader = address.ip
-            print(f"{self.TAG}FOLLOWER, NEW LEADER IS: {self.leader}")
+
+        self.state = "FOLLOWER"
+        self.leader = address.ip
+        print(f"{self.TAG}FOLLOWER, NEW LEADER IS: {self.leader}")
 
     def handleAliveMessage(self, message, address):
         """
         Handles an Alive message
         """
-        with self.lock:
-            self.state = "WAITING"
+
+        self.state = "WAITING"
 
     def bullyElection(self):
         """
         Implementation of the Bully Algorithm
         """
-        with self.lock:
-            if len(self.neighbors) < self.MINIMUM_NEIGHBORS:
-                print(f"{self.TAG}Not enough neighbors to start election")
-                return
-            self.sendElectionMessage()
+
+        if len(self.neighbors) < self.MINIMUM_NEIGHBORS:
+            print(f"{self.TAG}Not enough neighbors to start election")
+            return
+        self.sendElectionMessage()
         time.sleep(self.WAIT_TIME)
-        with self.lock:
-            if self.state == "ELECTION":
-                self.sendVictoryMessage()
+
+        if self.state == "ELECTION":
+            self.sendVictoryMessage()
 
     def sendAliveMessage(self, address: Address):
         """
@@ -88,22 +88,21 @@ class Node:
         """
         Sends an Election message to all processes with higher IDs
         """
-        with self.lock:
-            self.state = "ELECTION"
-            for neighbor in self.neighbors:
-                if neighbor > self.nu.ip:
-                    self.nu.send(ElectionMessage(), Address((neighbor, self.nu.PORT)))
+        self.state = "ELECTION"
+        for neighbor in self.neighbors:
+            if neighbor > self.nu.ip:
+                self.nu.send(ElectionMessage(), Address((neighbor, self.nu.PORT)))
 
     def sendVictoryMessage(self):
         """
         Sends a Victory message to all other processes and becomes the coordinator
         """
-        with self.lock:
-            self.state = "COORDINATOR"
-            self.leader = self.nu.ip
-            print(f"{self.TAG}I AM THE NEW LEADER")
-            for neighbor in self.neighbors:
-                self.nu.send(VictoryMessage(), Address((neighbor, self.nu.PORT)))
+
+        self.state = "COORDINATOR"
+        self.leader = self.nu.ip
+        print(f"{self.TAG}I AM THE NEW LEADER")
+        for neighbor in self.neighbors:
+            self.nu.send(VictoryMessage(), Address((neighbor, self.nu.PORT)))
 
     def findHighestID(self, ips: set[str]) -> str:
         sorted_ips = sorted(list(ips))
