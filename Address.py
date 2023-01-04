@@ -3,6 +3,7 @@ class Address:
         self.address = address
         self.ip = address[0]
         self.port = address[1]
+        self.id = self.ip
 
     def __eq__(self, other):
         return self.ip == other.ip and self.port == other.port

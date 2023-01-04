@@ -50,23 +50,23 @@ class NetworkUtils:
             if not self.messageQueue.empty():
                 message, address = self.messageQueue.get()
                 if isinstance(message, ConnectionEstablishedMessage):
-                    print(f"{self.TAG}Processed connection established from {address}")
+                    print(f"{self.TAG}Processed connection established from {address.id}")
                     self.handleConnectionEstablished(message=message, sender=address)
                 elif isinstance(message, AcceptConnectionMessage):
-                    print(f"{self.TAG}Processed connection acceptance from {address}")
+                    print(f"{self.TAG}Processed connection acceptance from {address.id}")
                     self.sendConnectionEstablished(address)
                     self.handleConnectionEstablished(address)
                 elif isinstance(message, ElectionMessage):
-                    print(f"{self.TAG}Processed election message from {address}")
+                    print(f"{self.TAG}Processed election message from {address.id}")
                     self.node.handleElectionMessage(message, address)
                 elif isinstance(message, VictoryMessage):
-                    print(f"{self.TAG}Processed victory message from {address}")
+                    print(f"{self.TAG}Processed victory message from {address.id}")
                     self.node.handleVictoryMessage(message, address)
                 elif isinstance(message, AliveMessage):
-                    print(f"{self.TAG}Processed alive message from {address}")
+                    print(f"{self.TAG}Processed alive message from {address.id}")
                     self.node.handleAliveMessage(message, address)
                 elif isinstance(message, LeaderExistsMessage):
-                    print(f"{self.TAG}Processed leader exists message from {address}")
+                    print(f"{self.TAG}Processed leader exists message from {address.id}")
                     self.node.handleLeaderExistsMessage(message, address)
                 else:
                     print(f"{self.TAG}Processed unknown message: {message}")
@@ -89,7 +89,7 @@ class NetworkUtils:
                 message = pickle.loads(data)
                 if address != self.broadcastAddress:
                     if isinstance(message, RequestConnectionMessage):
-                        print(f"{self.TAG}Received connection request from {address}")
+                        print(f"{self.TAG}Received connection request from {address.id}")
                         self.handleConnectionRequest(address)
                     else:
                         print(f"Received unknown broadcast message: {message}")
@@ -107,13 +107,13 @@ class NetworkUtils:
 
     def sendConnectionAcceptance(self, address: Address):
         if self.node.leader is not None:
-            print(f"{self.TAG}Sending connection acceptance to {address}, with leader {self.node.leader}")
+            print(f"{self.TAG}Sending connection acceptance to {address.id}, with leader {self.node.leader}")
         else:
-            print(f"{self.TAG}Sending connection acceptance to {address}, without leader")
+            print(f"{self.TAG}Sending connection acceptance to {address.id}, without leader")
         self.send(AcceptConnectionMessage(), address)
 
     def sendConnectionEstablished(self, address):
-        print(f"{self.TAG}Sending connection established to {address}")
+        print(f"{self.TAG}Sending connection established to {address.id}")
         self.send(ConnectionEstablishedMessage(Address((self.node.leader, self.PORT))), Address((address.ip, self.PORT)))
 
     def initListeningSocket(self):
@@ -140,7 +140,7 @@ class NetworkUtils:
                 message = client.recv(1024)
                 if message:
                     message = pickle.loads(message)
-                    print(f"{self.TAG}Received message from {address}: {message.message}")
+                    print(f"{self.TAG}Received message from {address.id}: {message.message}")
                     self.messageQueue.put((message, address))
             except socket.timeout:
                 pass
