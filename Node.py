@@ -75,7 +75,7 @@ class Node:
         self.sendElectionMessage()
         time.sleep(self.WAIT_TIME)
 
-        if self.state == "ELECTION":
+        if self.state == "ELECTION" and self.nu.messageQueue.empty():
             self.sendVictoryMessage()
 
     def sendAliveMessage(self, address: Address):
