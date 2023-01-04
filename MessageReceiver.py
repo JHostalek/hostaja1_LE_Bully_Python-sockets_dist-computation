@@ -39,7 +39,9 @@ class MessageReceiver:
                 address = Address(address)
                 message = pickle.loads(data)
                 if address != Address((self.network.IP, self.network.BROADCAST_PORT)):
-                    self.consume(message, address)
+                    thread = threading.Thread(target=self.consume, args=(message, address))
+                    thread.start()
+                    thread.join()
             except socket.timeout:
                 pass
 
@@ -60,7 +62,9 @@ class MessageReceiver:
                 if message:
                     message = pickle.loads(message)
                     print(f"{self.TAG}Received message from {address.id}: {message.message}")
-                    self.consume(message, address)
+                    thread = threading.Thread(target=self.consume, args=(message, address))
+                    thread.start()
+                    thread.join()
             except socket.timeout:
                 pass
 
