@@ -41,7 +41,6 @@ class MessageReceiver:
                 if address != Address((self.network.IP, self.network.BROADCAST_PORT)):
                     thread = threading.Thread(target=self.consume, args=(message, address))
                     thread.start()
-                    thread.join()
             except socket.timeout:
                 pass
 
@@ -64,7 +63,6 @@ class MessageReceiver:
                     print(f"{self.TAG}Received message from {address.id}: {message.message}")
                     thread = threading.Thread(target=self.consume, args=(message, address))
                     thread.start()
-                    thread.join()
             except socket.timeout:
                 pass
 
