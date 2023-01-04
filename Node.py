@@ -23,10 +23,15 @@ class Node:
         self.lock = threading.Lock()
         self.receiver.start()
         self.sender.sendConnectionRequest()
+        self.work_thread = None
 
     def setLeader(self, leader):
         self.leader = leader
         self.leader_address = Address((leader, self.network.PORT))
+        if self.work_thread is not None:
+            self.work_thread.join()
+        self.work_thread = threading.Thread(target=self.startWorking)
+        self.work_thread.start()
 
     def checkElection(self):
         if self.leader is None and self.state != 'ELECTION' and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
@@ -88,8 +93,6 @@ class Node:
             self.state = "FOLLOWER"
             self.setLeader(address.ip)
             print(f"{self.TAG}NEW LEADER IS: {self.leader}")
-            thread = threading.Thread(target=self.startWorking)
-            thread.start()
 
     def handleAliveMessage(self, message, address):
         with self.lock:
