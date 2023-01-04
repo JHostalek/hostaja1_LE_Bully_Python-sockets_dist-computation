@@ -2,14 +2,14 @@ import random
 import socket
 import threading
 
-import Network
 from Address import Address
 from Message import *
+from Network import parseIp
 
 
 class DataCenter:
     def __init__(self):
-        self.IP = Network.parseIp()
+        self.IP = parseIp()
         self.PORT = 5557
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((self.IP, self.PORT))
