@@ -17,7 +17,7 @@ class Node:
         self.leader = None
         self.leader_address = None
         self.MINIMUM_NEIGHBORS = 2
-        self.WAIT_TIME = 5
+        self.WAIT_TIME = 10
         self.TAG = self.network.IP + " - "
         self.terminate = threading.Event()
         self.lock = threading.Lock()
