@@ -63,3 +63,11 @@ class MessageSender:
     def sendTaskMessage(self, receiver_address: Address):
         message = TaskMessage()
         self.send(message, receiver_address)
+
+    def sendRequestAudioMessage(self, receiver_address: Address):
+        message = RequestAudioMessage()
+        self.send(message, receiver_address)
+
+    def sendResultMessage(self, receiver_address: Address, task: id, result: str):
+        message = ResultMessage(task, result)
+        self.send(message, receiver_address)

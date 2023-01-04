@@ -59,3 +59,24 @@ class TaskMessage(Message):
         super().__init__()
         self.message = "Sending task"
         self.task = str(time.time()).encode('utf-8').hex()[-8:]
+
+
+class RequestAudioMessage(Message):
+    def __init__(self):
+        super().__init__()
+        self.message = "Requesting audio"
+
+
+class AudioMessage(Message):
+    def __init__(self, audio):
+        super().__init__()
+        self.message = "Sending audio"
+        self.audio = audio
+
+
+class ResultMessage(Message):
+    def __init__(self, task: id, result: str):
+        super().__init__()
+        self.message = "Sending result"
+        self.task = task
+        self.result = result

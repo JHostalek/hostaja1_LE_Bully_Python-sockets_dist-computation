@@ -88,5 +88,10 @@ class MessageReceiver:
         elif isinstance(message, TaskMessage):
             print(f"{self.TAG}Processed task message from {address.id}")
             self.node.handleTaskMessage(message, address)
+        elif isinstance(message, RequestAudioMessage):
+            pass
+        elif isinstance(message, AudioMessage):
+            print(f"{self.TAG}Processed audio message from {address.id}")
+            self.node.handleAudioMessage(message, address)
         else:
-            print(f"{self.TAG}Processed unknown election message: {message}")
+            print(f"{self.TAG}Processed unknown message: {message}")
