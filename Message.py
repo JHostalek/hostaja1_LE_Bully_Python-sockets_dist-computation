@@ -58,4 +58,4 @@ class TaskMessage(Message):
     def __init__(self):
         super().__init__()
         self.message = "Sending task"
-        self.task = str(time.time()).encode('utf-8').hex()[:8]
+        self.task = str(time.time()).encode('utf-8').hex()[-8:]
