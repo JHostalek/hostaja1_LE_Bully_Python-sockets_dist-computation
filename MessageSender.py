@@ -14,26 +14,20 @@ class MessageSender:
         self.terminate = threading.Event()
 
     def sendBroadcast(self, message: Message):
-        print(self.TAG + "Sending broadcast message")
         receiver_address = (self.network.BROADCAST_IP, self.network.BROADCAST_PORT)
         self.network.broadcastSocket.sendto(message.toBytes(), receiver_address)
-        print(self.TAG + "Sending broadcast message DONE")
 
     def send(self, message: Message, receiver_address: Address):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print(self.TAG + "Sending " + str(message) + " to " + str(receiver_address))
         client.connect(receiver_address.address)
         client.send(message.toBytes())
         client.close()
-        print(self.TAG + "Sending " + str(message) + " to " + str(receiver_address) + " DONE")
 
     # --------------------------------------------------------------------------------------------------------------
     def sendConnectionRequest(self):
         # BROADCAST CONNECTION REQUEST
         message = RequestConnectionMessage()
-        print(self.TAG + "Putting into queue " + str(message) + " to " + str(self.network.BROADCAST_IP))
         self.sendBroadcast(message)
-        print(self.TAG + "Putting into queue " + str(message) + " to " + str(self.network.BROADCAST_IP) + " DONE")
 
     def sendConnectionAcceptance(self, receiver_address: Address):
         message = ConnectionAcceptanceMessage(self.node.leader)

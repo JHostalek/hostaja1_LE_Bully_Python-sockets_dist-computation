@@ -79,7 +79,8 @@ class Node:
         if self.state != "ELECTION":
             self.startElection()
         if sender_address.ip < self.network.IP:
-            self.sender.sendAliveMessage(sender_address)
+            receiver_address = Address((sender_address.ip, self.network.PORT))
+            self.sender.sendAliveMessage(receiver_address)
 
     def handleVictoryMessage(self, message, address):
         self.state = "FOLLOWER"
