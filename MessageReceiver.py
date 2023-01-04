@@ -48,6 +48,8 @@ class MessageReceiver:
                     print(f"{self.TAG}Received broadcast message from {address.id}: {message.message}")
                     with self.lock:
                         self.connection_q.put((message, address))
+                    print(f"{self.TAG}Received broadcast message from {address.id}: {message.message} DONE")
+
             except socket.timeout:
                 pass
 
