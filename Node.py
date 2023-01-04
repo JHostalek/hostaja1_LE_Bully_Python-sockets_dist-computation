@@ -51,7 +51,6 @@ class Node:
         receiver_address = Address((address.ip, self.network.PORT))
         self.sender.sendConnectionEstablished(receiver_address)
 
-        time.sleep(self.WAIT_TIME)
         self.checkElection()
 
 
@@ -67,7 +66,7 @@ class Node:
         self.state = "ELECTION"
         self.sender.sendElectionMessage()
         time.sleep(self.WAIT_TIME)
-        if self.state == "ELECTION":
+        if self.state == "ELECTION" and self.leader is None:
             print(f"{self.TAG}I AM THE NEW LEADER")
             self.state = "COORDINATOR"
             self.setLeader(self.network.IP)
