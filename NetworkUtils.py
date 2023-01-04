@@ -51,7 +51,7 @@ class NetworkUtils:
                 message, address = self.messageQueue.get()
                 if isinstance(message, ConnectionEstablishedMessage):
                     print(f"{self.TAG}Received connection established from {address}")
-                    self.node.handleConnectionEstablished(message, address)
+                    self.node.handleNewConnection(message, address)
                 elif isinstance(message, AcceptConnectionMessage):
                     print(f"{self.TAG}Received connection acceptance from {address}")
                     self.sendConnectionEstablished(address)
