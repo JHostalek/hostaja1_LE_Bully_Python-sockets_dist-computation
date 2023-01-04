@@ -50,26 +50,26 @@ class NetworkUtils:
             if not self.messageQueue.empty():
                 message, address = self.messageQueue.get()
                 if isinstance(message, ConnectionEstablishedMessage):
-                    print(f"{self.TAG}Received connection established from {address}")
+                    print(f"{self.TAG}Processed connection established from {address}")
                     self.handleConnectionEstablished(message=message, sender=address)
                 elif isinstance(message, AcceptConnectionMessage):
-                    print(f"{self.TAG}Received connection acceptance from {address}")
+                    print(f"{self.TAG}Processed connection acceptance from {address}")
                     self.sendConnectionEstablished(address)
                     self.handleConnectionEstablished(address)
                 elif isinstance(message, ElectionMessage):
-                    print(f"{self.TAG}Received election message from {address}")
+                    print(f"{self.TAG}Processed election message from {address}")
                     self.node.handleElectionMessage(message, address)
                 elif isinstance(message, VictoryMessage):
-                    print(f"{self.TAG}Received victory message from {address}")
+                    print(f"{self.TAG}Processed victory message from {address}")
                     self.node.handleVictoryMessage(message, address)
                 elif isinstance(message, AliveMessage):
-                    print(f"{self.TAG}Received alive message from {address}")
+                    print(f"{self.TAG}Processed alive message from {address}")
                     self.node.handleAliveMessage(message, address)
                 elif isinstance(message, LeaderExistsMessage):
-                    print(f"{self.TAG}Received leader exists message from {address}")
+                    print(f"{self.TAG}Processed leader exists message from {address}")
                     self.node.handleLeaderExistsMessage(message, address)
                 else:
-                    print(f"{self.TAG}Received unknown message: {message}")
+                    print(f"{self.TAG}Processed unknown message: {message}")
 
     def initBroadcast(self):
         self.broadcastSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -140,7 +140,7 @@ class NetworkUtils:
                 message = client.recv(1024)
                 if message:
                     message = pickle.loads(message)
-                    print(f"{self.TAG}Received message from {address}: {message}")
+                    print(f"{self.TAG}Received message from {address}: {message.message}")
                     self.messageQueue.put((message, address))
             except socket.timeout:
                 pass
