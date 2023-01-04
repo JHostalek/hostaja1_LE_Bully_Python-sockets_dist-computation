@@ -2,13 +2,13 @@ import threading
 import time
 
 from Message import *
-from NetworkUtils import NetworkUtils
+from Network import Network
 
 
 class Node:
     def __init__(self):
         self.state = None
-        self.nu = NetworkUtils(self)
+        self.nu = Network(self)
         self.lock = threading.Lock()
         self.neighbors = set()
         self.leader = None
