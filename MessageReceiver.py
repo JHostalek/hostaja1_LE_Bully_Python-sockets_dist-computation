@@ -23,6 +23,7 @@ class MessageReceiver:
         self.listenThread = None
         self.broadcastThread = None
         self.terminate = threading.Event()
+        self.lock = threading.Lock()
 
     def start(self):
         self.broadcastThread = threading.Thread(target=self.listenBroadcast)
@@ -45,7 +46,9 @@ class MessageReceiver:
                 message = pickle.loads(data)
                 if address != Address((self.network.IP, self.network.BROADCAST_PORT)):
                     print(f"{self.TAG}Received broadcast message from {address.id}: {message.message}")
-                    self.connection_q.put_nowait((message, address))
+                    self.lock.acquire()
+                    self.connection_q.put((message, address))
+                    self.lock.release()
             except socket.timeout:
                 pass
 
@@ -68,11 +71,17 @@ class MessageReceiver:
                     message = pickle.loads(message)
                     print(f"{self.TAG}Received message from {address.id}: {message.message}")
                     if message.category == "connection":
+                        self.lock.acquire()
                         self.connection_q.put((message, address))
+                        self.lock.release()
                     elif message.category == "election":
+                        self.lock.acquire()
                         self.election_q.put((message, address))
+                        self.lock.release()
                     elif message.category == "task":
+                        self.lock.acquire()
                         self.task_q.put((message, address))
+                        self.lock.release()
                     else:
                         print(f"{self.TAG}Received unknown message: {message}")
                     self.consume()
