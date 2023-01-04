@@ -22,21 +22,13 @@ class Node:
         self.TAG = self.network.IP + " - "
         self.terminate = threading.Event()
 
-    def setLeader(self, leader):
-        self.leader = leader
-        self.leader_address = Address((leader, self.network.PORT))
-
-    def start(self):
         self.receiver.start()
         self.sender.start()
         self.sender.sendConnectionRequest()
-        while not self.terminate.is_set():
-            self.receiver.consume()
 
-    def stop(self):
-        self.terminate.set()
-        self.sender.stop()
-        self.receiver.stop()
+    def setLeader(self, leader):
+        self.leader = leader
+        self.leader_address = Address((leader, self.network.PORT))
 
     def checkElection(self):
         if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:

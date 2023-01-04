@@ -73,6 +73,7 @@ class MessageReceiver:
                         self.task_q.put((message, address))
                     else:
                         print(f"{self.TAG}Received unknown message: {message}")
+                    self.consume()
             except socket.timeout:
                 pass
 
