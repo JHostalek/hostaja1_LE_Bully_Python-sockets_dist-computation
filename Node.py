@@ -9,7 +9,7 @@ class Node:
     def __init__(self):
         self.state = None
         self.nu = NetworkUtils(self)
-        self.neighbors_lock = threading.Lock()
+        self.lock = threading.Lock()
         self.neighbors = set()
         self.leader = None
         self.MINIMUM_NEIGHBORS = 2
@@ -23,7 +23,7 @@ class Node:
             print(f'{self.TAG}Established connection with {address}, leader is {self.leader}')
         else:
             print(f'{self.TAG}Established connection with {address}')
-        with self.neighbors_lock:
+        with self.lock:
             self.neighbors.add(address.ip)
         if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
             print(f'{self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
@@ -37,7 +37,6 @@ class Node:
             self.nu.send(LeaderExistsMessage(), Address((address.ip, self.nu.PORT)))
             return
         if self.state != "ELECTION":
-            self.state = "ELECTION"
             self.bullyElection()
         if address.ip < self.nu.ip:
             self.sendAliveMessage(address)
@@ -83,8 +82,8 @@ class Node:
         """
         Sends an Election message to all processes with higher IDs
         """
-        self.state = "ELECTION"
-        with self.neighbors_lock:
+        with self.lock:
+            self.state = "ELECTION"
             for neighbor in self.neighbors:
                 if neighbor > self.nu.ip:
                     self.nu.send(ElectionMessage(), Address((neighbor, self.nu.PORT)))
@@ -93,10 +92,10 @@ class Node:
         """
         Sends a Victory message to all other processes and becomes the coordinator
         """
-        self.state = "COORDINATOR"
-        self.leader = self.nu.ip
-        print(f"{self.TAG}I AM THE NEW LEADER")
-        with self.neighbors_lock:
+        with self.lock:
+            self.state = "COORDINATOR"
+            self.leader = self.nu.ip
+            print(f"{self.TAG}I AM THE NEW LEADER")
             for neighbor in self.neighbors:
                 self.nu.send(VictoryMessage(), Address((neighbor, self.nu.PORT)))
 
