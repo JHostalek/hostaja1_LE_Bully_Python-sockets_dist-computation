@@ -30,7 +30,7 @@ class Node:
         self.leader_address = Address((leader, self.network.PORT))
 
     def checkElection(self):
-        if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
+        if self.leader is None and self.state != 'ELECTION' and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
             print(f'{self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
             self.startElection()
 
@@ -79,14 +79,13 @@ class Node:
             self.startElection()
 
         if sender_address.ip < self.network.IP:
-            print(f'{self.TAG}I have a higher IP than {sender_address.ip}, sending election message')
             receiver_address = Address((sender_address.ip, self.network.PORT))
             self.sender.sendAliveMessage(receiver_address)
 
     def handleVictoryMessage(self, message, address):
         self.state = "FOLLOWER"
         self.setLeader(address.ip)
-        print(f"{self.TAG}ELECTION FINISHED - LEADER IS: {self.leader}")
+        print(f"{self.TAG}NEW LEADER IS: {self.leader}")
 
     def handleAliveMessage(self, message, address):
         self.state = "WAITING"
