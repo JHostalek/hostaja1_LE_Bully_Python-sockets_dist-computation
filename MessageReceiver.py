@@ -59,7 +59,6 @@ class MessageReceiver:
                 message = client.recv(1024)
                 if message:
                     message = pickle.loads(message)
-                    print(f"{self.TAG}Received message from {address.id}: {message.message}")
                     self.consume(message, address)
             except socket.timeout:
                 pass
