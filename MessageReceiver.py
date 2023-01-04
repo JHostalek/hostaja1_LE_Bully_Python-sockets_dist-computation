@@ -14,7 +14,7 @@ class MessageReceiver:
         self.broadcastSocket = self.network.broadcastSocket
         self.socket = self.network.socket
 
-        self.TAG = self.network.ip + " - "
+        self.TAG = self.network.IP + " - "
 
         self.connection_q = queue.Queue()
         self.election_q = queue.Queue()
