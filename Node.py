@@ -34,7 +34,6 @@ class Node:
             # time as hh:mm:ss
             print(f'{self.TAG}TIME: {time.strftime("%H:%M:%S", time.localtime())}')
             self.receiver.consume()
-            time.sleep(1)
 
     def stop(self):
         self.terminate.set()
