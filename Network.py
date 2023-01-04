@@ -34,9 +34,9 @@ class Network:
 
     def initSockets(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.bind((self.IP, self.PORT))
         sock.settimeout(self.SOCKET_TIMEOUT)
         sock.listen(self.MAX_CONNECTIONS)
-        sock.bind((self.IP, self.PORT))
 
         broadcast_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         broadcast_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
