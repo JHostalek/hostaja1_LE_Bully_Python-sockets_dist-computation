@@ -1,7 +1,6 @@
 import queue
 import socket
 import threading
-import time
 
 import Network
 from Address import Address
@@ -40,21 +39,17 @@ class MessageReceiver:
 
     def listenBroadcast(self):
         while not self.terminate.is_set():
-            print(self.TAG + "Listening for messages at " + time.strftime("%H:%M:%S", time.localtime()))
-            time.sleep(1)
             try:
                 data, address = self.broadcastSocket.recvfrom(1024)
                 address = Address(address)
                 message = pickle.loads(data)
                 if address != Address((self.network.IP, self.network.BROADCAST_PORT)):
-                    self.connection_q.put((message, address))
+                    self.connection_q.put_nowait((message, address))
             except socket.timeout:
                 pass
 
     def listenForNewConnections(self):
         while not self.terminate.is_set():
-            print(self.TAG + "Listening for connections at " + time.strftime("%H:%M:%S", time.localtime()))
-            time.sleep(1)
             try:
                 client, address = self.socket.accept()
                 address = Address(address)
@@ -65,19 +60,17 @@ class MessageReceiver:
 
     def listen(self, client, address: Address):
         while not self.terminate.is_set():
-            print(self.TAG + "Listening for messages at " + time.strftime("%H:%M:%S", time.localtime()))
-            time.sleep(1)
             try:
                 message = client.recv(1024)
                 if message:
                     message = pickle.loads(message)
                     print(f"{self.TAG}Received message from {address.id}: {message.message}")
                     if message.category == "connection":
-                        self.connection_q.put((message, address))
+                        self.connection_q.put_nowait((message, address))
                     elif message.category == "election":
-                        self.election_q.put((message, address))
+                        self.election_q.put_nowait((message, address))
                     elif message.category == "task":
-                        self.task_q.put((message, address))
+                        self.task_q.put_nowait((message, address))
                     else:
                         print(f"{self.TAG}Received unknown message: {message}")
                     self.consume()
