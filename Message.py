@@ -18,6 +18,12 @@ class RequestConnectionMessage(Message):
         self.message = "Requesting connection"
 
 
+class ConnectionEstablishedMessage(Message):
+    def __init__(self):
+        super().__init__()
+        self.message = "Established connection"
+
+
 class AcceptConnectionMessage(Message):
     def __init__(self, leader: Address = None):
         super().__init__()
