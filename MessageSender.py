@@ -12,17 +12,16 @@ class MessageSender:
         self.node = network.node
         self.TAG = self.network.IP + " - "
         self.terminate = threading.Event()
-        self.sockets = {}
 
     def sendBroadcast(self, message: Message):
         receiver_address = (self.network.BROADCAST_IP, self.network.BROADCAST_PORT)
         self.network.broadcastSocket.sendto(message.toBytes(), receiver_address)
 
     def send(self, message: Message, receiver_address: Address):
-        if receiver_address not in self.sockets:
-            self.sockets[receiver_address] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sockets[receiver_address].connect(receiver_address.address)
-        self.sockets[receiver_address].send(message.toBytes())
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect(receiver_address.address)
+        client.send(message.toBytes())
+        client.close()
 
     # --------------------------------------------------------------------------------------------------------------
     def sendConnectionRequest(self):

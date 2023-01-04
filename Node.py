@@ -13,7 +13,6 @@ class Node:
         self.network = Network(self)
         self.sender = MessageSender(self.network)
         self.receiver = MessageReceiver(self.network)
-        self.lock = threading.Lock()
         self.neighbors = set()
         self.leader = None
         self.leader_address = None
@@ -51,7 +50,6 @@ class Node:
         receiver_address = Address((address.ip, self.network.PORT))
         self.sender.sendConnectionEstablished(receiver_address)
 
-        self.checkElection()
 
 
     def handleConnectionEstablished(self, address):
@@ -60,7 +58,7 @@ class Node:
         print(f'{self.TAG}Established connection with {address.id}')
 
         # handshake with the incoming node finished check if we can start an election
-
+        self.checkElection()
     # --------------------------------------------------------------------------------------------------------------
     def startElection(self):
         self.state = "ELECTION"
