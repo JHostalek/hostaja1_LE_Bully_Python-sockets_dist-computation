@@ -43,6 +43,7 @@ class MessageSender:
                     client.connect(address.address)
                     client.send(message.toBytes())
                     client.close()
+                    print(self.TAG + "Sending " + str(message) + " to " + str(address) + " DONE")
 
     # --------------------------------------------------------------------------------------------------------------
     def sendConnectionRequest(self):
