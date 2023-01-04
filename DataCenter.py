@@ -23,9 +23,10 @@ def parseIp() -> str:
 class DataCenter:
     def __init__(self):
         self.IP = parseIp()
-        self.PORT = 5557
+        self.DATACENTER_PORT = 5557
+        self.PORT = 5556
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind((self.IP, self.PORT))
+        self.socket.bind((self.IP, self.DATACENTER_PORT))
         self.socket.settimeout(0.1)
         self.socket.listen(10)
 
