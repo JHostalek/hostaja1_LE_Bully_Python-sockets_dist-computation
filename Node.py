@@ -1,6 +1,7 @@
 import threading
 import time
 
+from Address import Address
 from MessageReceiver import MessageReceiver
 from MessageSender import MessageSender
 from Network import Network
