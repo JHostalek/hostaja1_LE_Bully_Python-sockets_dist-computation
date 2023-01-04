@@ -1,106 +1,93 @@
 import threading
 import time
 
-from Message import *
-from NetworkUtils import NetworkUtils
+from Address import Address
+from MessageReceiver import MessageReceiver
+from MessageSender import MessageSender
+from Network import Network
 
 
 class Node:
     def __init__(self):
         self.state = None
-        self.nu = NetworkUtils(self)
+        self.network = Network(self)
+        self.sender = MessageSender(self, self.network)
+        self.receiver = MessageReceiver(self, self.network)
         self.lock = threading.Lock()
         self.neighbors = set()
         self.leader = None
+        self.leader_address = None
         self.MINIMUM_NEIGHBORS = 2
         self.WAIT_TIME = 5
+        self.TAG = self.network.IP + " - "
+        self.terminate = threading.Event()
 
-        self.TAG = self.nu.ip + " - "
+    def setLeader(self, leader):
+        self.leader = leader
+        self.leader_address = Address((leader, self.network.PORT))
 
-    def handleNewConnection(self, message, address):
-        if message is not None:
-            self.leader = message.leader.ip
-            print(f'{self.TAG}Established connection with {address.id}, leader is {self.leader}')
-        else:
-            print(f'{self.TAG}Established connection with {address.id}')
+    def start(self):
+        self.receiver.start()
+        self.sender.start()
+        self.sender.sendConnectionRequest()
+        while not self.terminate.is_set():
+            self.receiver.consume()
 
-        self.neighbors.add(address.ip)
-
+    def checkElection(self):
         if self.leader is None and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
             print(f'{self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
-            self.bullyElection()
+            self.startElection()
 
-    def handleElectionMessage(self, message, address):
-        """
-        Handles an Election message
-        """
+    # --------------------------------------------------------------------------------------------------------------
+    def handleConnectionRequest(self, sender: Address):
+        # existing network member
+        receiver_address = Address((sender.ip, self.network.PORT))
+        self.sender.sendConnectionAcceptance(receiver_address)
 
+    def handleConnectionAcceptance(self, message, address):
+        # incoming node
+        if message.leader is not None:
+            self.setLeader(message.leader)
+        self.neighbors.add(address.ip)
+        print(f'{self.TAG}Established connection with {address.id}, leader is {self.leader}')
+        # finish handshake with the existing network member
+        self.sender.sendConnectionEstablished(address)
+
+        # incoming node is ready
+        self.checkElection()
+
+    def handleConnectionEstablished(self, address):
+        # existing network member
+        self.neighbors.add(address.ip)
+        print(f'{self.TAG}Established connection with {address.id}')
+
+        # handshake with the incoming node finished check if we can start an election
+        self.checkElection()
+
+    # --------------------------------------------------------------------------------------------------------------
+    def startElection(self):
+        self.state = "ELECTION"
+        self.sender.sendElectionMessage()
+        time.sleep(self.WAIT_TIME)
+        if self.state == "ELECTION":
+            print(f"{self.TAG}I AM THE NEW LEADER")
+            self.state = "COORDINATOR"
+            self.setLeader(self.network.IP)
+            self.sender.sendVictoryMessage()
+
+    def handleElectionMessage(self, message, sender_address):
         if self.leader is not None:
-            self.nu.send(LeaderExistsMessage(), Address((address.ip, self.nu.PORT)))
+            print(f'{self.TAG}ERROR: Why am I receiving an election message from {sender_address}?')
             return
         if self.state != "ELECTION":
-            self.bullyElection()
-        if address.ip < self.nu.ip:
-            self.sendAliveMessage(address)
-
-    def handleLeaderExistsMessage(self, message, address):
-
-        self.state = "FOLLOWER"
-        self.leader = address.ip
-        print(f"{self.TAG}FOLLOWER, ALREADY EXISTING LEADER: {self.leader}")
+            self.startElection()
+        if sender_address.ip < self.network.IP:
+            self.sender.sendAliveMessage(sender_address)
 
     def handleVictoryMessage(self, message, address):
-        """
-        Handles a Victory message
-        """
-
         self.state = "FOLLOWER"
-        self.leader = address.ip
-        print(f"{self.TAG}FOLLOWER, NEW LEADER IS: {self.leader}")
+        self.setLeader(address.ip)
+        print(f"{self.TAG}ELECTION FINISHED - LEADER IS: {self.leader}")
 
     def handleAliveMessage(self, message, address):
-        """
-        Handles an Alive message
-        """
-
         self.state = "WAITING"
-
-    def bullyElection(self):
-        """
-        Implementation of the Bully Algorithm
-        """
-        self.sendElectionMessage()
-        time.sleep(self.WAIT_TIME)
-
-        if self.state == "ELECTION":
-            self.sendVictoryMessage()
-
-    def sendAliveMessage(self, address: Address):
-        """
-        Sends an Alive message to the node that sent the Election message
-        """
-        self.nu.send(AliveMessage(), Address((address.ip, self.nu.PORT)))
-
-    def sendElectionMessage(self):
-        """
-        Sends an Election message to all processes with higher IDs
-        """
-        self.state = "ELECTION"
-        for neighbor in self.neighbors:
-            if neighbor > self.nu.ip:
-                self.nu.send(ElectionMessage(), Address((neighbor, self.nu.PORT)))
-
-    def sendVictoryMessage(self):
-        """
-        Sends a Victory message to all other processes and becomes the coordinator
-        """
-
-        self.state = "COORDINATOR"
-        self.leader = self.nu.ip
-        print(f"{self.TAG}I AM THE NEW LEADER")
-        for neighbor in self.neighbors:
-            self.nu.send(VictoryMessage(), Address((neighbor, self.nu.PORT)))
-
-    def findHighestID(self, ips: set[str]) -> str:
-        sorted_ips = sorted(list(ips))
-        return sorted_ips[-1]
