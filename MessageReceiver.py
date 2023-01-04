@@ -78,7 +78,7 @@ class MessageReceiver:
 
     def consume(self):
         print(f"{self.TAG}Consuming messages. Queue sizes: {self.connection_q.qsize()}, {self.election_q.qsize()}, {self.task_q.qsize()}")
-        if not self.connection_q.empty():
+        while not self.connection_q.empty():
             message, address = self.connection_q.get()
             if isinstance(message, RequestConnectionMessage):
                 self.node.handleConnectionRequest(address)
@@ -91,7 +91,7 @@ class MessageReceiver:
             else:
                 print(f"{self.TAG}Processed unknown connection message: {message}")
 
-        elif not self.election_q.empty():
+        while not self.election_q.empty():
             message, address = self.election_q.get()
             if isinstance(message, ElectionMessage):
                 print(f"{self.TAG}Processed election message from {address.id}")
