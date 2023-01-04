@@ -35,6 +35,7 @@ class MessageSender:
             while not self.q.empty():
                 message, address = self.q.get()
                 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                print(self.TAG + "Sending " + str(message) + " to " + str(address))
                 client.connect(address.address)
                 client.send(message.toBytes())
                 client.close()
