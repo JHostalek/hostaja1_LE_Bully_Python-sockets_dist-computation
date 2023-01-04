@@ -1,6 +1,7 @@
 import queue
 import socket
 import threading
+import time
 
 import Network
 from Address import Address
@@ -39,6 +40,8 @@ class MessageReceiver:
 
     def listenBroadcast(self):
         while not self.terminate.is_set():
+            print(self.TAG + "Listening for messages at " + time.strftime("%H:%M:%S", time.localtime()))
+            time.sleep(1)
             try:
                 data, address = self.broadcastSocket.recvfrom(1024)
                 address = Address(address)
@@ -50,6 +53,8 @@ class MessageReceiver:
 
     def listenForNewConnections(self):
         while not self.terminate.is_set():
+            print(self.TAG + "Listening for connections at " + time.strftime("%H:%M:%S", time.localtime()))
+            time.sleep(1)
             try:
                 client, address = self.socket.accept()
                 address = Address(address)
@@ -60,6 +65,8 @@ class MessageReceiver:
 
     def listen(self, client, address: Address):
         while not self.terminate.is_set():
+            print(self.TAG + "Listening for messages at " + time.strftime("%H:%M:%S", time.localtime()))
+            time.sleep(1)
             try:
                 message = client.recv(1024)
                 if message:
