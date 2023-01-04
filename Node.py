@@ -50,6 +50,8 @@ class Node:
         receiver_address = Address((address.ip, self.network.PORT))
         self.sender.sendConnectionEstablished(receiver_address)
 
+        self.checkElection()
+
 
     def handleConnectionEstablished(self, address):
         # existing network member
@@ -57,7 +59,6 @@ class Node:
         print(f'{self.TAG}Established connection with {address.id}')
 
         # handshake with the incoming node finished check if we can start an election
-        self.checkElection()
 
     # --------------------------------------------------------------------------------------------------------------
     def startElection(self):
