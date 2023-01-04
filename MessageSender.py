@@ -11,7 +11,7 @@ class MessageSender:
     def __init__(self, network: Network):
         self.network = network
         self.node = network.node
-        self.TAG = self.network.ip + " - "
+        self.TAG = self.network.IP + " - "
         self.broadcast_q = queue.Queue()
         self.q = queue.Queue()
         self.sendThread = None
