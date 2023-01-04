@@ -1,4 +1,3 @@
-import queue
 import socket
 import threading
 
@@ -15,10 +14,6 @@ class MessageReceiver:
         self.socket = self.network.socket
 
         self.TAG = self.network.IP + " - "
-
-        self.connection_q = queue.Queue()
-        self.election_q = queue.Queue()
-        self.task_q = queue.Queue()
 
         self.listenThread = None
         self.broadcastThread = None
@@ -45,9 +40,9 @@ class MessageReceiver:
                 message = pickle.loads(data)
                 if address != Address((self.network.IP, self.network.BROADCAST_PORT)):
                     print(f"{self.TAG}Received broadcast message from {address.id}: {message.message}")
-                    self.connection_q.put((message, address))
+                    self.consume(message, address)
                     print(f"{self.TAG}Received broadcast message from {address.id}: {message.message} DONE")
-                    self.consume()
+
             except socket.timeout:
                 pass
 
@@ -69,46 +64,28 @@ class MessageReceiver:
                 if message:
                     message = pickle.loads(message)
                     print(f"{self.TAG}Received message from {address.id}: {message.message}")
-
-                    if message.category == "connection":
-                        self.connection_q.put((message, address))
-                    elif message.category == "election":
-                        self.election_q.put((message, address))
-                    elif message.category == "task":
-                        self.task_q.put((message, address))
-                    else:
-                        print(f"{self.TAG}Received unknown message: {message}")
-                    self.consume()
+                    self.consume(message, address)
             except socket.timeout:
                 pass
 
-    def consume(self):
-        while not self.connection_q.empty():
-            print(f"{self.TAG}Consuming messages. Queue sizes: {self.connection_q.qsize()}, {self.election_q.qsize()}, {self.task_q.qsize()}")
-            message, address = self.connection_q.get()
-            if isinstance(message, RequestConnectionMessage):
-                self.node.handleConnectionRequest(address)
-            elif isinstance(message, ConnectionAcceptanceMessage):
-                print(f"{self.TAG}Processed connection acceptance from {address.id}")
-                self.node.handleConnectionAcceptance(message, address)
-            elif isinstance(message, ConnectionEstablishedMessage):
-                print(f"{self.TAG}Processed connection established from {address.id}")
-                self.node.handleConnectionEstablished(address)
-            else:
-                print(f"{self.TAG}Processed unknown connection message: {message}")
-
-        while not self.election_q.empty():
-            print(f"{self.TAG}Consuming messages. Queue sizes: {self.connection_q.qsize()}, {self.election_q.qsize()}, {self.task_q.qsize()}")
-            message, address = self.election_q.get()
-            if isinstance(message, ElectionMessage):
-                print(f"{self.TAG}Processed election message from {address.id}")
-                self.node.handleElectionMessage(message, address)
-            elif isinstance(message, VictoryMessage):
-                print(f"{self.TAG}Processed victory message from {address.id}")
-                self.node.handleVictoryMessage(message, address)
-            elif isinstance(message, AliveMessage):
-                print(f"{self.TAG}Processed alive message from {address.id}")
-                self.node.handleAliveMessage(message, address)
-            else:
-                print(f"{self.TAG}Processed unknown election message: {message}")
-
+    def consume(self, message, address):
+        print(f"{self.TAG}Consuming messages. Queue sizes: {self.connection_q.qsize()}, {self.election_q.qsize()}, {self.task_q.qsize()}")
+        if isinstance(message, RequestConnectionMessage):
+            self.node.handleConnectionRequest(address)
+        elif isinstance(message, ConnectionAcceptanceMessage):
+            print(f"{self.TAG}Processed connection acceptance from {address.id}")
+            self.node.handleConnectionAcceptance(message, address)
+        elif isinstance(message, ConnectionEstablishedMessage):
+            print(f"{self.TAG}Processed connection established from {address.id}")
+            self.node.handleConnectionEstablished(address)
+        elif isinstance(message, ElectionMessage):
+            print(f"{self.TAG}Processed election message from {address.id}")
+            self.node.handleElectionMessage(message, address)
+        elif isinstance(message, VictoryMessage):
+            print(f"{self.TAG}Processed victory message from {address.id}")
+            self.node.handleVictoryMessage(message, address)
+        elif isinstance(message, AliveMessage):
+            print(f"{self.TAG}Processed alive message from {address.id}")
+            self.node.handleAliveMessage(message, address)
+        else:
+            print(f"{self.TAG}Processed unknown election message: {message}")
