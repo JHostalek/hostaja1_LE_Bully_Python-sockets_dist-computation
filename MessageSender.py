@@ -47,7 +47,7 @@ class MessageSender:
         # BROADCAST CONNECTION REQUEST
         message = RequestConnectionMessage()
         print(self.TAG + "Putting into queue " + str(message) + " to " + str(self.network.BROADCAST_IP))
-        self.broadcast_q.put(message)
+        self.broadcast_q.put_nowait(message)
         print(self.TAG + "Putting into queue " + str(message) + " to " + str(self.network.BROADCAST_IP) + " DONE")
 
     def sendConnectionAcceptance(self, receiver_address: Address):
