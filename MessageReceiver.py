@@ -43,7 +43,7 @@ class MessageReceiver:
                 data, address = self.broadcastSocket.recvfrom(1024)
                 address = Address(address)
                 message = pickle.loads(data)
-                if address != Address((self.network.ip, self.network.BROADCAST_PORT)):
+                if address != Address((self.network.IP, self.network.BROADCAST_PORT)):
                     self.connection_q.put((message, address))
             except socket.timeout:
                 pass
