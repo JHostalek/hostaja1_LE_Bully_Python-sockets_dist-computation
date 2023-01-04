@@ -11,8 +11,8 @@ class Node:
     def __init__(self):
         self.state = None
         self.network = Network(self)
-        self.sender = MessageSender(self, self.network)
-        self.receiver = MessageReceiver(self, self.network)
+        self.sender = MessageSender(self.network)
+        self.receiver = MessageReceiver(self.network)
         self.lock = threading.Lock()
         self.neighbors = set()
         self.leader = None
