@@ -25,7 +25,7 @@ class NetworkUtils:
         self.BROADCAST_PORT = 5555
         self.PORT = 5556
         self.MAX_CONNECTIONS = 10
-        self.SOCKET_TIMEOUT = 0.1
+        self.SOCKET_TIMEOUT = 0.5
 
         self.terminate: threading.Event = threading.Event()
         self.node = node
@@ -139,6 +139,7 @@ class NetworkUtils:
                 message = client.recv(1024)
                 if message:
                     message = pickle.loads(message)
+                    print(f"{self.TAG}Received message from {address}: {message}")
                     self.messageQueue.put((message, address))
             except socket.timeout:
                 pass
