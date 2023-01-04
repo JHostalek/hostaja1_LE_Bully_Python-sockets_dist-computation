@@ -28,20 +28,21 @@ class MessageSender:
 
     def sendMessages(self):
         while not self.terminate.is_set():
-            while not self.broadcast_q.empty():
-                print(self.TAG + "Sending broadcast message")
-                message = self.broadcast_q.get()
-                receiver_address = (self.network.BROADCAST_IP, self.network.BROADCAST_PORT)
-                self.network.broadcastSocket.sendto(message.toBytes(), receiver_address)
-                print(self.TAG + "Sending broadcast message DONE")
+            with self.lock:
+                while not self.broadcast_q.empty():
+                    print(self.TAG + "Sending broadcast message")
+                    message = self.broadcast_q.get()
+                    receiver_address = (self.network.BROADCAST_IP, self.network.BROADCAST_PORT)
+                    self.network.broadcastSocket.sendto(message.toBytes(), receiver_address)
+                    print(self.TAG + "Sending broadcast message DONE")
 
-            while not self.q.empty():
-                message, address = self.q.get()
-                client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                print(self.TAG + "Sending " + str(message) + " to " + str(address))
-                client.connect(address.address)
-                client.send(message.toBytes())
-                client.close()
+                while not self.q.empty():
+                    message, address = self.q.get()
+                    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    print(self.TAG + "Sending " + str(message) + " to " + str(address))
+                    client.connect(address.address)
+                    client.send(message.toBytes())
+                    client.close()
 
     # --------------------------------------------------------------------------------------------------------------
     def sendConnectionRequest(self):
