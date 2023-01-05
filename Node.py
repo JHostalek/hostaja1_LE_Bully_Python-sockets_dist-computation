@@ -56,7 +56,8 @@ class Node:
         # incoming node
         if message.leader is not None:
             self.setLeader(message.leader)
-        self.neighbors.add(address.ip)
+        with self.lock:
+            self.neighbors.add(address.ip)
         print(f'{self.TAG}Established connection with {address.id}, leader is {self.leader}')
         # finish handshake with the existing network member
         receiver_address = Address((address.ip, self.network.PORT))
@@ -64,7 +65,8 @@ class Node:
 
     def handleConnectionEstablished(self, address):
         # existing network member
-        self.neighbors.add(address.ip)
+        with self.lock:
+            self.neighbors.add(address.ip)
         print(f'{self.TAG}Established connection with {address.id}')
 
         # handshake with the incoming node finished check if we can start an election

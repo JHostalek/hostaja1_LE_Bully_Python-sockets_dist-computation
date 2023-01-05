@@ -26,7 +26,8 @@ class MessageSender:
         except ConnectionError:
             print(self.TAG + "Connection error by " + str(receiver_address))
             if receiver_address.ip in self.node.neighbors:
-                self.node.neighbors.remove(receiver_address.ip)
+                with self.node.lock:
+                    self.node.neighbors.remove(receiver_address.ip)
                 if self.node.state == 'ELECTION':
                     self.node.state = None
             if receiver_address.ip == self.node.leader:
@@ -56,17 +57,19 @@ class MessageSender:
         self.send(message, receiver_address)
 
     def sendElectionMessage(self):
-        for neighbor in self.node.neighbors:
-            if neighbor > self.network.IP:
-                message = ElectionMessage()
-                receiver_address = Address((neighbor, self.network.PORT))
-                self.send(message, receiver_address)
+        with self.node.lock:
+            for neighbor in self.node.neighbors:
+                if neighbor > self.network.IP:
+                    message = ElectionMessage()
+                    receiver_address = Address((neighbor, self.network.PORT))
+                    self.send(message, receiver_address)
 
     def sendVictoryMessage(self):
-        for neighbor in self.node.neighbors:
-            message = VictoryMessage()
-            receiver_address = Address((neighbor, self.network.PORT))
-            self.send(message, receiver_address)
+        with self.node.lock:
+            for neighbor in self.node.neighbors:
+                message = VictoryMessage()
+                receiver_address = Address((neighbor, self.network.PORT))
+                self.send(message, receiver_address)
 
     # --------------------------------------------------------------------------------------------------------------
     def sendTaskRequestMessage(self, receiver_address: Address):
