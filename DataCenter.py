@@ -63,7 +63,6 @@ class DataCenter:
                 break
 
     def consume(self, message, address):
-
         if isinstance(message, RequestAudioMessage):
             print(f"{self.TAG}Received request for audio from {address.id} for chunk {message.task}")
             receiver_address = Address((address.ip, self.PORT))
@@ -72,7 +71,7 @@ class DataCenter:
 
     def sendAudio(self, receiver_address: Address, task: int):
         FileTransferUtils.sendFile(f'data/task{task}.mp3', receiver_address.ip, self.FILE_TRANSFER_PORT)
-        message = TransferSuccessful(self.chunks[task])
+        message = TransferSuccessful()
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(receiver_address.address)
         print(f'{self.TAG}Sending audio to {receiver_address.id} of size {len(message.toBytes())}')

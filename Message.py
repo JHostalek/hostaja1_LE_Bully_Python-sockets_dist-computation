@@ -68,7 +68,7 @@ class RequestAudioMessage(Message):
 
 
 class TransferSuccessful(Message):
-    def __init__(self, audio):
+    def __init__(self):
         super().__init__()
         self.message = "Transfer successful"
 
