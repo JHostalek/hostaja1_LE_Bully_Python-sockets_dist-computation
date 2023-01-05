@@ -123,14 +123,14 @@ class Node:
 
     # --------------------------------------------------------------------------------------------------------------
     def getTask(self) -> int:
-        with self.lock:
-            for task in self.tasks:
-                if task.state == 'NEW':
-                    task.setBeingProcessed()
-                    return task.id
-                elif task.state == 'PROCESSING' and task.getDuration() > 30:
-                    task.setBeingProcessed()
-                    return task.id
+
+        for task in self.tasks:
+            if task.state == 'NEW':
+                task.setBeingProcessed()
+                return task.id
+            elif task.state == 'PROCESSING' and task.getDuration() > 30:
+                task.setBeingProcessed()
+                return task.id
         return -1
 
     def askForTask(self):
