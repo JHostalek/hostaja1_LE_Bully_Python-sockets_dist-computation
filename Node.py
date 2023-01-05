@@ -127,8 +127,10 @@ class Node:
         with self.lock:
             for task in self.tasks:
                 if task.state == 'NEW':
+                    task.setBeingProcessed()
                     return task.id
                 elif task.state == 'IN_PROGRESS' and task.getDuration() > 20:
+                    task.setBeingProcessed()
                     return task.id
                 else:
                     raise Exception("No task available")
