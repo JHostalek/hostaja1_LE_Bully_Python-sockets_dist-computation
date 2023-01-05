@@ -56,7 +56,7 @@ class MessageReceiver:
     def listen(self, client, address: Address):
         while not self.terminate.is_set():
             try:
-                message = client.recv(65536)
+                message = client.recv(131072)
                 if message:
                     message = pickle.loads(message)
                     self.consume(message, address)
