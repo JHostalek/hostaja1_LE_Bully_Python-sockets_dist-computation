@@ -152,8 +152,9 @@ class Node:
 
     def handleAudioMessage(self, message, address):
         print(f"{self.TAG}Starting work on task: {self.task}")
-        work_thread = threading.Thread(target=self.processAudio, args=(self.leader, message.audio,))
-        work_thread.start()
+        # work_thread = threading.Thread(target=self.processAudio, args=(self.leader, message.audio,))
+        # work_thread.start()
+        self.processAudio(self.leader, message.audio)
 
     def handleResultMessage(self, message, address):
         print(f"{self.TAG}Received result: {message.result}")

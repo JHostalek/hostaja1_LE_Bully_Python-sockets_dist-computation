@@ -55,6 +55,7 @@ class MessageReceiver:
 
     def listen(self, client, address: Address):
         while not self.terminate.is_set():
+
             try:
                 message = client.recv(1024)
                 if message:
