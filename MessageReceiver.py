@@ -89,7 +89,7 @@ class MessageReceiver:
             self.node.handleTaskMessage(message, address)
         elif isinstance(message, RequestAudioMessage):
             pass
-        elif isinstance(message, TransferSuccessful):
+        elif isinstance(message, AudioMessage):
             print(f"{self.TAG}Processed audio message from {address.id}")
             self.node.handleAudioMessage(message, address)
         elif isinstance(message, ResultMessage):

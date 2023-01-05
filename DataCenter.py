@@ -1,7 +1,6 @@
 import socket
 import threading
 
-import FileTransferUtils
 from Address import Address
 from Message import *
 
@@ -24,7 +23,6 @@ class DataCenter:
     def __init__(self):
         self.IP = parseIp()
         self.DATACENTER_PORT = 5557
-        self.FILE_TRANSFER_PORT = 5558
         self.PORT = 5556
         self.NUM_OF_CHUNKS = 20
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -35,8 +33,6 @@ class DataCenter:
         self.TAG = self.IP + " - "
         self.terminate = threading.Event()
 
-        self.lock = threading.Lock()
-        self.chunks = []
 
     def listenForNewConnections(self):
         while not self.terminate.is_set():
@@ -70,8 +66,7 @@ class DataCenter:
             thread.start()
 
     def sendAudio(self, receiver_address: Address, task: int):
-        FileTransferUtils.sendFile(f'data/task{task}.mp3', receiver_address.ip, self.FILE_TRANSFER_PORT)
-        message = TransferSuccessful()
+        message = AudioMessage(f'data/task{task}.mp3')
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(receiver_address.address)
         print(f'{self.TAG}Sending audio to {receiver_address.id} of size {len(message.toBytes())}')

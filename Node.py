@@ -1,4 +1,3 @@
-import os
 import threading
 import time
 
@@ -29,7 +28,7 @@ class Node:
         self.sender.sendConnectionRequest()
         self.work_thread = None
 
-        self.task = 0
+        self.task = -1
 
         self.result = {}
 
@@ -141,27 +140,20 @@ class Node:
         self.sender.sendRequestAudioMessage(receiver_address, message.task)
 
     def handleAudioMessage(self, message, address):
-        if f'tmp{self.task}.mp3' in os.listdir():
-            print(f"{self.TAG}Audio file transfered successfully")
-        else:
-            print(f"{self.TAG}Audio file transfered unsuccessfully")
-            return
         print(f"{self.TAG}Processing audio...")
-        work_thread = threading.Thread(target=self.processAudio, args=(self.leader,))
+        work_thread = threading.Thread(target=self.processAudio, args=(self.leader, message.audio,))
         work_thread.start()
 
     def handleResultMessage(self, message, address):
         print(f"{self.TAG}Received result: {message.result}")
         self.result[message.task] = message.result
-        # print(''.join([self.result[key] for key in sorted(self.result)]))
         with self.lock:
             # print(''.join([self.result[key] for key in sorted(self.result)]))
             print(self.result)
 
-    def processAudio(self, current_leader):
+    def processAudio(self, current_leader, audio):
         model = whisper.load_model('base.en')
-        result = model.transcribe(f'tmp{self.task}.mp3')
-        os.remove(f'tmp{self.task}.mp3')
+        result = model.transcribe(audio)
         if self.leader != current_leader:
             print(f"{self.TAG}Leader changed, aborting")
             return

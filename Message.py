@@ -67,10 +67,11 @@ class RequestAudioMessage(Message):
         self.task = task
 
 
-class TransferSuccessful(Message):
-    def __init__(self):
+class AudioMessage(Message):
+    def __init__(self, audio: str):
         super().__init__()
-        self.message = "Transfer successful"
+        self.message = "Sending audio"
+        self.audio = audio
 
 
 class ResultMessage(Message):
