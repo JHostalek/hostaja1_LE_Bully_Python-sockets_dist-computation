@@ -28,12 +28,15 @@ class MessageSender:
             if receiver_address in self.node.neighbors:
                 self.node.neighbors.remove(receiver_address)
                 print(self.TAG + "Removed " + str(receiver_address) + " from neighbors")
+                if self.node.state == 'ELECTION':
+                    self.node.state = None
             if receiver_address.ip == self.node.leader:
                 self.node.leader = None
                 self.node.checkElection()
                 print(self.TAG + str(receiver_address) + " is no longer the leader")
         except socket.timeout:
             print(self.TAG + "Connection timeout by " + str(receiver_address))
+
     # --------------------------------------------------------------------------------------------------------------
     def sendConnectionRequest(self):
         # BROADCAST CONNECTION REQUEST
