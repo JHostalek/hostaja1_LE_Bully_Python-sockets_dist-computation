@@ -8,6 +8,7 @@ from Message import ElectionMessage
 from MessageReceiver import MessageReceiver
 from MessageSender import MessageSender
 from Network import Network
+from Task import Task
 
 
 class Node:
@@ -29,7 +30,9 @@ class Node:
         self.work_thread = None
 
         self.task = -1
-
+        self.tasks = []
+        for i in range(20):
+            self.tasks.append(Task(i))
         self.result = {}
 
     def setLeader(self, leader):
@@ -120,9 +123,15 @@ class Node:
             self.state = "WAITING"
 
     # --------------------------------------------------------------------------------------------------------------
-    def getTask(self):
-        self.task += 1
-        return self.task
+    def getTask(self) -> int:
+        with self.lock:
+            for task in self.tasks:
+                if task.state == 'NEW':
+                    return task.id
+                elif task.state == 'IN_PROGRESS' and task.getDuration() > 20:
+                    return task.id
+                else:
+                    raise Exception("No task available")
 
     def askForTask(self):
         if self.leader is not None:
@@ -140,7 +149,7 @@ class Node:
         self.sender.sendRequestAudioMessage(receiver_address, message.task)
 
     def handleAudioMessage(self, message, address):
-        print(f"{self.TAG}Processing audio...")
+        print(f"{self.TAG}Starting work on task: {message.task}")
         work_thread = threading.Thread(target=self.processAudio, args=(self.leader, message.audio,))
         work_thread.start()
 
@@ -152,8 +161,9 @@ class Node:
             print(self.result)
 
     def processAudio(self, current_leader, audio):
+        print(f"{self.TAG}Processing audio...")
         model = whisper.load_model('tiny.en')
-        result = model.transcribe(audio)["text"]
+        result = model.transcribe(audio, fp16=False)["text"]
         print(f"{self.TAG}Result: {result}")
         if self.leader != current_leader:
             print(f"{self.TAG}Leader changed, aborting")
