@@ -131,9 +131,11 @@ class Node:
         self.sender.sendTaskRequestMessage(receiver_address)
 
     def startWorking(self):
-        while not self.terminate.is_set() or self.leader is None:
+        # while not self.terminate.is_set() or self.leader is None:
+        #     self.askForTask()
+        #     time.sleep(5)
+        if self.leader is not None:
             self.askForTask()
-            time.sleep(5)
 
     def handleTaskRequestMessage(self, message, address):
         receiver_address = Address((address.ip, self.network.PORT))
@@ -150,7 +152,7 @@ class Node:
         audio = message.audio
         print(f"{self.TAG}Processing audio...")
         time.sleep(5)
-        result = audio + " processed"
+        result = audio
         print(f"{self.TAG}Audio processed")
         receiver_address = Address((self.leader, self.network.PORT))
         self.sender.sendResultMessage(receiver_address, self.task, result)

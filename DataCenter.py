@@ -53,6 +53,9 @@ class DataCenter:
                     self.consume(message, address)
             except socket.timeout:
                 pass
+            except ConnectionError:
+                print(f"{self.TAG}Connection to {address.id} closed")
+                break
 
     def consume(self, message, address):
         if isinstance(message, RequestAudioMessage):
