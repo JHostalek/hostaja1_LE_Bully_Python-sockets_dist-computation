@@ -37,14 +37,10 @@ class Node:
         if self.network.IP == leader:
             pass
         else:
-            if self.work_thread is not None:
-                self.work_thread.join()
-            self.work_thread = threading.Thread(target=self.startWorking)
-            self.work_thread.start()
+            self.askForTask()
 
     def checkElection(self):
         if self.leader is None and self.state != 'ELECTION' and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
-            # time in forma hh:mm:ss
             print(f'{self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
             self.startElection()
 
@@ -127,15 +123,9 @@ class Node:
         return self.task
 
     def askForTask(self):
-        receiver_address = Address((self.leader, self.network.PORT))
-        self.sender.sendTaskRequestMessage(receiver_address)
-
-    def startWorking(self):
-        # while not self.terminate.is_set() or self.leader is None:
-        #     self.askForTask()
-        #     time.sleep(5)
         if self.leader is not None:
-            self.askForTask()
+            receiver_address = Address((self.leader, self.network.PORT))
+            self.sender.sendTaskRequestMessage(receiver_address)
 
     def handleTaskRequestMessage(self, message, address):
         receiver_address = Address((address.ip, self.network.PORT))
@@ -157,6 +147,7 @@ class Node:
         receiver_address = Address((self.leader, self.network.PORT))
         self.sender.sendResultMessage(receiver_address, self.task, result)
         self.task = None
+        self.askForTask()
 
     def handleResultMessage(self, message, address):
         print(f"{self.TAG}Received result: {message.result}")
