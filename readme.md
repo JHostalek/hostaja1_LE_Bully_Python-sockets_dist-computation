@@ -1,3 +1,8 @@
+# SETUP
+
+- git clone https://github.com/JHostalek/hostaja1_LE_Bully_Python-sockets_dist-computation.git && cd hostaja1_LE_Bully_Python-sockets_dist-computation && chmod +x setup.sh && chmod
+  +x run.sh && ./setup.sh && ./run.sh
+
 # ZADANI
 
 - [ ] Programy musí podporovat interaktivní i dávkové řízení (např. přidání a odebrání procesu).
