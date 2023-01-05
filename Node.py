@@ -153,7 +153,8 @@ class Node:
 
     def processAudio(self, current_leader, audio):
         model = whisper.load_model('tiny.en')
-        result = model.transcribe(audio)
+        result = model.transcribe(audio)["text"]
+        print(f"{self.TAG}Result: {result}")
         if self.leader != current_leader:
             print(f"{self.TAG}Leader changed, aborting")
             return
