@@ -26,8 +26,7 @@ class MessageSender:
         except ConnectionError:
             print(self.TAG + "Connection error by " + str(receiver_address))
             if receiver_address in self.node.neighbors:
-                self.node.neighbors.remove(receiver_address)
-                print(self.TAG + "Removed " + str(receiver_address) + " from neighbors")
+                self.node.neighbors.remove(receiver_address.ip)
                 if self.node.state == 'ELECTION':
                     self.node.state = None
             if receiver_address.ip == self.node.leader:
