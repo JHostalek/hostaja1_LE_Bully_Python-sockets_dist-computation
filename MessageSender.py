@@ -18,11 +18,15 @@ class MessageSender:
         self.network.broadcastSocket.sendto(message.toBytes(), receiver_address)
 
     def send(self, message: Message, receiver_address: Address):
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect(receiver_address.address)
-        client.send(message.toBytes())
-        client.close()
-
+        try:
+            client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client.connect(receiver_address.address)
+            client.send(message.toBytes())
+            client.close()
+        except ConnectionError:
+            print(self.TAG + "Connection error by " + str(receiver_address))
+        except socket.timeout:
+            print(self.TAG + "Connection timeout by " + str(receiver_address))
     # --------------------------------------------------------------------------------------------------------------
     def sendConnectionRequest(self):
         # BROADCAST CONNECTION REQUEST

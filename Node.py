@@ -91,9 +91,9 @@ class Node:
             time.sleep(5)
 
     def handleElectionMessage(self, message, sender_address):
-        if self.leader is not None:
-            print(f'{self.TAG}ERROR: Why am I receiving an election message from {sender_address}?')
-            return
+        # if self.leader is not None:
+        #     print(f'{self.TAG}ERROR: Why am I receiving an election message from {sender_address}?')
+        #     return
         if sender_address.ip < self.network.IP:
             receiver_address = Address((sender_address.ip, self.network.PORT))
             self.sender.sendAliveMessage(receiver_address)
