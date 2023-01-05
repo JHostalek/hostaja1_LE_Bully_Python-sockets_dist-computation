@@ -25,7 +25,7 @@ class MessageSender:
             client.close()
         except ConnectionError:
             print(self.TAG + "Connection error by " + str(receiver_address))
-            if receiver_address in self.node.neighbors:
+            if receiver_address.ip in self.node.neighbors:
                 self.node.neighbors.remove(receiver_address.ip)
                 if self.node.state == 'ELECTION':
                     self.node.state = None
