@@ -102,9 +102,9 @@ class MessageSender:
     def sendRequestAudioMessage(self, receiver_address: Address, task: int):
         message = RequestAudioMessage(task)
         try:
-            thread = threading.Thread(target=FileTransferUtils.receiveFile, args=(f'tmp{task}.mp3', self.network.DATACENTER_IP, self.network.FILE_TRANSFER_PORT,))
-            thread.start()
+            socket = FileTransferUtils.startListeningForFile(self.network.DATACENTER_IP, self.network.FILE_TRANSFER_PORT)
             self.send(message, receiver_address)
+            FileTransferUtils.receiveFile(f'tmp{task}.mp3', socket)
         except ConnectionError:
             print(self.TAG + "SendRequestAudioMessage: ConnectionError to " + str(receiver_address))
             self.node.removeNeighbor(receiver_address.ip)

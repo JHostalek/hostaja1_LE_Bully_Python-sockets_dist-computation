@@ -23,9 +23,8 @@ def sendFile(filename: str, ip: str, port: str):
     sock.close()
 
 
-def receiveFile(filename: str, ip: str, port: str):
-    print("Receiving file...")
-    print("IP: " + ip + " Port: " + str(port) + " Store as: " + filename)
+def startListeningForFile(ip: str, port: str):
+    print("IP: " + ip + " Port: " + str(port))
     # Create a TCP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -35,6 +34,12 @@ def receiveFile(filename: str, ip: str, port: str):
 
     # Listen for incoming connections
     sock.listen(1)
+    return sock
+
+
+def receiveFile(filename: str, sock: socket.socket):
+    print("Receiving file...")
+    print("As " + filename)
 
     # Accept an incoming connection
     connection, address = sock.accept()
