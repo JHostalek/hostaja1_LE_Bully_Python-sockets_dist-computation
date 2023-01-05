@@ -1,6 +1,5 @@
 import abc
 import pickle
-import time
 
 
 class Message(abc.ABC):
@@ -55,10 +54,10 @@ class TaskRequestMessage(Message):
 
 
 class TaskMessage(Message):
-    def __init__(self):
+    def __init__(self, task: int):
         super().__init__()
         self.message = "Sending task"
-        self.task = str(time.time()).encode('utf-8').hex()[-8:]
+        self.task = task
 
 
 class RequestAudioMessage(Message):
@@ -75,7 +74,7 @@ class AudioMessage(Message):
 
 
 class ResultMessage(Message):
-    def __init__(self, task: id, result: str):
+    def __init__(self, task: int, result: str):
         super().__init__()
         self.message = "Sending result"
         self.task = task

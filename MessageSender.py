@@ -90,8 +90,8 @@ class MessageSender:
             print(self.TAG + "SendTaskRequestMessage: ConnectionError to " + str(receiver_address))
             self.node.removeNeighbor(receiver_address.ip)
 
-    def sendTaskMessage(self, receiver_address: Address):
-        message = TaskMessage()
+    def sendTaskMessage(self, receiver_address: Address, task: int):
+        message = TaskMessage(task)
         try:
             self.send(message, receiver_address)
         except ConnectionError:
@@ -106,7 +106,7 @@ class MessageSender:
             print(self.TAG + "SendRequestAudioMessage: ConnectionError to " + str(receiver_address))
             self.node.removeNeighbor(receiver_address.ip)
 
-    def sendResultMessage(self, receiver_address: Address, task: id, result: str):
+    def sendResultMessage(self, receiver_address: Address, task: int, result: str):
         message = ResultMessage(task, result)
         try:
             self.send(message, receiver_address)

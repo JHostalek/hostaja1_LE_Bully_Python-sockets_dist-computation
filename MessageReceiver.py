@@ -92,5 +92,8 @@ class MessageReceiver:
         elif isinstance(message, AudioMessage):
             print(f"{self.TAG}Processed audio message from {address.id}")
             self.node.handleAudioMessage(message, address)
+        elif isinstance(message, ResultMessage):
+            print(f"{self.TAG}Processed result message from {address.id}")
+            self.node.handleResultMessage(message, address)
         else:
             print(f"{self.TAG}Processed unknown message: {message}")

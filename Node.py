@@ -26,7 +26,9 @@ class Node:
         self.sender.sendConnectionRequest()
         self.work_thread = None
 
-        self.task = None
+        self.task = 0
+
+        self.result = {}
 
     def setLeader(self, leader):
         if self.leader == leader: return
@@ -120,8 +122,9 @@ class Node:
             self.state = "WAITING"
 
     # --------------------------------------------------------------------------------------------------------------
-    def createTasks(self):
-        pass
+    def getTask(self):
+        self.task += 1
+        return self.task
 
     def askForTask(self):
         receiver_address = Address((self.leader, self.network.PORT))
@@ -134,7 +137,7 @@ class Node:
 
     def handleTaskRequestMessage(self, message, address):
         receiver_address = Address((address.ip, self.network.PORT))
-        self.sender.sendTaskMessage(receiver_address)
+        self.sender.sendTaskMessage(receiver_address, self.getTask())
 
     def handleTaskMessage(self, message, address):
         print(f"{self.TAG}Received task: {message.task}")
@@ -152,3 +155,8 @@ class Node:
         receiver_address = Address((self.leader, self.network.PORT))
         self.sender.sendResultMessage(receiver_address, self.task, result)
         self.task = None
+
+    def handleResultMessage(self, message, address):
+        print(f"{self.TAG}Received result: {message.result}")
+        self.result[message.task] = message.result
+        print(''.join([self.result[key] for key in sorted(self.result)]))
