@@ -113,3 +113,13 @@ class MessageSender:
         except ConnectionError:
             print(self.TAG + "SendResultMessage: ConnectionError to " + str(receiver_address))
             self.node.removeNeighbor(receiver_address.ip)
+
+    # --------------------------------------------------------------------------------------------------------------
+
+    def sendTerminateMessage(self, receiver_address: Address):
+        message = TerminateMessage()
+        try:
+            self.send(message, receiver_address)
+        except ConnectionError:
+            print(self.TAG + "SendTerminateMessage: ConnectionError to " + str(receiver_address))
+            self.node.removeNeighbor(receiver_address.ip)

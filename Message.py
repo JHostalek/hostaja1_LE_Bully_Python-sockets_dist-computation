@@ -80,3 +80,9 @@ class ResultMessage(Message):
         self.message = "Sending result"
         self.task = task
         self.result = result
+
+
+class TerminateMessage(Message):
+    def __init__(self):
+        super().__init__()
+        self.message = "Terminating"

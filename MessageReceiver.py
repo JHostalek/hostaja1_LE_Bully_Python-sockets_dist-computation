@@ -55,7 +55,6 @@ class MessageReceiver:
 
     def listen(self, client, address: Address):
         while not self.terminate.is_set():
-
             try:
                 message = client.recv(1024)
                 if message:
@@ -96,5 +95,8 @@ class MessageReceiver:
         elif isinstance(message, ResultMessage):
             print(f"{self.TAG}Processed result message from {address.id}")
             self.node.handleResultMessage(message, address)
+        elif isinstance(message, TerminateMessage):
+            print(f"{self.TAG}Processed terminate message from {address.id}")
+            exit(0)
         else:
             print(f"{self.TAG}Processed unknown message: {message}")

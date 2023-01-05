@@ -32,7 +32,8 @@ class Node:
 
         self.task = None
         self.tasks = []
-        for i in range(20):
+        self.NUMBER_OF_TASKS = 5
+        for i in range(self.NUMBER_OF_TASKS):
             self.tasks.append(Task(i))
         self.result = {}
 
@@ -132,8 +133,7 @@ class Node:
                 elif task.state == 'NEW':
                     task.setBeingProcessed()
                     return task.id
-
-        raise Exception("No task available")
+        return -1
 
     def askForTask(self):
         if self.leader is not None:
@@ -142,7 +142,9 @@ class Node:
 
     def handleTaskRequestMessage(self, message, address):
         receiver_address = Address((address.ip, self.network.PORT))
-        self.sender.sendTaskMessage(receiver_address, self.getTask())
+        task = self.getTask()
+        if task != -1:
+            self.sender.sendTaskMessage(receiver_address, task)
 
     def handleTaskMessage(self, message, address):
         print(f"{self.TAG}Received task: {message.task}")
@@ -160,9 +162,14 @@ class Node:
         print(f"{self.TAG}Received result: {message.result}")
         self.tasks[message.task].result = message.result
         self.tasks[message.task].state = 'DONE'
-        # with self.lock:
-        #     for task in self.tasks:
-        #         print(f'{task.id}-{task.state}-{task.result}', end=' ')
+        with self.lock:
+            for task in self.tasks:
+                if task.state != 'DONE':
+                    return
+            for n in self.neighbors:
+                receiver_address = Address((n, self.network.PORT))
+                self.sender.sendTerminateMessage(receiver_address)
+            exit(0)
 
     def processAudio(self, current_leader, audio):
         print(f"{self.TAG}Processing audio...")
