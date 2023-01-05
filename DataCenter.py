@@ -26,7 +26,7 @@ class DataCenter:
         self.IP = parseIp()
         self.DATACENTER_PORT = 5557
         self.PORT = 5556
-        self.NUM_OF_CHUNKS = 20
+        self.NUM_OF_CHUNKS = 100
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((self.IP, self.DATACENTER_PORT))
         self.socket.settimeout(0.1)
