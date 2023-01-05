@@ -1,6 +1,8 @@
 import threading
 import time
 
+import whisper
+
 from Address import Address
 from Message import ElectionMessage
 from MessageReceiver import MessageReceiver
@@ -141,17 +143,24 @@ class Node:
         print(f"{self.TAG}Received audio: {message.audio}")
         audio = message.audio
         print(f"{self.TAG}Processing audio...")
-        time.sleep(5)
-        result = audio
-        print(f"{self.TAG}Audio processed")
-        receiver_address = Address((self.leader, self.network.PORT))
-        self.sender.sendResultMessage(receiver_address, self.task, result)
-        self.task = None
-        self.askForTask()
+        work_thread = threading.Thread(target=self.processAudio, args=(audio, self.leader,))
+        work_thread.start()
 
     def handleResultMessage(self, message, address):
         print(f"{self.TAG}Received result: {message.result}")
         self.result[message.task] = message.result
         # print(''.join([self.result[key] for key in sorted(self.result)]))
         with self.lock:
-            print(self.result)
+            print(''.join([self.result[key] for key in sorted(self.result)]))
+            # print(self.result)
+
+    def processAudio(self, audio, current_leader):
+        model = whisper.load_model('base.en')
+        result = model.transcribe(audio)
+        if self.leader != current_leader:
+            print(f"{self.TAG}Leader changed, aborting")
+            return
+        receiver_address = Address((self.leader, self.network.PORT))
+        self.sender.sendResultMessage(receiver_address, self.task, result)
+        self.task = None
+        self.askForTask()
