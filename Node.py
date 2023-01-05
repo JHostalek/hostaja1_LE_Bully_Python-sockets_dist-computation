@@ -27,8 +27,6 @@ class Node:
         self.work_thread = None
 
         self.task = None
-        self.audio = None
-        self.result = None
 
     def setLeader(self, leader):
         if self.leader == leader: return
@@ -135,13 +133,11 @@ class Node:
 
     def handleAudioMessage(self, message, address):
         print(f"{self.TAG}Received audio: {message.audio}")
-        self.audio = message.audio
+        audio = message.audio
         print(f"{self.TAG}Processing audio...")
         time.sleep(5)
-        self.result = self.audio + " processed"
+        result = audio + " processed"
         print(f"{self.TAG}Audio processed")
         receiver_address = Address((self.leader, self.network.PORT))
-        self.sender.sendResultMessage(receiver_address, self.task, self.result)
-        self.audio = None
+        self.sender.sendResultMessage(receiver_address, self.task, result)
         self.task = None
-        self.result = None
