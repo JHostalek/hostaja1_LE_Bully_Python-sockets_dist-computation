@@ -61,9 +61,10 @@ class TaskMessage(Message):
 
 
 class RequestAudioMessage(Message):
-    def __init__(self):
+    def __init__(self, task: int):
         super().__init__()
         self.message = "Requesting audio"
+        self.task = task
 
 
 class AudioMessage(Message):

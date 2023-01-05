@@ -1,6 +1,7 @@
-import random
 import socket
 import threading
+
+import whisper
 
 from Address import Address
 from Message import *
@@ -25,6 +26,7 @@ class DataCenter:
         self.IP = parseIp()
         self.DATACENTER_PORT = 5557
         self.PORT = 5556
+        self.NUM_OF_CHUNKS = 20
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((self.IP, self.DATACENTER_PORT))
         self.socket.settimeout(0.1)
@@ -32,6 +34,9 @@ class DataCenter:
 
         self.TAG = self.IP + " - "
         self.terminate = threading.Event()
+
+        self.lock = threading.Lock()
+        self.chunks = None
 
     def listenForNewConnections(self):
         while not self.terminate.is_set():
@@ -58,15 +63,26 @@ class DataCenter:
                 break
 
     def consume(self, message, address):
+
         if isinstance(message, RequestAudioMessage):
-            print(f"{self.TAG}Received request for audio from {address.id}")
+            print(f"{self.TAG}Received request for audio from {address.id} for chunk {message.task}")
             receiver_address = Address((address.ip, self.PORT))
-            thread = threading.Thread(target=self.sendAudio, args=(receiver_address,))
+            thread = threading.Thread(target=self.sendAudio, args=(receiver_address, message.task))
             thread.start()
 
-    def sendAudio(self, receiver_address: Address):
-        audio = ''.join([chr(random.randint(97, 122)) for _ in range(10)])
-        message = AudioMessage(audio)
+    def loadAudio(self):
+        audio = whisper.load_audio("data/file1.mp3")
+        chunk_size = len(audio) // self.NUM_OF_CHUNKS
+        for i in range(self.NUM_OF_CHUNKS):
+            start_index = i * chunk_size
+            end_index = start_index + chunk_size
+            self.chunks.append(audio[start_index:end_index])
+
+    def sendAudio(self, receiver_address: Address, task: int):
+        with self.lock:
+            if self.chunks is None:
+                self.loadAudio()
+        message = AudioMessage(self.chunks[task])
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(receiver_address.address)
         client.send(message.toBytes())
