@@ -127,12 +127,13 @@ class Node:
     def getTask(self) -> int:
         with self.lock:
             for task in self.tasks:
-                if task.state == 'NEW':
+                if task.state == 'PROCESSING' and task.getDuration() > 20:
                     task.setBeingProcessed()
                     return task.id
-                elif task.state == 'PROCESSING' and task.getDuration() > 20:
+                elif task.state == 'NEW':
                     task.setBeingProcessed()
                     return task.id
+
         raise Exception("No task available")
 
     def askForTask(self):
