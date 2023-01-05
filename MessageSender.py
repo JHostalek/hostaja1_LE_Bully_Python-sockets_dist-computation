@@ -64,6 +64,7 @@ class MessageSender:
                         self.send(message, receiver_address)
                     except ConnectionError:
                         print(self.TAG + "SendElectionMessage: ConnectionError to " + str(receiver_address))
+                        print(self.TAG + "ABORTING ELECTION")
                         self.node.removeNeighbor(receiver_address.ip)
                         self.node.checkElection()
                         break

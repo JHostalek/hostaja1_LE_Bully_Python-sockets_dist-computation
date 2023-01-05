@@ -43,7 +43,7 @@ class Node:
     def checkElection(self):
         if self.leader is None and self.state != 'ELECTION' and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
             # time in forma hh:mm:ss
-            print(f'{self.TAG}{time.strftime("%H:%M:%S")}STARTING ELECTIONS - neighbors: {self.neighbors}')
+            print(f'{self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
             self.startElection()
 
     def removeNeighbor(self, ip):
