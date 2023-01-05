@@ -1,7 +1,9 @@
 import socket
 
 
-def sendFile(filename, ip, port):
+def sendFile(filename: str, ip: str, port: str):
+    print("Sending file...")
+    print("IP: " + ip + " Port: " + str(port) + " File: " + filename)
     # Create a TCP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -21,7 +23,9 @@ def sendFile(filename, ip, port):
     sock.close()
 
 
-def receiveFile(filename, ip, port):
+def receiveFile(filename: str, ip: str, port: str):
+    print("Receiving file...")
+    print("IP: " + ip + " Port: " + str(port) + " Store as: " + filename)
     # Create a TCP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
