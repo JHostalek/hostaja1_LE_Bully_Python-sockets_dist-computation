@@ -21,6 +21,7 @@ class Network:
     def __init__(self, node: Node):
         self.DATACENTER_IP = '192.168.56.102'
         self.DATACENTER_PORT = 5557
+        self.FILE_TRANSFER_PORT = 5558
         self.BROADCAST_IP = '192.168.56.255'
         self.BROADCAST_PORT = 5555
         self.IP = parseIp()

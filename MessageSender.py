@@ -1,6 +1,7 @@
 import socket
 import threading
 
+import FileTransferUtils
 import Network
 from Address import Address
 from Message import *
@@ -101,6 +102,8 @@ class MessageSender:
     def sendRequestAudioMessage(self, receiver_address: Address, task: int):
         message = RequestAudioMessage(task)
         try:
+            thread = threading.Thread(target=FileTransferUtils.receiveFile, args=(f'tmp{task}.mp3', self.network.DATACENTER_IP, self.network.FILE_TRANSFER_PORT,))
+            thread.start()
             self.send(message, receiver_address)
         except ConnectionError:
             print(self.TAG + "SendRequestAudioMessage: ConnectionError to " + str(receiver_address))

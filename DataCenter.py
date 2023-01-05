@@ -1,8 +1,7 @@
 import socket
 import threading
 
-import whisper
-
+import FileTransferUtils
 from Address import Address
 from Message import *
 
@@ -25,6 +24,7 @@ class DataCenter:
     def __init__(self):
         self.IP = parseIp()
         self.DATACENTER_PORT = 5557
+        self.FILE_TRANSFER_PORT = 5558
         self.PORT = 5556
         self.NUM_OF_CHUNKS = 20
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -70,19 +70,9 @@ class DataCenter:
             thread = threading.Thread(target=self.sendAudio, args=(receiver_address, message.task))
             thread.start()
 
-    def loadAudio(self):
-        audio = whisper.load_audio("data/original.mp3")
-        chunk_size = 10000
-        for i in range(self.NUM_OF_CHUNKS):
-            start_index = i * chunk_size
-            end_index = start_index + chunk_size
-            self.chunks.append(audio[start_index:end_index])
-
     def sendAudio(self, receiver_address: Address, task: int):
-        with self.lock:
-            if len(self.chunks) == 0:
-                self.loadAudio()
-        message = AudioMessage(self.chunks[task])
+        FileTransferUtils.sendFile(f'data/task{task}.mp3', receiver_address.ip, self.FILE_TRANSFER_PORT)
+        message = TransferSuccessful(self.chunks[task])
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(receiver_address.address)
         print(f'{self.TAG}Sending audio to {receiver_address.id} of size {len(message.toBytes())}')
