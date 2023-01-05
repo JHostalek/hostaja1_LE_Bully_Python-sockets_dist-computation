@@ -149,7 +149,7 @@ class Node:
         self.sender.sendRequestAudioMessage(receiver_address, message.task)
 
     def handleAudioMessage(self, message, address):
-        print(f"{self.TAG}Starting work on task: {message.task}")
+        print(f"{self.TAG}Starting work on task: {self.task}")
         work_thread = threading.Thread(target=self.processAudio, args=(self.leader, message.audio,))
         work_thread.start()
 
