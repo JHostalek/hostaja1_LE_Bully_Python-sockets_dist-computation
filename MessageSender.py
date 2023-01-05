@@ -18,24 +18,10 @@ class MessageSender:
         self.network.broadcastSocket.sendto(message.toBytes(), receiver_address)
 
     def send(self, message: Message, receiver_address: Address):
-        try:
-            client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client.connect(receiver_address.address)
-            client.send(message.toBytes())
-            client.close()
-        except ConnectionError:
-            print(self.TAG + "Connection error by " + str(receiver_address))
-            if receiver_address.ip in self.node.neighbors:
-                with self.node.lock:
-                    self.node.neighbors.remove(receiver_address.ip)
-                if self.node.state == 'ELECTION':
-                    self.node.state = None
-            if receiver_address.ip == self.node.leader:
-                self.node.leader = None
-                self.node.checkElection()
-                print(self.TAG + str(receiver_address) + " is no longer the leader")
-        except socket.timeout:
-            print(self.TAG + "Connection timeout by " + str(receiver_address))
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect(receiver_address.address)
+        client.send(message.toBytes())
+        client.close()
 
     # --------------------------------------------------------------------------------------------------------------
     def sendConnectionRequest(self):
@@ -45,16 +31,25 @@ class MessageSender:
 
     def sendConnectionAcceptance(self, receiver_address: Address):
         message = ConnectionAcceptanceMessage(self.node.leader)
-        self.send(message, receiver_address)
+        try:
+            self.send(message, receiver_address)
+        except ConnectionError:
+            print(self.TAG + "SendConnectionAcceptance: ConnectionError to " + str(receiver_address))
 
     def sendConnectionEstablished(self, receiver_address: Address):
         message = ConnectionEstablishedMessage()
-        self.send(message, receiver_address)
+        try:
+            self.send(message, receiver_address)
+        except ConnectionError:
+            print(self.TAG + "SendConnectionEstablished: ConnectionError to " + str(receiver_address))
 
     # --------------------------------------------------------------------------------------------------------------
     def sendAliveMessage(self, receiver_address: Address):
         message = AliveMessage()
-        self.send(message, receiver_address)
+        try:
+            self.send(message, receiver_address)
+        except ConnectionError:
+            print(self.TAG + "SendAliveMessage: ConnectionError to " + str(receiver_address))
 
     def sendElectionMessage(self):
         with self.node.lock:
@@ -62,28 +57,48 @@ class MessageSender:
                 if neighbor > self.network.IP:
                     message = ElectionMessage()
                     receiver_address = Address((neighbor, self.network.PORT))
-                    self.send(message, receiver_address)
+                    try:
+                        self.send(message, receiver_address)
+                    except ConnectionError:
+                        print(self.TAG + "SendElectionMessage: ConnectionError to " + str(receiver_address))
+                        break
 
     def sendVictoryMessage(self):
         with self.node.lock:
             for neighbor in self.node.neighbors:
                 message = VictoryMessage()
                 receiver_address = Address((neighbor, self.network.PORT))
-                self.send(message, receiver_address)
+                try:
+                    self.send(message, receiver_address)
+                except ConnectionError:
+                    print(self.TAG + "SendVictoryMessage: ConnectionError to " + str(receiver_address))
+                    break
 
     # --------------------------------------------------------------------------------------------------------------
     def sendTaskRequestMessage(self, receiver_address: Address):
         message = TaskRequestMessage()
-        self.send(message, receiver_address)
+        try:
+            self.send(message, receiver_address)
+        except ConnectionError:
+            print(self.TAG + "SendTaskRequestMessage: ConnectionError to " + str(receiver_address))
 
     def sendTaskMessage(self, receiver_address: Address):
         message = TaskMessage()
-        self.send(message, receiver_address)
+        try:
+            self.send(message, receiver_address)
+        except ConnectionError:
+            print(self.TAG + "SendTaskMessage: ConnectionError to " + str(receiver_address))
 
     def sendRequestAudioMessage(self, receiver_address: Address):
         message = RequestAudioMessage()
-        self.send(message, receiver_address)
+        try:
+            self.send(message, receiver_address)
+        except ConnectionError:
+            print(self.TAG + "SendRequestAudioMessage: ConnectionError to " + str(receiver_address))
 
     def sendResultMessage(self, receiver_address: Address, task: id, result: str):
         message = ResultMessage(task, result)
-        self.send(message, receiver_address)
+        try:
+            self.send(message, receiver_address)
+        except ConnectionError:
+            print(self.TAG + "SendResultMessage: ConnectionError to " + str(receiver_address))
