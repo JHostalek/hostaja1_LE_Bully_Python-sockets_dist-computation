@@ -18,7 +18,7 @@ class Node:
         self.leader = None
         self.leader_address = None
         self.MINIMUM_NEIGHBORS = 2
-        self.WAIT_TIME = 15
+        self.WAIT_TIME = 10
         self.TAG = self.network.IP + " - "
         self.terminate = threading.Event()
         self.lock = threading.Lock()
@@ -159,4 +159,6 @@ class Node:
     def handleResultMessage(self, message, address):
         print(f"{self.TAG}Received result: {message.result}")
         self.result[message.task] = message.result
-        print(''.join([self.result[key] for key in sorted(self.result)]))
+        # print(''.join([self.result[key] for key in sorted(self.result)]))
+        with self.lock:
+            print(self.result)
