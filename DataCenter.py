@@ -26,7 +26,7 @@ class DataCenter:
         self.IP = parseIp()
         self.DATACENTER_PORT = 5557
         self.PORT = 5556
-        self.NUM_OF_CHUNKS = 120
+        self.NUM_OF_CHUNKS = 20
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((self.IP, self.DATACENTER_PORT))
         self.socket.settimeout(0.1)
@@ -72,7 +72,7 @@ class DataCenter:
 
     def loadAudio(self):
         audio = whisper.load_audio("./data/file1.mp3")
-        chunk_size = len(audio) // self.NUM_OF_CHUNKS
+        chunk_size = 10000
         for i in range(self.NUM_OF_CHUNKS):
             start_index = i * chunk_size
             end_index = start_index + chunk_size
