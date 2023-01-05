@@ -49,9 +49,11 @@ class Node:
     def removeNeighbor(self, ip):
         with self.lock:
             self.neighbors.remove(ip)
+            print(f'{self.TAG}Removed {ip} from neighbors')
         if self.leader == ip:
             self.setLeader(None)
             self.checkElection()
+            print(f'{self.TAG}{ip} is no longer the leader')
 
     # --------------------------------------------------------------------------------------------------------------
     def handleConnectionRequest(self, sender: Address):
