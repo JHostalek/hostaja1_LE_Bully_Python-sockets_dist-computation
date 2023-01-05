@@ -131,7 +131,7 @@ class Node:
         self.sender.sendTaskRequestMessage(receiver_address)
 
     def startWorking(self):
-        while not self.terminate.is_set():
+        while not self.terminate.is_set() or self.leader is None:
             self.askForTask()
             time.sleep(5)
 
