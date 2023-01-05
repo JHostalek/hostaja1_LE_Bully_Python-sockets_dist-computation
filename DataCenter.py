@@ -71,7 +71,7 @@ class DataCenter:
             thread.start()
 
     def loadAudio(self):
-        audio = whisper.load_audio("data/file1.mp3")
+        audio = whisper.load_audio("./data/file1.mp3")
         chunk_size = len(audio) // self.NUM_OF_CHUNKS
         for i in range(self.NUM_OF_CHUNKS):
             start_index = i * chunk_size
