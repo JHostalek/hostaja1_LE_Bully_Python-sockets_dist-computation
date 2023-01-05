@@ -1,3 +1,4 @@
+import random
 import threading
 import time
 
@@ -13,7 +14,7 @@ from Task import Task
 
 class Node:
     def __init__(self):
-
+        self.REAL_AUDIO = False
         self.state = None
         self.network = Network(self)
         self.sender = MessageSender(self.network)
@@ -128,7 +129,6 @@ class Node:
     def getTask(self) -> int:
         for task in self.tasks:
             if task.state == 'NEW':
-
                 with self.task_lock:
                     task.setBeingProcessed()
                 return task.id
@@ -176,9 +176,11 @@ class Node:
 
     def processAudio(self, current_leader, audio):
         print(f"{self.TAG}Processing audio...")
-        model = whisper.load_model('tiny.en')
-        # result = model.transcribe(audio, fp16=False, verbose=None)["text"]
-        result = self.task
+        if self.REAL_AUDIO:
+            model = whisper.load_model('tiny.en')
+            result = model.transcribe(audio, fp16=False, verbose=None)["text"]
+        else:
+            result = ''.join([chr(random.randint(97, 122)) for _ in range(10)])
         print(f"{self.TAG}Result: {result}")
         if self.leader != current_leader:
             print(f"{self.TAG}Leader changed, aborting")
