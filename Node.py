@@ -126,6 +126,7 @@ class Node:
     def getTask(self) -> int:
         with self.lock:
             for task in self.tasks:
+                print(f"{self.TAG}Task {task.id} is {task.status}")
                 if task.state == 'NEW':
                     task.setBeingProcessed()
                     return task.id
