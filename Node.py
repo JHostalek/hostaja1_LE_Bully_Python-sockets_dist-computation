@@ -31,7 +31,7 @@ class Node:
 
         self.task = None
         self.tasks = []
-        self.NUMBER_OF_TASKS = 500
+        self.NUMBER_OF_TASKS = 20
         for i in range(self.NUMBER_OF_TASKS):
             self.tasks.append(Task(i))
         self.result = {}
