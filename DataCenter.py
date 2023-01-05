@@ -85,6 +85,7 @@ class DataCenter:
         message = AudioMessage(self.chunks[task])
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(receiver_address.address)
+        print(f'{self.TAG}Sending audio to {receiver_address.id} of size {len(message.toBytes())}')
         client.send(message.toBytes())
         client.close()
         print(f"{self.TAG}Sent audio to {receiver_address.id}")
