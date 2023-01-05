@@ -1,8 +1,6 @@
 import threading
 import time
 
-import whisper
-
 from Address import Address
 from Message import ElectionMessage
 from MessageReceiver import MessageReceiver
@@ -173,8 +171,9 @@ class Node:
 
     def processAudio(self, current_leader, audio):
         print(f"{self.TAG}Processing audio...")
-        model = whisper.load_model('tiny.en')
-        result = model.transcribe(audio, fp16=False, verbose=None)["text"]
+        # model = whisper.load_model('tiny.en')
+        # result = model.transcribe(audio, fp16=False, verbose=None)["text"]
+        result = self.task
         print(f"{self.TAG}Result: {result}")
         if self.leader != current_leader:
             print(f"{self.TAG}Leader changed, aborting")
