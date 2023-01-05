@@ -13,6 +13,7 @@ from Task import Task
 
 class Node:
     def __init__(self):
+
         self.state = None
         self.network = Network(self)
         self.sender = MessageSender(self.network)
@@ -29,10 +30,12 @@ class Node:
         self.sender.sendConnectionRequest()
         self.work_thread = None
 
-        self.task = -1
+        self.task = None
         self.tasks = []
         for i in range(20):
-            self.tasks.append(Task(i))
+            t = Task(i)
+            print(f"{self.TAG}Task {t.id} is {t.state}")
+            self.tasks.append(t)
         self.result = {}
 
     def setLeader(self, leader):
