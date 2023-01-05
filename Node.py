@@ -46,6 +46,13 @@ class Node:
             print(f'{self.TAG}{time.strftime("%H:%M:%S")}STARTING ELECTIONS - neighbors: {self.neighbors}')
             self.startElection()
 
+    def removeNeighbor(self, ip):
+        with self.lock:
+            self.neighbors.remove(ip)
+        if self.leader == ip:
+            self.setLeader(None)
+            self.checkElection()
+
     # --------------------------------------------------------------------------------------------------------------
     def handleConnectionRequest(self, sender: Address):
         # existing network member

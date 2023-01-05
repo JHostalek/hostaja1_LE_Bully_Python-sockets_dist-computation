@@ -35,6 +35,7 @@ class MessageSender:
             self.send(message, receiver_address)
         except ConnectionError:
             print(self.TAG + "SendConnectionAcceptance: ConnectionError to " + str(receiver_address))
+            self.node.removeNeighbor(receiver_address.ip)
 
     def sendConnectionEstablished(self, receiver_address: Address):
         message = ConnectionEstablishedMessage()
@@ -42,6 +43,7 @@ class MessageSender:
             self.send(message, receiver_address)
         except ConnectionError:
             print(self.TAG + "SendConnectionEstablished: ConnectionError to " + str(receiver_address))
+            self.node.removeNeighbor(receiver_address.ip)
 
     # --------------------------------------------------------------------------------------------------------------
     def sendAliveMessage(self, receiver_address: Address):
@@ -50,6 +52,7 @@ class MessageSender:
             self.send(message, receiver_address)
         except ConnectionError:
             print(self.TAG + "SendAliveMessage: ConnectionError to " + str(receiver_address))
+            self.node.removeNeighbor(receiver_address.ip)
 
     def sendElectionMessage(self):
         with self.node.lock:
@@ -61,6 +64,8 @@ class MessageSender:
                         self.send(message, receiver_address)
                     except ConnectionError:
                         print(self.TAG + "SendElectionMessage: ConnectionError to " + str(receiver_address))
+                        self.node.removeNeighbor(receiver_address.ip)
+                        self.node.checkElection()
                         break
 
     def sendVictoryMessage(self):
@@ -72,6 +77,7 @@ class MessageSender:
                     self.send(message, receiver_address)
                 except ConnectionError:
                     print(self.TAG + "SendVictoryMessage: ConnectionError to " + str(receiver_address))
+                    self.node.removeNeighbor(receiver_address.ip)
                     break
 
     # --------------------------------------------------------------------------------------------------------------
@@ -81,6 +87,7 @@ class MessageSender:
             self.send(message, receiver_address)
         except ConnectionError:
             print(self.TAG + "SendTaskRequestMessage: ConnectionError to " + str(receiver_address))
+            self.node.removeNeighbor(receiver_address.ip)
 
     def sendTaskMessage(self, receiver_address: Address):
         message = TaskMessage()
@@ -88,6 +95,7 @@ class MessageSender:
             self.send(message, receiver_address)
         except ConnectionError:
             print(self.TAG + "SendTaskMessage: ConnectionError to " + str(receiver_address))
+            self.node.removeNeighbor(receiver_address.ip)
 
     def sendRequestAudioMessage(self, receiver_address: Address):
         message = RequestAudioMessage()
@@ -95,6 +103,7 @@ class MessageSender:
             self.send(message, receiver_address)
         except ConnectionError:
             print(self.TAG + "SendRequestAudioMessage: ConnectionError to " + str(receiver_address))
+            self.node.removeNeighbor(receiver_address.ip)
 
     def sendResultMessage(self, receiver_address: Address, task: id, result: str):
         message = ResultMessage(task, result)
@@ -102,3 +111,4 @@ class MessageSender:
             self.send(message, receiver_address)
         except ConnectionError:
             print(self.TAG + "SendResultMessage: ConnectionError to " + str(receiver_address))
+            self.node.removeNeighbor(receiver_address.ip)
