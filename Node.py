@@ -133,11 +133,10 @@ class Node:
                 if task.state == 'NEW':
                     task.setBeingProcessed()
                     return task.id
-                elif task.state == 'IN_PROGRESS' and task.getDuration() > 20:
+                elif task.state == 'PROCESSING' and task.getDuration() > 20:
                     task.setBeingProcessed()
                     return task.id
-                else:
-                    raise Exception("No task available")
+        raise Exception("No task available")
 
     def askForTask(self):
         if self.leader is not None:
