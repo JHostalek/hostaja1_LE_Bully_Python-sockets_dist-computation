@@ -21,3 +21,4 @@
 - [ ] Detekce ukončení distribuovaného výpočtu
 - [ ] Logování do souboru
 - [ ] Časové razítko logického času
+- [ ] Ukladani progresu do DataStorage
