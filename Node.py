@@ -159,9 +159,9 @@ class Node:
         print(f"{self.TAG}Received result: {message.result}")
         self.tasks[message.task].result = message.result
         self.tasks[message.task].state = 'DONE'
-        with self.lock:
-            for task in self.tasks:
-                print(f'{task.id}-{task.state}-{task.result}', end=' ')
+        # with self.lock:
+        #     for task in self.tasks:
+        #         print(f'{task.id}-{task.state}-{task.result}', end=' ')
 
     def processAudio(self, current_leader, audio):
         print(f"{self.TAG}Processing audio...")
