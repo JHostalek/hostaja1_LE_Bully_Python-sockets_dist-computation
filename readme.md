@@ -1,9 +1,11 @@
 # SETUP
 
-- git clone https://github.com/JHostalek/hostaja1_LE_Bully_Python-sockets_dist-computation.git && cd hostaja1_LE_Bully_Python-sockets_dist-computation && chmod +x setup.sh && chmod
-  +x run.sh && ./setup.sh && ./run.sh
+- HTTP
+  SETUP<br>`git clone https://github.com/JHostalek/hostaja1_LE_Bully_Python-sockets_dist-computation.git && cd hostaja1_LE_Bully_Python-sockets_dist-computation && /bin/bash setup.sh`
+- (if private repo) SSH
+  SETUP<br>`git clone git@github.com:JHostalek/hostaja1_LE_Bully_Python-sockets_dist-computation.git && cd hostaja1_LE_Bully_Python-sockets_dist-computation && /bin/bash setup.sh`
 
-# ZADANI
+# ZADÁNÍ
 
 - [ ] Programy musí podporovat interaktivní i dávkové řízení (např. přidání a odebrání procesu).
 - [ ] Kromě správnosti algoritmu se zaměřte i na prezentaci výsledků. Cílem je aby bylo poznat co Váš program právě dělá.

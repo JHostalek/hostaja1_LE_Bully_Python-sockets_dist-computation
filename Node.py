@@ -135,7 +135,7 @@ class Node:
         print(f"{self.TAG}Received task: {message.task}")
         self.task = message.task
         receiver_address = Address((self.network.DATACENTER_IP, self.network.DATACENTER_PORT))
-        self.sender.sendRequestAudioMessage(receiver_address)
+        self.sender.sendRequestAudioMessage(receiver_address, message.task)
 
     def handleAudioMessage(self, message, address):
         print(f"{self.TAG}Received audio: {message.audio}")

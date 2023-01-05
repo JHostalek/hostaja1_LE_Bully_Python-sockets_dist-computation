@@ -98,8 +98,8 @@ class MessageSender:
             print(self.TAG + "SendTaskMessage: ConnectionError to " + str(receiver_address))
             self.node.removeNeighbor(receiver_address.ip)
 
-    def sendRequestAudioMessage(self, receiver_address: Address):
-        message = RequestAudioMessage()
+    def sendRequestAudioMessage(self, receiver_address: Address, task: int):
+        message = RequestAudioMessage(task)
         try:
             self.send(message, receiver_address)
         except ConnectionError:
