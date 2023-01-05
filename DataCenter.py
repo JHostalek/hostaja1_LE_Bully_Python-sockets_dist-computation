@@ -36,7 +36,7 @@ class DataCenter:
         self.terminate = threading.Event()
 
         self.lock = threading.Lock()
-        self.chunks = None
+        self.chunks = []
 
     def listenForNewConnections(self):
         while not self.terminate.is_set():
@@ -80,7 +80,7 @@ class DataCenter:
 
     def sendAudio(self, receiver_address: Address, task: int):
         with self.lock:
-            if self.chunks is None:
+            if len(self.chunks) == 0:
                 self.loadAudio()
         message = AudioMessage(self.chunks[task])
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
