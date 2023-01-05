@@ -62,7 +62,7 @@ class DataCenter:
             thread.start()
 
     def sendAudio(self, receiver_address: Address):
-        audio = ''.join([chr(random.randint(0, 255)) for _ in range(10)])
+        audio = ''.join([chr(random.randint(97, 122)) for _ in range(10)])
         message = AudioMessage(audio)
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(receiver_address.address)
