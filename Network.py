@@ -41,8 +41,8 @@ class Network:
         sock.settimeout(self.SOCKET_TIMEOUT)
         sock.listen(self.MAX_CONNECTIONS)
 
-        max_buffer_size = sock.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
-        print(f"Maximum buffer size: {max_buffer_size} bytes")
+        # max_buffer_size = sock.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
+        # print(f"Maximum buffer size: {max_buffer_size} bytes")
 
         broadcast_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         broadcast_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
