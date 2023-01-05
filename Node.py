@@ -101,7 +101,6 @@ class Node:
                 self.state = "COORDINATOR"
                 self.setLeader(self.network.IP)
             self.sender.sendVictoryMessage()
-            time.sleep(5)
 
     def handleElectionMessage(self, message, sender_address):
         # if self.leader is not None:
@@ -168,7 +167,7 @@ class Node:
     def processAudio(self, current_leader, audio):
         print(f"{self.TAG}Processing audio...")
         model = whisper.load_model('tiny.en')
-        result = model.transcribe(audio, fp16=False, verbose=True)["text"]
+        result = model.transcribe(audio, fp16=False, verbose=None)["text"]
         print(f"{self.TAG}Result: {result}")
         if self.leader != current_leader:
             print(f"{self.TAG}Leader changed, aborting")

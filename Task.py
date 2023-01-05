@@ -11,7 +11,7 @@ class Task:
 
     def setTime(self):
         # return time as hh:mm:ss
-        self.time = time.strftime('%H:%M:%S', time.gmtime(self.time))
+        # self.time = time.strftime('%H:%M:%S', time.gmtime(self.time))
         self.time_ = time.time()
 
     def getDuration(self):
