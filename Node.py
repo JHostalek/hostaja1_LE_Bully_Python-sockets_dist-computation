@@ -24,6 +24,7 @@ class Node:
         self.TAG = self.network.IP + " - "
         self.terminate = threading.Event()
         self.lock = threading.Lock()
+        self.task_lock = threading.Lock()
         self.receiver.start()
         self.sender.sendConnectionRequest()
         self.work_thread = None
@@ -126,10 +127,13 @@ class Node:
 
         for task in self.tasks:
             if task.state == 'NEW':
-                task.setBeingProcessed()
+
+                with self.task_lock:
+                    task.setBeingProcessed()
                 return task.id
             elif task.state == 'PROCESSING' and task.getDuration() > 30:
-                task.setBeingProcessed()
+                with self.task_lock:
+                    task.setBeingProcessed()
                 return task.id
         return -1
 
