@@ -33,9 +33,7 @@ class Node:
         self.task = None
         self.tasks = []
         for i in range(20):
-            t = Task(i)
-            print(f"{self.TAG}Task {t.id} is {t.state}")
-            self.tasks.append(t)
+            self.tasks.append(Task(i))
         self.result = {}
 
     def setLeader(self, leader):
@@ -129,7 +127,6 @@ class Node:
     def getTask(self) -> int:
         with self.lock:
             for task in self.tasks:
-                print(f"{self.TAG}Task {task.id} is {task.state}")
                 if task.state == 'NEW':
                     task.setBeingProcessed()
                     return task.id
@@ -169,7 +166,7 @@ class Node:
     def processAudio(self, current_leader, audio):
         print(f"{self.TAG}Processing audio...")
         model = whisper.load_model('tiny.en')
-        result = model.transcribe(audio, fp16=False)["text"]
+        result = model.transcribe(audio, fp16=False, verbose=False)["text"]
         print(f"{self.TAG}Result: {result}")
         if self.leader != current_leader:
             print(f"{self.TAG}Leader changed, aborting")
