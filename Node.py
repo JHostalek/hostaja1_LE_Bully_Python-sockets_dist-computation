@@ -155,10 +155,11 @@ class Node:
 
     def handleResultMessage(self, message, address):
         print(f"{self.TAG}Received result: {message.result}")
-        self.result[message.task] = message.result
+        self.tasks[message.task].result = message.result
+        self.tasks[message.task].state = 'DONE'
         with self.lock:
-            # print(''.join([self.result[key] for key in sorted(self.result)]))
-            print(self.result)
+            for task in self.tasks:
+                print(f'{task.id}-{task.state}-{task.result}', end=' ')
 
     def processAudio(self, current_leader, audio):
         print(f"{self.TAG}Processing audio...")
