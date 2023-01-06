@@ -38,6 +38,7 @@ class Node:
         for i in range(self.NUMBER_OF_TASKS):
             self.tasks.append(Task(i))
         self.result = {}
+        self.got_response = False
 
     def setLeader(self, leader):
         if self.leader == leader: return
@@ -141,8 +142,11 @@ class Node:
 
     def askForTask(self):
         if self.leader is not None:
-            receiver_address = Address((self.leader, self.network.PORT))
-            self.sender.sendTaskRequestMessage(receiver_address)
+            while not self.got_response:
+                receiver_address = Address((self.leader, self.network.PORT))
+                self.sender.sendTaskRequestMessage(receiver_address)
+                time.sleep(10)
+            self.got_response = False
 
     def handleTaskRequestMessage(self, message, address):
         receiver_address = Address((address.ip, self.network.PORT))
@@ -151,6 +155,7 @@ class Node:
             self.sender.sendTaskMessage(receiver_address, task)
 
     def handleTaskMessage(self, message, address):
+        self.got_response = True
         print(f"{self.TAG}Received task: {message.task}")
         self.task = message.task
         receiver_address = Address((self.network.DATACENTER_IP, self.network.DATACENTER_PORT))
