@@ -41,6 +41,8 @@ class MessageReceiver:
                 data, address = self.broadcastSocket.recvfrom(1024)
                 address = Address(address)
                 message = pickle.loads(data)
+                with self.node.clockLock:
+                    self.node.logicalClock = max(self.node.logicalClock, message.logicalClock)
                 if address != Address((self.network.IP, self.network.BROADCAST_PORT)):
                     self.consume(message, address)
             except socket.timeout:

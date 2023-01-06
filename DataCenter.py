@@ -93,9 +93,8 @@ class DataCenter:
         self.send(message, receiver_address)
 
     def send(self, message, receiver_address: Address):
-        with self.clockLock:
-            self.logicalClock += 1
-            message.logicalClock = self.logicalClock
+        self.logicalClock += 1
+        message.logicalClock = self.logicalClock
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(receiver_address.address)
         print(f'({self.logicalClock}) {self.TAG}Sending {message.message} to {receiver_address.id}')

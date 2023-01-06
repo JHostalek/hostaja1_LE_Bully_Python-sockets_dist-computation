@@ -14,19 +14,13 @@ class MessageSender:
         self.terminate = threading.Event()
 
     def sendBroadcast(self, message: Message):
-        print("BEFORE BROADCAST LOCK")
-        with self.node.clockLock:
-            self.node.logicalClock += 1
-        print("AFTER BROADCAST LOCK")
+        self.node.logicalClock += 1
         message.logicalClock = self.node.logicalClock
         receiver_address = (self.network.BROADCAST_IP, self.network.BROADCAST_PORT)
         self.network.broadcastSocket.sendto(message.toBytes(), receiver_address)
 
     def send(self, message: Message, receiver_address: Address):
-        print("BEFORE SEND LOCK")
-        with self.node.clockLock:
-            self.node.logicalClock += 1
-        print("AFTER SEND LOCK")
+        self.node.logicalClock += 1
         message.logicalClock = self.node.logicalClock
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(receiver_address.address)
