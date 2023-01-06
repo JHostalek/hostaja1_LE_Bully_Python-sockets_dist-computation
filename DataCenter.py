@@ -85,7 +85,7 @@ class DataCenter:
             print(f"({self.logicalClock}) {self.TAG}Saved results to file")
 
     def sendAudio(self, receiver_address: Address, task: int):
-        message = AudioMessage(f'data/task{task}.mp3')
+        message = AudioMessage(f'data/task{task}.mp3', task)
         self.send(message, receiver_address)
 
     def sendCheckpoint(self, receiver_address: Address):

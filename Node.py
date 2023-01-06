@@ -35,7 +35,6 @@ class Node:
         self.sender.sendConnectionRequest()
         self.work_thread = None
 
-        self.task = None
         self.tasks = []
         self.NUMBER_OF_TASKS = tasks
         for i in range(self.NUMBER_OF_TASKS):
@@ -171,10 +170,10 @@ class Node:
         self.sender.sendRequestAudioMessage(receiver_address, message.task)
 
     def handleAudioMessage(self, message, address):
-        print(f"({self.logicalClock}) {self.TAG}Starting work on task: {self.task}")
+        print(f"({self.logicalClock}) {self.TAG}Starting work on task: {message.task}")
         # work_thread = threading.Thread(target=self.processAudio, args=(self.leader, message.audio,))
         # work_thread.start()
-        self.processAudio(self.leader, message.audio)
+        self.processAudio(self.leader, message.audio, message.task)
 
     def handleResultMessage(self, message, address):
         print(f"({self.logicalClock}) {self.TAG}Received result: {message.result}")
@@ -200,20 +199,20 @@ class Node:
         self.receiver.terminate.set()
         self.terminate.set()
 
-    def processAudio(self, current_leader, audio):
+    def processAudio(self, current_leader, audio, task):
         print(f"({self.logicalClock}) {self.TAG}Processing audio {audio}...")
         if self.REAL_AUDIO:
             model = whisper.load_model('tiny.en')
             result = model.transcribe(audio, fp16=False, verbose=None)["text"]
         else:
             result = ''.join([chr(random.randint(97, 122)) for _ in range(10)])
+            time.sleep(5)
         print(f"({self.logicalClock}) {self.TAG}Result: {result}")
         if self.leader != current_leader:
             print(f"({self.logicalClock}) {self.TAG}Leader changed, aborting")
             return
         receiver_address = Address((self.leader, self.network.PORT))
-        self.sender.sendResultMessage(receiver_address, self.task, result)
-        self.task = None
+        self.sender.sendResultMessage(receiver_address, task, result)
         self.askForTask()
 
     # --------------------------------------------------------------------------------------------------------------
