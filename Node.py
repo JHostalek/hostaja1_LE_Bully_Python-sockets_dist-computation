@@ -127,17 +127,16 @@ class Node:
 
     # --------------------------------------------------------------------------------------------------------------
     def getTask(self) -> int:
-        for task in self.tasks:
-            if task.state == 'NEW':
-                with self.task_lock:
+        with self.task_lock:
+            for task in self.tasks:
+                if task.state == 'NEW':
                     task.setBeingProcessed()
-                return task.id
-            elif task.state == 'PROCESSING' and task.getDuration() > 10:
-                print(f'({self.logicalClock}) {self.TAG}Task {task.id} is taking too long to process - {task.getDuration()}')
-                with self.task_lock:
+                    return task.id
+                elif task.state == 'PROCESSING' and task.getDuration() > 10:
+                    print(f'({self.logicalClock}) {self.TAG}Task {task.id} is taking too long to process - {task.getDuration()}')
                     task.setBeingProcessed()
-                return task.id
-        return -1
+                    return task.id
+            return -1
 
     def askForTask(self):
         if self.leader is not None:
