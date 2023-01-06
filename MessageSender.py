@@ -35,6 +35,7 @@ class MessageSender:
             while True:
                 try:
                     c = sys.stdin.read(1)
+                    print("Got character", repr(c))
                     if c == "\x05":
                         return False
                     else:
