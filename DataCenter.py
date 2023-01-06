@@ -68,7 +68,7 @@ class DataCenter:
             # thread = threading.Thread(target=self.sendAudio, args=(receiver_address, message.task))
             # thread.start()
         elif isinstance(message, CheckpointMessage):
-            print(f"{self.TAG}Received checkpoint from {address.id} for chunk {message.checkpoint}")
+            print(f"{self.TAG}Received checkpoint from {address.id}")
             self.checkpoint = message.checkpoint
         elif isinstance(message, RequestCheckpointMessage):
             print(f"{self.TAG}Received request for checkpoint from {address.id}")

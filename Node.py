@@ -47,6 +47,7 @@ class Node:
         if self.network.IP == leader:
             pass
         elif leader is not None:
+            print(f'{self.TAG}DEBUG - setLeader: {leader}')
             self.askForTask()
 
     def checkElection(self):
