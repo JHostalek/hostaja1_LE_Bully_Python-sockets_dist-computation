@@ -46,7 +46,7 @@ class Node:
         self.leader_address = Address((leader, self.network.PORT))
         if self.network.IP == leader:
             pass
-        else:
+        elif leader is not None:
             self.askForTask()
 
     def checkElection(self):
