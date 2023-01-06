@@ -36,6 +36,7 @@ class Network:
         # self.broadcastRequestConnection()
 
     def initSockets(self):
+        print(f"{self.TAG}Initializing sockets {self.IP}:{self.PORT}, {self.BROADCAST_IP}:{self.BROADCAST_PORT}")
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.bind((self.IP, self.PORT))
         sock.settimeout(self.SOCKET_TIMEOUT)
