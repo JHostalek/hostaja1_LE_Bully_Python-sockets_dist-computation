@@ -48,7 +48,7 @@ class DataCenter:
     def listen(self, client, address: Address):
         while not self.terminate.is_set():
             try:
-                message = client.recv(1024)
+                message = client.recv(16384)
                 if message:
                     message = pickle.loads(message)
                     print(f"{self.TAG}Received message from {address.id}: {message.message}")
