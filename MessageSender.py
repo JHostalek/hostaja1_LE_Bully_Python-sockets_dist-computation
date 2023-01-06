@@ -139,4 +139,4 @@ class MessageSender:
             self.send(message, receiver_address)
         except ConnectionError:
             print(self.TAG + "SendTerminateMessage: ConnectionError to " + str(receiver_address))
-            self.node.removeNeighbor(receiver_address.ip)
+            # self.node.removeNeighbor(receiver_address.ip)

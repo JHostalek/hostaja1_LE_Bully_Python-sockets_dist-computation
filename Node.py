@@ -55,7 +55,8 @@ class Node:
             self.startElection()
 
     def removeNeighbor(self, ip):
-        self.neighbors.remove(ip)
+        with self.lock:
+            self.neighbors.remove(ip)
         print(f'{self.TAG}Removed {ip} from neighbors')
         if self.leader == ip:
             self.setLeader(None)
