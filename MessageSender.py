@@ -14,6 +14,9 @@ class MessageSender:
         self.terminate = threading.Event()
 
     def sendBroadcast(self, message: Message):
+        with self.node.clockLock:
+            self.node.logicalClock += 1
+        message.logicalClock = self.node.logicalClock
         receiver_address = (self.network.BROADCAST_IP, self.network.BROADCAST_PORT)
         self.network.broadcastSocket.sendto(message.toBytes(), receiver_address)
 
