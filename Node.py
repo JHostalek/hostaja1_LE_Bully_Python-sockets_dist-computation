@@ -139,9 +139,7 @@ class Node:
     def askForTask(self):
         if self.leader is not None:
             receiver_address = Address((self.leader, self.network.PORT))
-            print(f'{self.TAG}ASKING FOR TASK')
             self.sender.sendTaskRequestMessage(receiver_address)
-            print(f'{self.TAG}ASKED FOR TASK')
             prev_time = time.time()
             while True:
                 if self.terminate.is_set():
@@ -152,22 +150,14 @@ class Node:
                 if time.time() - prev_time > 10:
                     prev_time = time.time()
                     receiver_address = Address((self.leader, self.network.PORT))
-                    print(f'{self.TAG}ASKING FOR TASK')
                     self.sender.sendTaskRequestMessage(receiver_address)
-                    print(f'{self.TAG}ASKED FOR TASK')
 
     def handleTaskRequestMessage(self, message, address):
-        print(f'{self.TAG}BEFORE CHECK ALL DONE')
         self.checkAllDone()
-        print(f'{self.TAG}AFTER CHECK ALL DONE')
         receiver_address = Address((address.ip, self.network.PORT))
-        print(f'{self.TAG}BEFORE GET TASK')
         task = self.getTask()
-        print(f'{self.TAG}AFTER GET TASK')
         if task != -1:
-            print(f'{self.TAG}SENDING TASK {task}')
             self.sender.sendTaskMessage(receiver_address, task)
-            print(f'{self.TAG}SENT TASK {task}')
 
     def handleTaskMessage(self, message, address):
         self.got_response = True
@@ -204,7 +194,7 @@ class Node:
         self.terminate.set()
 
     def processAudio(self, current_leader, audio):
-        print(f"{self.TAG}Processing audio...")
+        print(f"{self.TAG}Processing audio.", end='')
         if self.REAL_AUDIO:
             model = whisper.load_model('tiny.en')
             result = model.transcribe(audio, fp16=False, verbose=None)["text"]
@@ -219,13 +209,9 @@ class Node:
             print(f"{self.TAG}Leader changed, aborting")
             return
         receiver_address = Address((self.leader, self.network.PORT))
-        print(f"{self.TAG}BEFORE SEND RESULT")
         self.sender.sendResultMessage(receiver_address, self.task, result)
-        print(f"{self.TAG}AFTER SEND RESULT")
         self.task = None
-        print(f"{self.TAG}BEFORE ASK FOR TASK")
         self.askForTask()
-        print(f"{self.TAG}AFTER ASK FOR TASK")
 
     # --------------------------------------------------------------------------------------------------------------
     def handleCheckpointMessage(self, message, address):
