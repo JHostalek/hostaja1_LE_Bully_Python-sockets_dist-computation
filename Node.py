@@ -79,7 +79,7 @@ class Node:
             self.setLeader(message.leader)
         with self.lock:
             self.neighbors.add(address.ip)
-        print(f'{self.TAG}Established connection with {address.id}, leader is {self.leader}')
+        print(f'{self.TAG}{self.logicalClock}Established connection with {address.id}, leader is {self.leader}')
         # finish handshake with the existing network member
         receiver_address = Address((address.ip, self.network.PORT))
         self.sender.sendConnectionEstablished(receiver_address)
