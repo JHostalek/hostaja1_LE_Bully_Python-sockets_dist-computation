@@ -128,14 +128,15 @@ class Node:
     # --------------------------------------------------------------------------------------------------------------
     def getTask(self) -> int:
         for task in self.tasks:
-            with self.task_lock:
-                if task.state == 'NEW':
+            if task.state == 'NEW':
+                with self.task_lock:
                     task.setBeingProcessed()
-                    return task.id
-                elif task.state == 'PROCESSING' and task.getDuration() > 10:
-                    print(f'({self.logicalClock}) {self.TAG}Task {task.id} is taking too long to process - {task.getDuration()}')
+                return task.id
+            elif task.state == 'PROCESSING' and task.getDuration() > 10:
+                print(f'({self.logicalClock}) {self.TAG}Task {task.id} is taking too long to process - {task.getDuration()}')
+                with self.task_lock:
                     task.setBeingProcessed()
-                    return task.id
+                return task.id
         return -1
 
     def askForTask(self):
@@ -150,7 +151,7 @@ class Node:
                     self.got_response = False
                     return
                 if time.time() - prev_time > 30:
-                    print(f'({self.logicalClock}) {self.TAG}Leader {self.leader} is not responding')
+                    print(f'({self.logicalClock}) {self.TAG}Leader {self.leader} is not responding, sending another request')
                     prev_time = time.time()
                     receiver_address = Address((self.leader, self.network.PORT))
                     self.sender.sendTaskRequestMessage(receiver_address)
