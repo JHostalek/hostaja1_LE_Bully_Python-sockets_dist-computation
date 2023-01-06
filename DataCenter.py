@@ -50,6 +50,7 @@ class DataCenter:
                 message = client.recv(16384)
                 if message:
                     message = pickle.loads(message)
+                    self.logicalClock = max(self.logicalClock, message.logicalClock)
                     print(f"({self.logicalClock}) {self.TAG}Received message from {address.id}: {message.message}")
                     self.consume(message, address)
             except socket.timeout:
