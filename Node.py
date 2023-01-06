@@ -148,7 +148,9 @@ class Node:
                 if time.time() - prev_time > 10:
                     prev_time = time.time()
                     receiver_address = Address((self.leader, self.network.PORT))
+                    print(f'{self.TAG}ASKING FOR TASK')
                     self.sender.sendTaskRequestMessage(receiver_address)
+                    print(f'{self.TAG}ASKED FOR TASK')
 
     def handleTaskRequestMessage(self, message, address):
         print(f'{self.TAG}BEFORE CHECK ALL DONE')
