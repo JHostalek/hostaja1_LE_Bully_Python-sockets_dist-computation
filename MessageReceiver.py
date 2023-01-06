@@ -1,5 +1,6 @@
 import socket
 import threading
+import time
 
 import Network
 from Address import Address
@@ -42,6 +43,7 @@ class MessageReceiver:
                     self.consume(message, address)
             except socket.timeout:
                 pass
+            time.sleep(0.5)
 
     def listenForNewConnections(self):
         while not self.terminate.is_set():
@@ -52,6 +54,7 @@ class MessageReceiver:
                 receive_thread.start()
             except socket.timeout:
                 pass
+            time.sleep(0.5)
 
     def listen(self, client, address: Address):
         while not self.terminate.is_set():
@@ -62,6 +65,7 @@ class MessageReceiver:
                     self.consume(message, address)
             except socket.timeout:
                 pass
+            time.sleep(0.5)
 
     def consume(self, message, address):
         if isinstance(message, RequestConnectionMessage):
