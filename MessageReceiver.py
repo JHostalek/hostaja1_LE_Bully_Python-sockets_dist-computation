@@ -1,5 +1,6 @@
 import socket
 import threading
+import time
 
 import Network
 from Address import Address
@@ -8,6 +9,7 @@ from Message import *
 
 class MessageReceiver:
     def __init__(self, network: Network):
+        self.MESSAGE_DELAY = 2
         self.network = network
         self.node = network.node
         self.broadcastSocket = self.network.broadcastSocket
@@ -34,6 +36,7 @@ class MessageReceiver:
 
     def listenBroadcast(self):
         while not self.terminate.is_set():
+            time.sleep(self.MESSAGE_DELAY)
             try:
                 data, address = self.broadcastSocket.recvfrom(1024)
                 address = Address(address)
@@ -55,6 +58,7 @@ class MessageReceiver:
 
     def listen(self, client, address: Address):
         while not self.terminate.is_set():
+            time.sleep(self.MESSAGE_DELAY)
             try:
                 message = client.recv(16384)
                 if message:

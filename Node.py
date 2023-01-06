@@ -195,9 +195,10 @@ class Node:
             for task in self.tasks:
                 if task.state != 'DONE':
                     return
-            for n in self.neighbors:
-                receiver_address = Address((n, self.network.PORT))
-                self.sender.sendTerminateMessage(receiver_address)
+            with self.lock:
+                for n in self.neighbors:
+                    receiver_address = Address((n, self.network.PORT))
+                    self.sender.sendTerminateMessage(receiver_address)
             self.sender.sendTerminateMessage(Address((self.network.DATACENTER_IP, self.network.DATACENTER_PORT)))
             self.sender.terminate.set()
             self.receiver.terminate.set()
