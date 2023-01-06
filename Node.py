@@ -138,6 +138,10 @@ class Node:
 
     def askForTask(self):
         if self.leader is not None:
+            receiver_address = Address((self.leader, self.network.PORT))
+            print(f'{self.TAG}ASKING FOR TASK')
+            self.sender.sendTaskRequestMessage(receiver_address)
+            print(f'{self.TAG}ASKED FOR TASK')
             prev_time = time.time()
             while True:
                 if self.terminate.is_set():
