@@ -34,7 +34,7 @@ class Node:
 
         self.task = None
         self.tasks = []
-        self.NUMBER_OF_TASKS = 20
+        self.NUMBER_OF_TASKS = 5
         for i in range(self.NUMBER_OF_TASKS):
             self.tasks.append(Task(i))
         self.result = {}
@@ -116,14 +116,12 @@ class Node:
             self.startElection()
 
     def handleVictoryMessage(self, message, address):
-        with self.lock:
-            self.state = "FOLLOWER"
-            self.setLeader(address.ip)
-            print(f"{self.TAG}NEW LEADER IS: {self.leader}")
+        self.state = "FOLLOWER"
+        self.setLeader(address.ip)
+        print(f"{self.TAG}NEW LEADER IS: {self.leader}")
 
     def handleAliveMessage(self, message, address):
-        with self.lock:
-            self.state = "WAITING"
+        self.state = "WAITING"
 
     # --------------------------------------------------------------------------------------------------------------
     def getTask(self) -> int:
@@ -140,11 +138,15 @@ class Node:
 
     def askForTask(self):
         if self.leader is not None:
-            while not self.got_response and not self.terminate.is_set():
+            while True:
+                if self.terminate.is_set():
+                    return
+                if self.got_response:
+                    self.got_response = False
+                    return
                 receiver_address = Address((self.leader, self.network.PORT))
                 self.sender.sendTaskRequestMessage(receiver_address)
                 time.sleep(10)
-            self.got_response = False
 
     def handleTaskRequestMessage(self, message, address):
         receiver_address = Address((address.ip, self.network.PORT))
