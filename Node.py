@@ -116,7 +116,7 @@ class Node:
 
     def handleVictoryMessage(self, message, address):
         self.state = "FOLLOWER"
-        print(f"{self.TAG}NEW LEADER IS: {self.leader}")
+        print(f"{self.TAG}NEW LEADER IS: {address.ip}")
         self.setLeader(address.ip)
 
     def handleAliveMessage(self, message, address):
@@ -151,11 +151,17 @@ class Node:
                     self.sender.sendTaskRequestMessage(receiver_address)
 
     def handleTaskRequestMessage(self, message, address):
+        print(f'{self.TAG}BEFORE CHECK ALL DONE')
         self.checkAllDone()
+        print(f'{self.TAG}AFTER CHECK ALL DONE')
         receiver_address = Address((address.ip, self.network.PORT))
+        print(f'{self.TAG}BEFORE GET TASK')
         task = self.getTask()
+        print(f'{self.TAG}AFTER GET TASK')
         if task != -1:
+            print(f'{self.TAG}SENDING TASK {task}')
             self.sender.sendTaskMessage(receiver_address, task)
+            print(f'{self.TAG}SENT TASK {task}')
 
     def handleTaskMessage(self, message, address):
         self.got_response = True
