@@ -22,3 +22,4 @@
 - [ ] Logování do souboru
 - [ ] Časové razítko logického času
 - [x] Ukladani progresu do DataStorage
+
