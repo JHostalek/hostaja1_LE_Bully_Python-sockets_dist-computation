@@ -204,7 +204,7 @@ class Node:
             result = model.transcribe(audio, fp16=False, verbose=None)["text"]
         else:
             result = ''.join([chr(random.randint(97, 122)) for _ in range(10)])
-            time.sleep(5)
+            time.sleep(1)
         print(f"({self.logicalClock}) {self.TAG}Result: {result}")
         if self.leader != current_leader:
             print(f"({self.logicalClock}) {self.TAG}Leader changed, aborting")
