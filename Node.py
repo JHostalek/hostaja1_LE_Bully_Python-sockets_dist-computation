@@ -103,7 +103,8 @@ class Node:
             with self.lock:
                 self.state = "COORDINATOR"
                 self.setLeader(self.network.IP)
-            self.sender.sendVictoryMessage()
+            receiver_address = Address((self.network.DATACENTER_IP, self.network.DATACENTER_PORT))
+            self.sender.sendRequestCheckpointMessage(receiver_address)
 
     def handleElectionMessage(self, message, sender_address):
         # if self.leader is not None:
@@ -165,6 +166,8 @@ class Node:
         print(f"{self.TAG}Received result: {message.result}")
         self.tasks[message.task].result = message.result
         self.tasks[message.task].state = 'DONE'
+        receiver_address = Address((self.network.DATACENTER_IP, self.network.DATACENTER_PORT))
+        self.sender.sendCheckpointMessage(receiver_address, self.tasks)
         with self.lock:
             for task in self.tasks:
                 if task.state != 'DONE':
@@ -189,3 +192,10 @@ class Node:
         self.sender.sendResultMessage(receiver_address, self.task, result)
         self.task = None
         self.askForTask()
+
+    # --------------------------------------------------------------------------------------------------------------
+    def handleCheckpointMessage(self, message, address):
+        print(f"{self.TAG}Received checkpoint")
+        self.tasks = message.checkpoint
+        # Let other nodes know that we have the checkpoint, and we can start
+        self.sender.sendVictoryMessage()

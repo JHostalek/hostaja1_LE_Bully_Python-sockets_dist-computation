@@ -102,5 +102,8 @@ class MessageReceiver:
         elif isinstance(message, TerminateMessage):
             print(f"{self.TAG}Processed terminate message from {address.id}")
             exit(0)
+        elif isinstance(message, CheckpointMessage):
+            print(f"{self.TAG}Processed checkpoint message from {address.id}")
+            self.node.handleCheckpointMessage(message, address)
         else:
             print(f"{self.TAG}Processed unknown message: {message}")

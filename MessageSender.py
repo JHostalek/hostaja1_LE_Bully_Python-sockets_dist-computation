@@ -115,6 +115,23 @@ class MessageSender:
             self.node.removeNeighbor(receiver_address.ip)
 
     # --------------------------------------------------------------------------------------------------------------
+    def sendCheckpointMessage(self, receiver_address: Address, checkpoint: [Task]):
+        message = CheckpointMessage(checkpoint)
+        try:
+            self.send(message, receiver_address)
+        except ConnectionError:
+            print(self.TAG + "SendCheckpointMessage: ConnectionError to " + str(receiver_address))
+            self.node.removeNeighbor(receiver_address.ip)
+
+    def sendRequestCheckpointMessage(self, receiver_address: Address):
+        message = RequestCheckpointMessage()
+        try:
+            self.send(message, receiver_address)
+        except ConnectionError:
+            print(self.TAG + "SendRequestCheckpointMessage: ConnectionError to " + str(receiver_address))
+            self.node.removeNeighbor(receiver_address.ip)
+
+    # --------------------------------------------------------------------------------------------------------------
 
     def sendTerminateMessage(self, receiver_address: Address):
         message = TerminateMessage()
