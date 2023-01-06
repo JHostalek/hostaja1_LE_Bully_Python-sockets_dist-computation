@@ -184,6 +184,8 @@ class Node:
             for n in self.neighbors:
                 receiver_address = Address((n, self.network.PORT))
                 self.sender.sendTerminateMessage(receiver_address)
+            self.sender.terminate.set()
+            self.receiver.terminate.set()
             self.terminate.set()
 
     def processAudio(self, current_leader, audio):
