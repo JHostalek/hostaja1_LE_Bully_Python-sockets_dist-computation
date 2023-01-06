@@ -6,6 +6,7 @@ from Task import Task
 
 class Message(abc.ABC):
     def __init__(self):
+        self.logicalClock = 0
         pass
 
     def toBytes(self):

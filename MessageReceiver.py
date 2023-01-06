@@ -63,6 +63,8 @@ class MessageReceiver:
                 message = client.recv(16384)
                 if message:
                     message = pickle.loads(message)
+                    with self.node.clockLock:
+                        self.node.logicalClock = max(self.node.logicalClock, message.logicalClock)
                     self.consume(message, address)
             except socket.timeout:
                 pass
