@@ -179,12 +179,15 @@ class Node:
         self.tasks[message.task].state = 'DONE'
         receiver_address = Address((self.network.DATACENTER_IP, self.network.DATACENTER_PORT))
         self.sender.sendCheckpointMessage(receiver_address, self.tasks)
+
         self.checkAllDone()
 
     def checkAllDone(self):
         for task in self.tasks:
             if task.state != 'DONE':
                 return
+        print(f"{self.TAG}All tasks done. Shutting down.")
+        time.sleep(5)
         with self.lock:
             for n in self.neighbors:
                 receiver_address = Address((n, self.network.PORT))
