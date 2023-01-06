@@ -211,3 +211,4 @@ class Node:
         print(f"{self.TAG}Received terminate message")
         self.sender.terminate.set()
         self.receiver.terminate.set()
+        self.terminate.set()
