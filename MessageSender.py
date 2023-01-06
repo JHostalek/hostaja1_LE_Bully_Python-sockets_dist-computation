@@ -1,5 +1,8 @@
-import msvcrt
+import fcntl
+import os
 import socket
+import sys
+import termios
 import threading
 
 import Network
@@ -20,16 +23,31 @@ class MessageSender:
         receiver_address = (self.network.BROADCAST_IP, self.network.BROADCAST_PORT)
         self.network.broadcastSocket.sendto(message.toBytes(), receiver_address)
 
-    def send(self, message: Message, receiver_address: Address):
+    def wait_for_ctrl_e(self):
+        fd = sys.stdin.fileno()
+        oldterm = termios.tcgetattr(fd)
+        newattr = termios.tcgetattr(fd)
+        newattr[3] = newattr[3] & ~termios.ICANON & ~termios.ECHO
+        termios.tcsetattr(fd, termios.TCSANOW, newattr)
+        oldflags = fcntl.fcntl(fd, fcntl.F_GETFL)
+        fcntl.fcntl(fd, fcntl.F_SETFL, oldflags | os.O_NONBLOCK)
+        try:
+            while True:
+                try:
+                    c = sys.stdin.read(1)
+                    if c == "\x05":
+                        return True
+                    else:
+                        return False
+                except IOError:
+                    pass
+        finally:
+            termios.tcsetattr(fd, termios.TCSAFLUSH, oldterm)
+            fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
 
+    def send(self, message: Message, receiver_address: Address):
         if self.node.hold_each_message:
-            print("Press any key to continue...")
-            # Wait for the user to press a key
-            msvcrt.getch()
-            # Check if the user pressed CTRL+E
-            if ord(msvcrt.getch()) == 5:
-                print("CTRL+E was pressed")
-                self.node.hold_each_message = False
+            self.node.hold_each_message = self.wait_for_ctrl_e()
 
         self.node.logicalClock += 1
         message.logicalClock = self.node.logicalClock
