@@ -97,7 +97,7 @@ class Node:
         self.state = "ELECTION"
         self.sender.sendElectionMessage()
         time.sleep(self.WAIT_TIME)
-        if self.state == "ELECTION" and self.leader is None:
+        if self.state == "ELECTION" and self.leader is None and self.terminate.is_set() is False:
             print(f"{self.TAG}I AM THE NEW LEADER")
             self.state = "COORDINATOR"
             self.setLeader(self.network.IP)
