@@ -196,6 +196,7 @@ class Node:
     # --------------------------------------------------------------------------------------------------------------
     def handleCheckpointMessage(self, message, address):
         print(f"{self.TAG}Received checkpoint")
-        self.tasks = message.checkpoint
+        if message.checkpoint is not None:
+            self.tasks = message.checkpoint
         # Let other nodes know that we have the checkpoint, and we can start
         self.sender.sendVictoryMessage()
