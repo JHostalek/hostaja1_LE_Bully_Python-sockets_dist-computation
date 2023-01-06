@@ -33,6 +33,7 @@ class DataCenter:
         self.TAG = self.IP + " - "
         self.terminate = threading.Event()
 
+        self.checkpoint = None
 
     def listenForNewConnections(self):
         while not self.terminate.is_set():
@@ -62,14 +63,30 @@ class DataCenter:
         if isinstance(message, RequestAudioMessage):
             print(f"{self.TAG}Received request for audio from {address.id} for chunk {message.task}")
             receiver_address = Address((address.ip, self.PORT))
-            thread = threading.Thread(target=self.sendAudio, args=(receiver_address, message.task))
-            thread.start()
+            self.sendAudio(receiver_address, message.task)
+            # for real audio
+            # thread = threading.Thread(target=self.sendAudio, args=(receiver_address, message.task))
+            # thread.start()
+        elif isinstance(message, CheckpointMessage):
+            print(f"{self.TAG}Received checkpoint from {address.id} for chunk {message.task}")
+            self.checkpoint = message.checkpoint
+        elif isinstance(message, RequestCheckpointMessage):
+            print(f"{self.TAG}Received request for checkpoint from {address.id}")
+            receiver_address = Address((address.ip, self.PORT))
+            self.sendCheckpoint(receiver_address)
 
     def sendAudio(self, receiver_address: Address, task: int):
         message = AudioMessage(f'data/task{task}.mp3')
+        self.send(message, receiver_address)
+
+    def sendCheckpoint(self, receiver_address: Address):
+        message = CheckpointMessage(self.checkpoint)
+        self.send(message, receiver_address)
+
+    def send(self, message, receiver_address: Address):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(receiver_address.address)
-        print(f'{self.TAG}Sending audio to {receiver_address.id} of size {len(message.toBytes())}')
+        print(f'{self.TAG}Sending {message.message} to {receiver_address.id}')
         client.send(message.toBytes())
         client.close()
-        print(f"{self.TAG}Sent audio to {receiver_address.id}")
+        print(f"{self.TAG}Sent message to {receiver_address.id}")

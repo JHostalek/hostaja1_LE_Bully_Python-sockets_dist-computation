@@ -1,6 +1,8 @@
 import abc
 import pickle
 
+from Task import Task
+
 
 class Message(abc.ABC):
     def __init__(self):
@@ -86,3 +88,16 @@ class TerminateMessage(Message):
     def __init__(self):
         super().__init__()
         self.message = "Terminating"
+
+
+class CheckpointMessage(Message):
+    def __init__(self, checkpoint: [Task]):
+        super().__init__()
+        self.message = "Checkpoint"
+        self.checkpoint = checkpoint
+
+
+class RequestCheckpointMessage(Message):
+    def __init__(self):
+        super().__init__()
+        self.message = "Requesting checkpoint"
