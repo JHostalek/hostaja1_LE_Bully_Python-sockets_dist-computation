@@ -48,8 +48,8 @@ class MessageSender:
             fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
 
     def send(self, message: Message, receiver_address: Address):
-        print(f'{self.node.hold_each_message}')
         if self.node.hold_each_message:
+            print(f'Press any key to send {message.type} to {receiver_address.ip} or Ctrl+E to escape manual sending')
             self.node.hold_each_message = self.wait_for_ctrl_e()
 
         self.node.logicalClock += 1
