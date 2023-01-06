@@ -191,18 +191,17 @@ class Node:
         self.checkAllDone()
 
     def checkAllDone(self):
+        for task in self.tasks:
+            if task.state != 'DONE':
+                return
         with self.lock:
-            for task in self.tasks:
-                if task.state != 'DONE':
-                    return
-            with self.lock:
-                for n in self.neighbors:
-                    receiver_address = Address((n, self.network.PORT))
-                    self.sender.sendTerminateMessage(receiver_address)
-            self.sender.sendTerminateMessage(Address((self.network.DATACENTER_IP, self.network.DATACENTER_PORT)))
-            self.sender.terminate.set()
-            self.receiver.terminate.set()
-            self.terminate.set()
+            for n in self.neighbors:
+                receiver_address = Address((n, self.network.PORT))
+                self.sender.sendTerminateMessage(receiver_address)
+        self.sender.sendTerminateMessage(Address((self.network.DATACENTER_IP, self.network.DATACENTER_PORT)))
+        self.sender.terminate.set()
+        self.receiver.terminate.set()
+        self.terminate.set()
 
     def processAudio(self, current_leader, audio):
         print(f"{self.TAG}Processing audio...")
