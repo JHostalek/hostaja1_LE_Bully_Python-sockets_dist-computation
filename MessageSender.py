@@ -49,7 +49,7 @@ class MessageSender:
 
     def send(self, message: Message, receiver_address: Address):
         if self.node.hold_each_message:
-            print(f'Press any key to send message or Ctrl+E to escape manual sending')
+            print(f'Press any key to send {message.message} or Ctrl+E to escape manual sending')
             self.node.hold_each_message = self.wait_for_ctrl_e()
 
         self.node.logicalClock += 1
