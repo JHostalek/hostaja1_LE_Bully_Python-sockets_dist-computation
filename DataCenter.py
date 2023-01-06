@@ -72,16 +72,14 @@ class DataCenter:
             receiver_address = Address((address.ip, self.PORT))
             self.sendCheckpoint(receiver_address)
         elif isinstance(message, TerminateMessage):
-            if not self.terminate.is_set():
-                print(f"{self.TAG}Received terminate message from {address.id}")
-                results_str = ""
-                for task in self.checkpoint:
-                    results_str += task.result
-                print(f"{self.TAG}Result: {results_str}")
-                with open("results.txt", "w") as f:
-                    f.write(results_str)
-                print(f"{self.TAG}Saved results to file")
-                self.terminate.set()
+            print(f"{self.TAG}Received terminate message from {address.id}")
+            results_str = ""
+            for task in self.checkpoint:
+                results_str += task.result
+            print(f"{self.TAG}Result: {results_str}")
+            with open("results.txt", "w") as f:
+                f.write(results_str)
+            print(f"{self.TAG}Saved results to file")
 
     def sendAudio(self, receiver_address: Address, task: int):
         message = AudioMessage(f'data/task{task}.mp3')
