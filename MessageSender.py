@@ -18,13 +18,13 @@ class MessageSender:
         self.network.broadcastSocket.sendto(message.toBytes(), receiver_address)
 
     def send(self, message: Message, receiver_address: Address):
+        with self.node.clockLock:
+            self.node.logicalClock += 1
         message.logicalClock = self.node.logicalClock
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(receiver_address.address)
         client.send(message.toBytes())
         client.close()
-        with self.node.clockLock:
-            self.node.logicalClock += 1
 
     # --------------------------------------------------------------------------------------------------------------
     def sendConnectionRequest(self):
