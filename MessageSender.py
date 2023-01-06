@@ -38,6 +38,8 @@ class MessageSender:
                     print("Got character", repr(c))
                     if c == "\x05":
                         return False
+                    elif c == "":
+                        pass
                     else:
                         return True
                 except IOError:
