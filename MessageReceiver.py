@@ -9,7 +9,7 @@ from Message import *
 
 class MessageReceiver:
     def __init__(self, network: Network):
-        self.MESSAGE_DELAY = 2
+        self.MESSAGE_DELAY = 1
         self.network = network
         self.node = network.node
         self.broadcastSocket = self.network.broadcastSocket
