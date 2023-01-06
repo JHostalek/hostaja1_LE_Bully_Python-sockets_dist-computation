@@ -131,7 +131,7 @@ class Node:
             if task.state == 'NEW':
                 task.setBeingProcessed()
                 return task.id
-            elif task.state == 'PROCESSING' and task.getDuration() > 10:
+            elif task.state == 'PROCESSING' and task.getDuration() > 20:
                 print(f'({self.logicalClock}) {self.TAG}Task {task.id} is taking too long to process - {task.getDuration()}')
                 task.setBeingProcessed()
                 return task.id
