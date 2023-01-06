@@ -195,7 +195,7 @@ class Node:
         self.terminate.set()
 
     def processAudio(self, current_leader, audio):
-        print(f"{self.TAG}Processing audio...", end='')
+        print(f"{self.TAG}Processing audio {audio}...")
         if self.REAL_AUDIO:
             model = whisper.load_model('tiny.en')
             result = model.transcribe(audio, fp16=False, verbose=None)["text"]
