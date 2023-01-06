@@ -138,15 +138,17 @@ class Node:
 
     def askForTask(self):
         if self.leader is not None:
+            prev_time = time.time()
             while True:
                 if self.terminate.is_set():
                     return
                 if self.got_response:
                     self.got_response = False
                     return
-                receiver_address = Address((self.leader, self.network.PORT))
-                self.sender.sendTaskRequestMessage(receiver_address)
-                time.sleep(10)
+                if time.time() - prev_time > 10:
+                    prev_time = time.time()
+                    receiver_address = Address((self.leader, self.network.PORT))
+                    self.sender.sendTaskRequestMessage(receiver_address)
 
     def handleTaskRequestMessage(self, message, address):
         self.checkAllDone()
