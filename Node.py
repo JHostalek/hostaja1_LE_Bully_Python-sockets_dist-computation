@@ -186,8 +186,6 @@ class Node:
         for task in self.tasks:
             if task.state != 'DONE':
                 return
-        if self.terminate.is_set():
-            return
         print(f"{self.TAG}All tasks done. Shutting down.")
         time.sleep(5)
         with self.lock:
