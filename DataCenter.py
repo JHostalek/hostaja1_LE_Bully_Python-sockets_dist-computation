@@ -24,15 +24,12 @@ class DataCenter:
         self.IP = parseIp()
         self.DATACENTER_PORT = 5557
         self.PORT = 5556
-        self.NUM_OF_CHUNKS = 20
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((self.IP, self.DATACENTER_PORT))
         self.socket.settimeout(0.1)
         self.socket.listen(10)
-
         self.TAG = self.IP + " - "
         self.terminate = threading.Event()
-
         self.checkpoint = None
 
     def listenForNewConnections(self):
@@ -74,6 +71,18 @@ class DataCenter:
             print(f"{self.TAG}Received request for checkpoint from {address.id}")
             receiver_address = Address((address.ip, self.PORT))
             self.sendCheckpoint(receiver_address)
+        elif isinstance(message, TerminateMessage):
+            print(f"{self.TAG}Received terminate message from {address.id}")
+            # sort and concat all tasks inside checkpoint
+            # save checkpoint to file
+            results_str = ""
+            for task in self.checkpoint:
+                results_str += task.result
+            print(f"{self.TAG}Result: {results_str}")
+            with open("results.txt", "w") as f:
+                f.write(results_str)
+            print(f"{self.TAG}Saved results to file")
+            self.terminate.set()
 
     def sendAudio(self, receiver_address: Address, task: int):
         message = AudioMessage(f'data/task{task}.mp3')
