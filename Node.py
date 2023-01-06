@@ -142,7 +142,7 @@ class Node:
 
     def askForTask(self):
         if self.leader is not None:
-            while not self.got_response:
+            while not self.got_response and not self.terminate.is_set():
                 receiver_address = Address((self.leader, self.network.PORT))
                 self.sender.sendTaskRequestMessage(receiver_address)
                 time.sleep(10)
@@ -205,3 +205,10 @@ class Node:
             self.tasks = message.checkpoint
         # Let other nodes know that we have the checkpoint, and we can start
         self.sender.sendVictoryMessage()
+
+    # --------------------------------------------------------------------------------------------------------------
+    def handleTerminateMessage(self, message, address):
+        print(f"{self.TAG}Received terminate message")
+        self.sender.terminate.set()
+        self.receiver.terminate.set()
+        self.terminate.set()
