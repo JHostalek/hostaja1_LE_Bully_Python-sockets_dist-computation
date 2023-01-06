@@ -127,7 +127,6 @@ class Node:
 
     # --------------------------------------------------------------------------------------------------------------
     def getTask(self) -> int:
-
         for task in self.tasks:
             if task.state == 'NEW':
                 with self.task_lock:
@@ -165,7 +164,6 @@ class Node:
     def handleTaskMessage(self, message, address):
         self.got_response = True
         print(f"({self.logicalClock}) {self.TAG}Received task: {message.task}")
-        self.task = message.task
         receiver_address = Address((self.network.DATACENTER_IP, self.network.DATACENTER_PORT))
         self.sender.sendRequestAudioMessage(receiver_address, message.task)
 
