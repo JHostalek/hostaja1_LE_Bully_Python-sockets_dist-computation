@@ -34,7 +34,7 @@ class Node:
 
         self.task = None
         self.tasks = []
-        self.NUMBER_OF_TASKS = 5
+        self.NUMBER_OF_TASKS = 10
         for i in range(self.NUMBER_OF_TASKS):
             self.tasks.append(Task(i))
         self.result = {}
@@ -195,15 +195,11 @@ class Node:
         self.terminate.set()
 
     def processAudio(self, current_leader, audio):
-        print(f"{self.TAG}Processing audio.", end='')
+        print(f"{self.TAG}Processing audio...", end='')
         if self.REAL_AUDIO:
             model = whisper.load_model('tiny.en')
             result = model.transcribe(audio, fp16=False, verbose=None)["text"]
         else:
-            for i in range(5):
-                print('.', end='')
-                time.sleep(1)
-            print()
             result = ''.join([chr(random.randint(97, 122)) for _ in range(10)])
         print(f"{self.TAG}Result: {result}")
         if self.leader != current_leader:
