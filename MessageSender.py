@@ -36,9 +36,9 @@ class MessageSender:
                 try:
                     c = sys.stdin.read(1)
                     if c == "\x05":
-                        return True
-                    else:
                         return False
+                    else:
+                        return True
                 except IOError:
                     pass
         finally:
