@@ -46,6 +46,7 @@ class MessageSender:
             fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
 
     def send(self, message: Message, receiver_address: Address):
+        print(f'{self.node.hold_each_message}')
         if self.node.hold_each_message:
             self.node.hold_each_message = self.wait_for_ctrl_e()
 
