@@ -209,9 +209,13 @@ class Node:
             print(f"{self.TAG}Leader changed, aborting")
             return
         receiver_address = Address((self.leader, self.network.PORT))
+        print(f"{self.TAG}BEFORE SEND RESULT")
         self.sender.sendResultMessage(receiver_address, self.task, result)
+        print(f"{self.TAG}AFTER SEND RESULT")
         self.task = None
+        print(f"{self.TAG}BEFORE ASK FOR TASK")
         self.askForTask()
+        print(f"{self.TAG}AFTER ASK FOR TASK")
 
     # --------------------------------------------------------------------------------------------------------------
     def handleCheckpointMessage(self, message, address):
