@@ -95,15 +95,13 @@ class Node:
 
     # --------------------------------------------------------------------------------------------------------------
     def startElection(self):
-        with self.lock:
-            self.state = "ELECTION"
+        self.state = "ELECTION"
         self.sender.sendElectionMessage()
         time.sleep(self.WAIT_TIME)
         if self.state == "ELECTION" and self.leader is None:
             print(f"{self.TAG}I AM THE NEW LEADER")
-            with self.lock:
-                self.state = "COORDINATOR"
-                self.setLeader(self.network.IP)
+            self.state = "COORDINATOR"
+            self.setLeader(self.network.IP)
             receiver_address = Address((self.network.DATACENTER_IP, self.network.DATACENTER_PORT))
             self.sender.sendRequestCheckpointMessage(receiver_address)
 
@@ -180,7 +178,7 @@ class Node:
             for n in self.neighbors:
                 receiver_address = Address((n, self.network.PORT))
                 self.sender.sendTerminateMessage(receiver_address)
-            exit(0)
+            self.terminate.set()
 
     def processAudio(self, current_leader, audio):
         print(f"{self.TAG}Processing audio...")
@@ -211,4 +209,3 @@ class Node:
         print(f"{self.TAG}Received terminate message")
         self.sender.terminate.set()
         self.receiver.terminate.set()
-        self.terminate.set()
