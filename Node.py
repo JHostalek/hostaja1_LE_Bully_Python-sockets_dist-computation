@@ -27,7 +27,7 @@ class Node:
         self.WAIT_TIME = 10
         self.logicalClock = 0
         self.clockLock = threading.Lock()
-        self.TAG = f'{self.network.IP}: '
+        self.TAG = f'{self.network.IP} - '
         self.terminate = threading.Event()
         self.lock = threading.Lock()
         self.task_lock = threading.Lock()
@@ -128,15 +128,14 @@ class Node:
     # --------------------------------------------------------------------------------------------------------------
     def getTask(self) -> int:
         for task in self.tasks:
-            if task.state == 'NEW':
-                with self.task_lock:
+            with self.task_lock:
+                if task.state == 'NEW':
                     task.setBeingProcessed()
-                return task.id
-            elif task.state == 'PROCESSING' and task.getDuration() > 10:
-                print(f'({self.logicalClock}) {self.TAG}Task {task.id} is taking too long to process - {task.getDuration()}')
-                with self.task_lock:
+                    return task.id
+                elif task.state == 'PROCESSING' and task.getDuration() > 10:
+                    print(f'({self.logicalClock}) {self.TAG}Task {task.id} is taking too long to process - {task.getDuration()}')
                     task.setBeingProcessed()
-                return task.id
+                    return task.id
         return -1
 
     def askForTask(self):
