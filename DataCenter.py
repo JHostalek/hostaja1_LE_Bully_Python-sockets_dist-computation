@@ -77,6 +77,7 @@ class DataCenter:
             # save checkpoint to file
             results_str = ""
             for task in self.checkpoint:
+                print(f"{self.TAG}Task {task} state: {task.state}")
                 results_str += task.result
             print(f"{self.TAG}Result: {results_str}")
             with open("results.txt", "w") as f:
