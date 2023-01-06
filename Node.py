@@ -13,10 +13,11 @@ from Task import Task
 
 
 class Node:
-    def __init__(self):
+    def __init__(self, data_center_ip, real_audio, tasks, message_delay, hold_each_message, bully_timeout):
+        self.hold_each_message = hold_each_message
         self.REAL_AUDIO = False
         self.state = None
-        self.network = Network(self)
+        self.network = Network(self, data_center_ip)
         self.sender = MessageSender(self.network)
         self.receiver = MessageReceiver(self.network)
         self.neighbors = set()
@@ -36,13 +37,11 @@ class Node:
 
         self.task = None
         self.tasks = []
-        self.NUMBER_OF_TASKS = 10
+        self.NUMBER_OF_TASKS = tasks
         for i in range(self.NUMBER_OF_TASKS):
             self.tasks.append(Task(i))
         self.result = {}
         self.got_response = False
-
-
 
     def setLeader(self, leader):
         if self.leader == leader: return

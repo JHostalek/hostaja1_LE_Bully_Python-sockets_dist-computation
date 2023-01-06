@@ -1,3 +1,4 @@
+import msvcrt
 import socket
 import threading
 
@@ -20,6 +21,16 @@ class MessageSender:
         self.network.broadcastSocket.sendto(message.toBytes(), receiver_address)
 
     def send(self, message: Message, receiver_address: Address):
+
+        if self.node.hold_each_message:
+            print("Press any key to continue...")
+            # Wait for the user to press a key
+            msvcrt.getch()
+            # Check if the user pressed CTRL+E
+            if ord(msvcrt.getch()) == 5:
+                print("CTRL+E was pressed")
+                self.node.hold_each_message = False
+
         self.node.logicalClock += 1
         message.logicalClock = self.node.logicalClock
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
