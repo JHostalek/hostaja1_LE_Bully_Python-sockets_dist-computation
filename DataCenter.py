@@ -31,6 +31,8 @@ class DataCenter:
         self.TAG = self.IP + " - "
         self.terminate = threading.Event()
         self.checkpoint = None
+        self.logicalClock = 0
+        self.clockLock = threading.Lock()
 
     def listenForNewConnections(self):
         while not self.terminate.is_set():
@@ -48,38 +50,38 @@ class DataCenter:
                 message = client.recv(16384)
                 if message:
                     message = pickle.loads(message)
-                    print(f"{self.TAG}Received message from {address.id}: {message.message}")
+                    print(f"({self.logicalClock}) {self.TAG}Received message from {address.id}: {message.message}")
                     self.consume(message, address)
             except socket.timeout:
                 pass
             except ConnectionError:
-                print(f"{self.TAG}Connection to {address.id} closed")
+                print(f"({self.logicalClock}) {self.TAG}Connection to {address.id} closed")
                 break
 
     def consume(self, message, address):
         if isinstance(message, RequestAudioMessage):
-            print(f"{self.TAG}Received request for audio from {address.id} for chunk {message.task}")
+            print(f"({self.logicalClock}) {self.TAG}Received request for audio from {address.id} for chunk {message.task}")
             receiver_address = Address((address.ip, self.PORT))
             self.sendAudio(receiver_address, message.task)
             # for real audio
             # thread = threading.Thread(target=self.sendAudio, args=(receiver_address, message.task))
             # thread.start()
         elif isinstance(message, CheckpointMessage):
-            print(f"{self.TAG}Received checkpoint from {address.id}")
+            print(f"({self.logicalClock}) {self.TAG}Received checkpoint from {address.id}")
             self.checkpoint = message.checkpoint
         elif isinstance(message, RequestCheckpointMessage):
-            print(f"{self.TAG}Received request for checkpoint from {address.id}")
+            print(f"({self.logicalClock}) {self.TAG}Received request for checkpoint from {address.id}")
             receiver_address = Address((address.ip, self.PORT))
             self.sendCheckpoint(receiver_address)
         elif isinstance(message, TerminateMessage):
-            print(f"{self.TAG}Received terminate message from {address.id}")
+            print(f"({self.logicalClock}) {self.TAG}Received terminate message from {address.id}")
             results_str = ""
             for task in self.checkpoint:
                 results_str += task.result
-            print(f"{self.TAG}Result: {results_str}")
+            print(f"({self.logicalClock}) {self.TAG}Result: {results_str}")
             with open("results.txt", "w") as f:
                 f.write(results_str)
-            print(f"{self.TAG}Saved results to file")
+            print(f"({self.logicalClock}) {self.TAG}Saved results to file")
 
     def sendAudio(self, receiver_address: Address, task: int):
         message = AudioMessage(f'data/task{task}.mp3')
@@ -90,9 +92,12 @@ class DataCenter:
         self.send(message, receiver_address)
 
     def send(self, message, receiver_address: Address):
+        with self.clockLock:
+            self.logicalClock += 1
+            message.logicalClock = self.logicalClock
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(receiver_address.address)
-        print(f'{self.TAG}Sending {message.message} to {receiver_address.id}')
+        print(f'({self.logicalClock}) {self.TAG}Sending {message.message} to {receiver_address.id}')
         client.send(message.toBytes())
         client.close()
-        print(f"{self.TAG}Sent message to {receiver_address.id}")
+        print(f"({self.logicalClock}) {self.TAG}Sent message to {receiver_address.id}")
