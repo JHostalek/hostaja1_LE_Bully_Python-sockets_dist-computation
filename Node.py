@@ -47,7 +47,6 @@ class Node:
         if self.network.IP == leader:
             pass
         elif leader is not None:
-            print(f'{self.TAG}DEBUG - setLeader: {leader}')
             self.askForTask()
 
     def checkElection(self):
@@ -125,6 +124,7 @@ class Node:
 
     # --------------------------------------------------------------------------------------------------------------
     def getTask(self) -> int:
+
         for task in self.tasks:
             if task.state == 'NEW':
                 with self.task_lock:
@@ -149,6 +149,7 @@ class Node:
                 time.sleep(10)
 
     def handleTaskRequestMessage(self, message, address):
+        self.checkAllDone()
         receiver_address = Address((address.ip, self.network.PORT))
         task = self.getTask()
         if task != -1:
@@ -173,6 +174,9 @@ class Node:
         self.tasks[message.task].state = 'DONE'
         receiver_address = Address((self.network.DATACENTER_IP, self.network.DATACENTER_PORT))
         self.sender.sendCheckpointMessage(receiver_address, self.tasks)
+        self.checkAllDone()
+
+    def checkAllDone(self):
         with self.lock:
             for task in self.tasks:
                 if task.state != 'DONE':

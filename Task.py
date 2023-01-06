@@ -16,7 +16,6 @@ class Task:
 
     def getDuration(self):
         # return duration in seconds
-        print(time.time() - self.time_)
         return time.time() - self.time_
 
     def setBeingProcessed(self):
