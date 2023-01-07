@@ -1,3 +1,4 @@
+import logging
 import socket
 import threading
 
@@ -21,6 +22,7 @@ def parseIp() -> str:
 
 class DataCenter:
     def __init__(self):
+        self.log = self.initLogger()
         self.IP = parseIp()
         self.DATACENTER_PORT = 5557
         self.PORT = 5556
@@ -33,6 +35,15 @@ class DataCenter:
         self.checkpoint = None
         self.logicalClock = 0
         self.clockLock = threading.Lock()
+        self.log.debug(f'----------------------------------------')
+        self.log.debug(f'Initializing node {self.IP}...')
+
+    def initLogger(self):
+        logging.basicConfig(level=logging.DEBUG)
+        logger = logging.getLogger(__name__)
+        file_handler = logging.FileHandler('log.txt')
+        logger.addHandler(file_handler)
+        return logger
 
     def listenForNewConnections(self):
         while not self.terminate.is_set():
@@ -51,38 +62,38 @@ class DataCenter:
                 if message:
                     message = pickle.loads(message)
                     self.logicalClock = max(self.logicalClock, message.logicalClock)
-                    print(f"({self.logicalClock}) {self.TAG}Received message from {address.id}: {message.message}")
+                    self.log.debug(f"({self.logicalClock}) {self.TAG}Received message from {address.id}: {message.message}")
                     self.consume(message, address)
             except socket.timeout:
                 pass
             except ConnectionError:
-                print(f"({self.logicalClock}) {self.TAG}Connection to {address.id} closed")
+                self.log.debug(f"({self.logicalClock}) {self.TAG}Connection to {address.id} closed")
                 break
 
     def consume(self, message, address):
         if isinstance(message, RequestAudioMessage):
-            print(f"({self.logicalClock}) {self.TAG}Received request for audio from {address.id} for chunk {message.task}")
+            self.log.debug(f"({self.logicalClock}) {self.TAG}Received request for audio from {address.id} for chunk {message.task}")
             receiver_address = Address((address.ip, self.PORT))
             self.sendAudio(receiver_address, message.task)
             # for real audio
             # thread = threading.Thread(target=self.sendAudio, args=(receiver_address, message.task))
             # thread.start()
         elif isinstance(message, CheckpointMessage):
-            print(f"({self.logicalClock}) {self.TAG}Received checkpoint from {address.id}")
+            self.log.debug(f"({self.logicalClock}) {self.TAG}Received checkpoint from {address.id}")
             self.checkpoint = message.checkpoint
         elif isinstance(message, RequestCheckpointMessage):
-            print(f"({self.logicalClock}) {self.TAG}Received request for checkpoint from {address.id}")
+            self.log.debug(f"({self.logicalClock}) {self.TAG}Received request for checkpoint from {address.id}")
             receiver_address = Address((address.ip, self.PORT))
             self.sendCheckpoint(receiver_address)
         elif isinstance(message, TerminateMessage):
-            print(f"({self.logicalClock}) {self.TAG}Received terminate message from {address.id}")
+            self.log.debug(f"({self.logicalClock}) {self.TAG}Received terminate message from {address.id}")
             results_str = ""
             for task in self.checkpoint:
                 results_str += task.result
-            print(f"({self.logicalClock}) {self.TAG}Result: {results_str}")
+            self.log.debug(f"({self.logicalClock}) {self.TAG}Result: {results_str}")
             with open("results.txt", "w") as f:
                 f.write(results_str)
-            print(f"({self.logicalClock}) {self.TAG}Saved results to file")
+            self.log.debug(f"({self.logicalClock}) {self.TAG}Saved results to file")
 
     def sendAudio(self, receiver_address: Address, task: int):
         message = AudioMessage(f'data/task{task}.mp3', task)
@@ -97,7 +108,7 @@ class DataCenter:
         message.logicalClock = self.logicalClock
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(receiver_address.address)
-        print(f'({self.logicalClock}) {self.TAG}Sending {message.message} to {receiver_address.id}')
+        self.log.debug(f'({self.logicalClock}) {self.TAG}Sending {message.message} to {receiver_address.id}')
         client.send(message.toBytes())
         client.close()
-        print(f"({self.logicalClock}) {self.TAG}Sent message to {receiver_address.id}")
+        self.log.debug(f"({self.logicalClock}) {self.TAG}Sent message to {receiver_address.id}")

@@ -49,7 +49,7 @@ class MessageSender:
 
     def send(self, message: Message, receiver_address: Address):
         if self.node.hold_each_message:
-            print(f'Press any key to send {message.message} or Ctrl+E to escape manual sending')
+            self.node.log.debug(f'Press any key to send {message.message} or Ctrl+E to escape manual sending')
             self.node.hold_each_message = self.wait_for_ctrl_e()
 
         self.node.logicalClock += 1
@@ -70,7 +70,7 @@ class MessageSender:
         try:
             self.send(message, receiver_address)
         except ConnectionError:
-            print(f'({self.node.logicalClock}) {self.TAG}SendConnectionAcceptance: ConnectionError to {str(receiver_address)}')
+            self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}SendConnectionAcceptance: ConnectionError to {str(receiver_address)}')
             self.node.removeNeighbor(receiver_address.ip)
 
     def sendConnectionEstablished(self, receiver_address: Address):
@@ -78,7 +78,7 @@ class MessageSender:
         try:
             self.send(message, receiver_address)
         except ConnectionError:
-            print(f'({self.node.logicalClock}) {self.TAG}SendConnectionEstablished: ConnectionError to {str(receiver_address)}')
+            self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}SendConnectionEstablished: ConnectionError to {str(receiver_address)}')
             self.node.removeNeighbor(receiver_address.ip)
 
     # --------------------------------------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ class MessageSender:
         try:
             self.send(message, receiver_address)
         except ConnectionError:
-            print(f'({self.node.logicalClock}) {self.TAG}SendAliveMessage: ConnectionError to {str(receiver_address)}')
+            self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}SendAliveMessage: ConnectionError to {str(receiver_address)}')
             self.node.removeNeighbor(receiver_address.ip)
 
     def sendElectionMessage(self):
@@ -99,8 +99,8 @@ class MessageSender:
                     try:
                         self.send(message, receiver_address)
                     except ConnectionError:
-                        print(f'({self.node.logicalClock}) {self.TAG}SendElectionMessage: ConnectionError to {str(receiver_address)}')
-                        print(f'({self.node.logicalClock}) {self.TAG}Aborting election')
+                        self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}SendElectionMessage: ConnectionError to {str(receiver_address)}')
+                        self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}Aborting election')
                         self.node.removeNeighbor(receiver_address.ip)
                         self.node.checkElection()
                         break
@@ -113,7 +113,7 @@ class MessageSender:
                 try:
                     self.send(message, receiver_address)
                 except ConnectionError:
-                    print(f'({self.node.logicalClock}) {self.TAG}SendVictoryMessage: ConnectionError to {str(receiver_address)}')
+                    self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}SendVictoryMessage: ConnectionError to {str(receiver_address)}')
                     self.node.removeNeighbor(receiver_address.ip)
                     break
 
@@ -123,7 +123,7 @@ class MessageSender:
         try:
             self.send(message, receiver_address)
         except ConnectionError:
-            print(f'({self.node.logicalClock}) {self.TAG}SendTaskRequestMessage: ConnectionError to {str(receiver_address)}')
+            self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}SendTaskRequestMessage: ConnectionError to {str(receiver_address)}')
             self.node.removeNeighbor(receiver_address.ip)
 
     def sendTaskMessage(self, receiver_address: Address, task: int):
@@ -131,7 +131,7 @@ class MessageSender:
         try:
             self.send(message, receiver_address)
         except ConnectionError:
-            print(f'({self.node.logicalClock}) {self.TAG}SendTaskMessage: ConnectionError to {str(receiver_address)}')
+            self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}SendTaskMessage: ConnectionError to {str(receiver_address)}')
             self.node.removeNeighbor(receiver_address.ip)
 
     def sendRequestAudioMessage(self, receiver_address: Address, task: int):
@@ -139,7 +139,7 @@ class MessageSender:
         try:
             self.send(message, receiver_address)
         except ConnectionError:
-            print(f'({self.node.logicalClock}) {self.TAG}SendRequestAudioMessage: ConnectionError to {str(receiver_address)}')
+            self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}SendRequestAudioMessage: ConnectionError to {str(receiver_address)}')
             self.node.removeNeighbor(receiver_address.ip)
 
     def sendResultMessage(self, receiver_address: Address, task: int, result: str):
@@ -147,7 +147,7 @@ class MessageSender:
         try:
             self.send(message, receiver_address)
         except ConnectionError:
-            print(f'({self.node.logicalClock}) {self.TAG}SendResultMessage: ConnectionError to {str(receiver_address)}')
+            self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}SendResultMessage: ConnectionError to {str(receiver_address)}')
             self.node.removeNeighbor(receiver_address.ip)
 
     # --------------------------------------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ class MessageSender:
         try:
             self.send(message, receiver_address)
         except ConnectionError:
-            print(f'({self.node.logicalClock}) {self.TAG}SendCheckpointMessage: ConnectionError to {str(receiver_address)}')
+            self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}SendCheckpointMessage: ConnectionError to {str(receiver_address)}')
             self.node.removeNeighbor(receiver_address.ip)
 
     def sendRequestCheckpointMessage(self, receiver_address: Address):
@@ -164,7 +164,7 @@ class MessageSender:
         try:
             self.send(message, receiver_address)
         except ConnectionError:
-            print(f'({self.node.logicalClock}) {self.TAG}SendRequestCheckpointMessage: ConnectionError to {str(receiver_address)}')
+            self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}SendRequestCheckpointMessage: ConnectionError to {str(receiver_address)}')
             self.node.removeNeighbor(receiver_address.ip)
 
     # --------------------------------------------------------------------------------------------------------------
@@ -174,5 +174,5 @@ class MessageSender:
         try:
             self.send(message, receiver_address)
         except ConnectionError:
-            print(f'({self.node.logicalClock}) {self.TAG}SendTerminateMessage: ConnectionError to {str(receiver_address)}')
+            self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}SendTerminateMessage: ConnectionError to {str(receiver_address)}')
             # self.node.removeNeighbor(receiver_address.ip)

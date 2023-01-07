@@ -75,51 +75,39 @@ class MessageReceiver:
         if isinstance(message, RequestConnectionMessage):
             self.node.handleConnectionRequest(address)
         elif isinstance(message, ConnectionAcceptanceMessage):
-            print(f"({self.node.logicalClock}) {self.TAG}Processed connection acceptance from {address.id}")
             self.node.log.debug(f"({self.node.logicalClock}) {self.TAG}Processed connection acceptance from {address.id}")
             self.node.handleConnectionAcceptance(message, address)
         elif isinstance(message, ConnectionEstablishedMessage):
-            print(f"({self.node.logicalClock}) {self.TAG}Processed connection established from {address.id}")
             self.node.log.debug(f"({self.node.logicalClock}) {self.TAG}Processed connection established from {address.id}")
             self.node.handleConnectionEstablished(address)
         elif isinstance(message, ElectionMessage):
-            print(f"({self.node.logicalClock}) {self.TAG}Processed election message from {address.id}")
             self.node.log.debug(f"({self.node.logicalClock}) {self.TAG}Processed election message from {address.id}")
             self.node.handleElectionMessage(message, address)
         elif isinstance(message, VictoryMessage):
-            print(f"({self.node.logicalClock}) {self.TAG}Processed victory message from {address.id}")
             self.node.log.debug(f"({self.node.logicalClock}) {self.TAG}Processed victory message from {address.id}")
             self.node.handleVictoryMessage(message, address)
         elif isinstance(message, AliveMessage):
-            print(f"({self.node.logicalClock}) {self.TAG}Processed alive message from {address.id}")
             self.node.log.debug(f"({self.node.logicalClock}) {self.TAG}Processed alive message from {address.id}")
             self.node.handleAliveMessage(message, address)
         elif isinstance(message, TaskRequestMessage):
-            print(f"({self.node.logicalClock}) {self.TAG}Processed task request message from {address.id}")
             self.node.log.debug(f"({self.node.logicalClock}) {self.TAG}Processed task request message from {address.id}")
             self.node.handleTaskRequestMessage(message, address)
         elif isinstance(message, TaskMessage):
-            print(f"({self.node.logicalClock}) {self.TAG}Processed task message from {address.id}")
             self.node.log.debug(f"({self.node.logicalClock}) {self.TAG}Processed task message from {address.id}")
             self.node.handleTaskMessage(message, address)
         elif isinstance(message, RequestAudioMessage):
             pass
         elif isinstance(message, AudioMessage):
-            print(f"({self.node.logicalClock}) {self.TAG}Processed audio message from {address.id}")
             self.node.log.debug(f"({self.node.logicalClock}) {self.TAG}Processed audio message from {address.id}")
             self.node.handleAudioMessage(message, address)
         elif isinstance(message, ResultMessage):
-            print(f"({self.node.logicalClock}) {self.TAG}Processed result message from {address.id}")
             self.node.log.debug(f"({self.node.logicalClock}) {self.TAG}Processed result message from {address.id}")
             self.node.handleResultMessage(message, address)
         elif isinstance(message, TerminateMessage):
-            print(f"({self.node.logicalClock}) {self.TAG}Processed terminate message from {address.id}")
             self.node.log.debug(f"({self.node.logicalClock}) {self.TAG}Processed terminate message from {address.id}")
             self.node.handleTerminateMessage(message, address)
         elif isinstance(message, CheckpointMessage):
-            print(f"({self.node.logicalClock}) {self.TAG}Processed checkpoint message from {address.id}")
             self.node.log.debug(f"({self.node.logicalClock}) {self.TAG}Processed checkpoint message from {address.id}")
             self.node.handleCheckpointMessage(message, address)
         else:
-            print(f"({self.node.logicalClock}) {self.TAG}Processed unknown message: {message}")
             self.node.log.debug(f"({self.node.logicalClock}) {self.TAG}Processed unknown message: {message}")
