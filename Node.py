@@ -222,8 +222,9 @@ class Node:
         receiver_address = Address((self.leader, self.network.PORT))
         self.log.debug(f"({self.logicalClock}) {self.TAG}Sending result {result} to leader {self.leader}")
         self.sender.sendResultMessage(receiver_address, task, result)
-        self.log.debug(f"({self.logicalClock}) {self.TAG}Asking for new task")
+        self.log.debug(f"({self.logicalClock}) {self.TAG}Before asking for new task")
         self.askForTask()
+        self.log.debug(f"({self.logicalClock}) {self.TAG}After asking for new task")
 
     # --------------------------------------------------------------------------------------------------------------
     def handleCheckpointMessage(self, message, address):
