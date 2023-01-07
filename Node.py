@@ -17,7 +17,9 @@ class Node:
     def __init__(self, data_center_ip, real_audio, tasks, message_delay, hold_each_message, bully_timeout):
         self.log = self.initLogger()
         self.hold_each_message = hold_each_message
-        self.REAL_AUDIO = False
+        self.bully_timeout = bully_timeout
+        self.REAL_AUDIO = real_audio
+        self.message_delay = message_delay
         self.state = None
         self.network = Network(self, data_center_ip)
         self.log.debug(f'----------------------------------------')
@@ -28,7 +30,6 @@ class Node:
         self.leader = None
         self.leader_address = None
         self.MINIMUM_NEIGHBORS = 2
-        self.WAIT_TIME = 10
         self.logicalClock = 0
         self.clockLock = threading.Lock()
         self.TAG = f'{self.network.IP} - '
@@ -110,7 +111,7 @@ class Node:
     def startElection(self):
         self.state = "ELECTION"
         self.sender.sendElectionMessage()
-        time.sleep(self.WAIT_TIME)
+        time.sleep(self.bully_timeout)
         if self.state == "ELECTION" and self.leader is None:
             self.log.debug(f"({self.logicalClock}) {self.TAG}I AM THE NEW LEADER")
             self.state = "COORDINATOR"

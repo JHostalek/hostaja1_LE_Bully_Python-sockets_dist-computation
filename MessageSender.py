@@ -4,6 +4,7 @@ import socket
 import sys
 import termios
 import threading
+import time
 
 import Network
 from Address import Address
@@ -51,7 +52,7 @@ class MessageSender:
         if self.node.hold_each_message:
             self.node.log.debug(f'Press any key to send {message.message} or Ctrl+E to escape manual sending')
             self.node.hold_each_message = self.wait_for_ctrl_e()
-
+        time.sleep(self.node.message_delay)
         self.node.logicalClock += 1
         message.logicalClock = self.node.logicalClock
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
