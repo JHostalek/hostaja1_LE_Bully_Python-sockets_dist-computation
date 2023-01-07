@@ -154,11 +154,13 @@ class Node:
             self.sender.sendTaskRequestMessage(receiver_address)
             prev_time = time.time()
             while True:
+                time.sleep(0.5)
                 if self.terminate.is_set():
                     return
-                if self.got_response:
-                    self.got_response = False
-                    return
+                with self.lock:
+                    if self.got_response:
+                        self.got_response = False
+                        return
                 if time.time() - prev_time > 10:
                     self.log.debug(f'({self.logicalClock}) {self.TAG}Leader {self.leader} is not responding, sending another request')
                     prev_time = time.time()
@@ -173,7 +175,8 @@ class Node:
             self.sender.sendTaskMessage(receiver_address, task)
 
     def handleTaskMessage(self, message, address):
-        self.got_response = True
+        with self.lock:
+            self.got_response = True
         self.log.debug(f"({self.logicalClock}) {self.TAG}Received task: {message.task}")
         receiver_address = Address((self.network.DATACENTER_IP, self.network.DATACENTER_PORT))
         self.sender.sendRequestAudioMessage(receiver_address, message.task)
