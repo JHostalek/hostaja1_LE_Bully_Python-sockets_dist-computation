@@ -20,7 +20,8 @@ class Node:
         self.REAL_AUDIO = False
         self.state = None
         self.network = Network(self, data_center_ip)
-        self.log.log(logging.INFO, f'Initializing node {self.network.IP}...')
+        self.log.debug(f'----------------------------------------')
+        self.log.debug(f'Initializing node {self.network.IP}...')
         self.sender = MessageSender(self.network)
         self.receiver = MessageReceiver(self.network)
         self.neighbors = set()
