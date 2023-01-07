@@ -121,7 +121,7 @@ class MessageSender:
     def sendTaskRequestMessage(self, receiver_address: Address):
         message = TaskRequestMessage()
         try:
-            if self.node.leader != receiver_address.ip:
+            if receiver_address.ip != self.network.IP:
                 self.send(message, receiver_address)
         except ConnectionError:
             self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}SendTaskRequestMessage: ConnectionError to {str(receiver_address)}')
