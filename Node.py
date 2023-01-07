@@ -159,7 +159,7 @@ class Node:
                 if self.got_response:
                     self.got_response = False
                     return
-                if time.time() - prev_time > 20:
+                if time.time() - prev_time > 10:
                     self.log.debug(f'({self.logicalClock}) {self.TAG}Leader {self.leader} is not responding, sending another request')
                     prev_time = time.time()
                     receiver_address = Address((self.leader, self.network.PORT))

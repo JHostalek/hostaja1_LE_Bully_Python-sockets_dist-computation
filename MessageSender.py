@@ -121,7 +121,8 @@ class MessageSender:
     def sendTaskRequestMessage(self, receiver_address: Address):
         message = TaskRequestMessage()
         try:
-            self.send(message, receiver_address)
+            if self.node.leader != receiver_address.ip:
+                self.send(message, receiver_address)
         except ConnectionError:
             self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}SendTaskRequestMessage: ConnectionError to {str(receiver_address)}')
             self.node.removeNeighbor(receiver_address.ip)
