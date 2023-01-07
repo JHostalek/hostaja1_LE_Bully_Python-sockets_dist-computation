@@ -86,6 +86,7 @@ class DataCenter:
             receiver_address = Address((address.ip, self.PORT))
             self.sendCheckpoint(receiver_address)
         elif isinstance(message, TerminateMessage):
+            self.terminate.set()
             self.log.debug(f"({self.logicalClock}) {self.TAG}Received terminate message from {address.id}")
             results_str = ""
             for task in self.checkpoint:
