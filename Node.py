@@ -1,3 +1,4 @@
+import logging
 import random
 import threading
 import time
@@ -14,10 +15,12 @@ from Task import Task
 
 class Node:
     def __init__(self, data_center_ip, real_audio, tasks, message_delay, hold_each_message, bully_timeout):
+        self.log = self.initLogger()
         self.hold_each_message = hold_each_message
         self.REAL_AUDIO = False
         self.state = None
         self.network = Network(self, data_center_ip)
+        self.log.debug(f'Initializing node {self.network.IP}...')
         self.sender = MessageSender(self.network)
         self.receiver = MessageReceiver(self.network)
         self.neighbors = set()
@@ -42,6 +45,13 @@ class Node:
         self.result = {}
         self.got_response = False
 
+    def initLogger(self):
+        logging.basicConfig(level=logging.DEBUG)
+        logger = logging.getLogger(__name__)
+        file_handler = logging.FileHandler('log.txt')
+        logger.addHandler(file_handler)
+        return logger
+
     def setLeader(self, leader):
         if self.leader == leader: return
         self.leader = leader
@@ -54,16 +64,19 @@ class Node:
     def checkElection(self):
         if self.leader is None and self.state != 'ELECTION' and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
             print(f'({self.logicalClock}) {self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
+            self.log.debug(f'({self.logicalClock}) {self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
             self.startElection()
 
     def removeNeighbor(self, ip):
         with self.lock:
             self.neighbors.remove(ip)
         print(f'({self.logicalClock}) {self.TAG}Removed {ip} from neighbors')
+        self.log.debug(f'({self.logicalClock}) {self.TAG}Removed {ip} from neighbors')
         if self.leader == ip:
             self.setLeader(None)
             self.checkElection()
             print(f'({self.logicalClock}) {self.TAG}{ip} is no longer the leader')
+            self.log.debug(f'({self.logicalClock}) {self.TAG}{ip} is no longer the leader')
 
     # --------------------------------------------------------------------------------------------------------------
     def handleConnectionRequest(self, sender: Address):
@@ -78,6 +91,7 @@ class Node:
         with self.lock:
             self.neighbors.add(address.ip)
         print(f'({self.logicalClock}) {self.TAG}Established connection with {address.id}, leader is {self.leader}')
+        self.log.debug(f'({self.logicalClock}) {self.TAG}Established connection with {address.id}, leader is {self.leader}')
         # finish handshake with the existing network member
         receiver_address = Address((address.ip, self.network.PORT))
         self.sender.sendConnectionEstablished(receiver_address)
@@ -87,6 +101,7 @@ class Node:
         with self.lock:
             self.neighbors.add(address.ip)
         print(f'({self.logicalClock}) {self.TAG}Established connection with {address.id}')
+        self.log.debug(f'({self.logicalClock}) {self.TAG}Established connection with {address.id}')
 
         # handshake with the incoming node finished check if we can start an election
         self.checkElection()
@@ -102,6 +117,7 @@ class Node:
         time.sleep(self.WAIT_TIME)
         if self.state == "ELECTION" and self.leader is None:
             print(f"({self.logicalClock}) {self.TAG}I AM THE NEW LEADER")
+            self.log.debug(f"({self.logicalClock}) {self.TAG}I AM THE NEW LEADER")
             self.state = "COORDINATOR"
             self.setLeader(self.network.IP)
             receiver_address = Address((self.network.DATACENTER_IP, self.network.DATACENTER_PORT))
@@ -120,6 +136,7 @@ class Node:
     def handleVictoryMessage(self, message, address):
         self.state = "FOLLOWER"
         print(f"({self.logicalClock}) {self.TAG}NEW LEADER IS: {address.ip}")
+        self.log.debug(f"({self.logicalClock}) {self.TAG}NEW LEADER IS: {address.ip}")
         self.setLeader(address.ip)
 
     def handleAliveMessage(self, message, address):
@@ -133,6 +150,7 @@ class Node:
                 return task.id
             elif task.state == 'PROCESSING' and task.getDuration() > 20:
                 print(f'({self.logicalClock}) {self.TAG}Task {task.id} is taking too long to process - {task.getDuration()}')
+                self.log.debug(f'({self.logicalClock}) {self.TAG}Task {task.id} is taking too long to process - {task.getDuration()}')
                 task.setBeingProcessed()
                 return task.id
         return -1
@@ -150,6 +168,7 @@ class Node:
                     return
                 if time.time() - prev_time > 10:
                     print(f'({self.logicalClock}) {self.TAG}Leader {self.leader} is not responding, sending another request')
+                    self.log.debug(f'({self.logicalClock}) {self.TAG}Leader {self.leader} is not responding, sending another request')
                     prev_time = time.time()
                     receiver_address = Address((self.leader, self.network.PORT))
                     self.sender.sendTaskRequestMessage(receiver_address)
@@ -164,17 +183,20 @@ class Node:
     def handleTaskMessage(self, message, address):
         self.got_response = True
         print(f"({self.logicalClock}) {self.TAG}Received task: {message.task}")
+        self.log.debug(f"({self.logicalClock}) {self.TAG}Received task: {message.task}")
         receiver_address = Address((self.network.DATACENTER_IP, self.network.DATACENTER_PORT))
         self.sender.sendRequestAudioMessage(receiver_address, message.task)
 
     def handleAudioMessage(self, message, address):
         print(f"({self.logicalClock}) {self.TAG}Starting work on task: {message.task}")
+        self.log.debug(f"({self.logicalClock}) {self.TAG}Starting work on task: {message.task}")
         # work_thread = threading.Thread(target=self.processAudio, args=(self.leader, message.audio,))
         # work_thread.start()
         self.processAudio(self.leader, message.audio, message.task)
 
     def handleResultMessage(self, message, address):
         print(f"({self.logicalClock}) {self.TAG}Received result: {message.result}")
+        self.log.debug(f"({self.logicalClock}) {self.TAG}Received result: {message.result}")
         self.tasks[message.task].result = message.result
         self.tasks[message.task].state = 'DONE'
         receiver_address = Address((self.network.DATACENTER_IP, self.network.DATACENTER_PORT))
@@ -187,6 +209,7 @@ class Node:
             if task.state != 'DONE':
                 return
         print(f"({self.logicalClock}) {self.TAG}All tasks done. Shutting down.")
+        self.log.debug(f"({self.logicalClock}) {self.TAG}All tasks done. Shutting down.")
         time.sleep(5)
         with self.lock:
             for n in self.neighbors:
@@ -199,6 +222,7 @@ class Node:
 
     def processAudio(self, current_leader, audio, task):
         print(f"({self.logicalClock}) {self.TAG}Processing audio {audio}...")
+        self.log.debug(f"({self.logicalClock}) {self.TAG}Processing audio {audio}...")
         if self.REAL_AUDIO:
             model = whisper.load_model('tiny.en')
             result = model.transcribe(audio, fp16=False, verbose=None)["text"]
@@ -208,6 +232,7 @@ class Node:
         print(f"({self.logicalClock}) {self.TAG}Result: {result}")
         if self.leader != current_leader:
             print(f"({self.logicalClock}) {self.TAG}Leader changed, aborting")
+            self.log.debug(f"({self.logicalClock}) {self.TAG}Leader changed, aborting")
             return
         receiver_address = Address((self.leader, self.network.PORT))
         self.sender.sendResultMessage(receiver_address, task, result)
@@ -216,6 +241,7 @@ class Node:
     # --------------------------------------------------------------------------------------------------------------
     def handleCheckpointMessage(self, message, address):
         print(f"({self.logicalClock}) {self.TAG}Received checkpoint")
+        self.log.debug(f"({self.logicalClock}) {self.TAG}Received checkpoint")
         if message.checkpoint is not None:
             self.tasks = message.checkpoint
         # Let other nodes know that we have the checkpoint, and we can start
@@ -224,6 +250,7 @@ class Node:
     # --------------------------------------------------------------------------------------------------------------
     def handleTerminateMessage(self, message, address):
         print(f"({self.logicalClock}) {self.TAG}Received terminate message")
+        self.log.debug(f"({self.logicalClock}) {self.TAG}Received terminate message")
         self.sender.terminate.set()
         self.receiver.terminate.set()
         self.terminate.set()
