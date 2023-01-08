@@ -5,7 +5,7 @@ if __name__ == '__main__':
     audio = AudioSegment.from_mp3("original.mp3")
 
     # Calculate the step size (in milliseconds)
-    step_size = int(audio.duration_seconds * 1000 // 100)
+    step_size = int(audio.duration_seconds * 1000 // 20)
 
     # Split the audio file into 20 parts
     parts = [audio[i:i + step_size] for i in range(0, len(audio), step_size)]
