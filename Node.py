@@ -37,6 +37,7 @@ class Node:
         self.terminate = threading.Event()
         self.lock = threading.Lock()
         self.task_lock = threading.Lock()
+        self.bully_lock = threading.Lock()
         self.receiver.start()
         self.sender.sendConnectionRequest()
         self.work_thread = None
@@ -66,8 +67,10 @@ class Node:
 
     def checkElection(self):
         # sleep for random number of seconds from 5 to 15
-        time.sleep(random.randint(5, 15))
+        self.bully_lock.acquire()
         if self.leader is None and self.state != 'ELECTION' and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
+            self.state = "ELECTION"
+            self.bully_lock.release()
             self.log.debug(f'({self.logicalClock}) {self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
             self.startElection()
 
@@ -112,7 +115,6 @@ class Node:
 
     # --------------------------------------------------------------------------------------------------------------
     def startElection(self):
-        self.state = "ELECTION"
         self.sender.sendElectionMessage()
         time.sleep(self.bully_timeout)
         if self.state == "ELECTION" and self.leader is None:
