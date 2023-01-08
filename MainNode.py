@@ -12,7 +12,7 @@ if __name__ == '__main__':
     parser.add_argument('--bully_timeout', required=False,
                         help='Time limit for the bully algorithm. Node claims to be the coordinator (leader) if neighbors with higher id do not respond until this timeout expires.',
                         type=float,
-                        default=10)
+                        default=20)
     parser.add_argument('--manual_ip', required=False, help='Manually set the IP of this node', type=str, default=None)
     args = parser.parse_args()
 
