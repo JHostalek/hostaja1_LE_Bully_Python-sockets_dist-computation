@@ -176,5 +176,6 @@ class MessageSender:
         try:
             self.send(message, receiver_address)
         except ConnectionError:
-            self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}SendTerminateMessage: ConnectionError to {str(receiver_address)}')
+            pass
+            # self.node.log.debug(f'({self.node.logicalClock}) {self.TAG}SendTerminateMessage: ConnectionError to {str(receiver_address)}')
             # self.node.removeNeighbor(receiver_address.ip)
