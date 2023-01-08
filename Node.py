@@ -67,10 +67,8 @@ class Node:
 
     def checkElection(self):
         # sleep for random number of seconds from 5 to 15
-        self.bully_lock.acquire()
+
         if self.leader is None and self.state != 'ELECTION' and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
-            self.state = "ELECTION"
-            self.bully_lock.release()
             self.log.debug(f'({self.logicalClock}) {self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
             self.startElection()
 
@@ -107,14 +105,17 @@ class Node:
         self.log.debug(f'({self.logicalClock}) {self.TAG}Established connection with {address.id}')
 
         # handshake with the incoming node finished check if we can start an election
-        self.checkElection()
+
         if self.state == 'ELECTION':
             message = ElectionMessage()
             receiver_address = Address((address.ip, self.network.PORT))
             self.sender.send(message, receiver_address)
+        else:
+            self.checkElection()
 
     # --------------------------------------------------------------------------------------------------------------
     def startElection(self):
+        self.state = "ELECTION"
         self.sender.sendElectionMessage()
         time.sleep(self.bully_timeout)
         if self.state == "ELECTION" and self.leader is None:
