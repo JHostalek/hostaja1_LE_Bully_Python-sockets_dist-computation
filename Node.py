@@ -40,7 +40,6 @@ class Node:
         self.receiver.start()
         self.sender.sendConnectionRequest()
         self.work_thread = None
-
         self.tasks = []
         self.NUMBER_OF_TASKS = tasks
         for i in range(self.NUMBER_OF_TASKS):
@@ -185,7 +184,6 @@ class Node:
         self.sender.sendRequestAudioMessage(receiver_address, message.task)
 
     def handleAudioMessage(self, message, address):
-        self.log.debug(f"({self.logicalClock}) {self.TAG}Starting work on task: {message.task}")
         # work_thread = threading.Thread(target=self.processAudio, args=(self.leader, message.audio,))
         # work_thread.start()
         self.processAudio(self.leader, message.audio, message.task)
@@ -226,7 +224,7 @@ class Node:
             self.log.debug(f"({self.logicalClock}) {self.TAG}Leader changed, aborting")
             return
         receiver_address = Address((self.leader, self.network.PORT))
-        self.log.debug(f"({self.logicalClock}) {self.TAG}Sending result {result} to leader {self.leader}")
+        self.log.debug(f"({self.logicalClock}) {self.TAG}Sending transcription \"{result}\" to leader {self.leader}")
         self.sender.sendResultMessage(receiver_address, task, result)
         self.askForTask()
 
