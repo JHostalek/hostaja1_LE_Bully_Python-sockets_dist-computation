@@ -18,13 +18,13 @@ def parseIp() -> str:
 
 
 class Network:
-    def __init__(self, node: Node, data_center_ip='192.168.56.115'):
+    def __init__(self, node: Node, data_center_ip='192.168.56.115', manual_ip=None):
         self.DATACENTER_IP = data_center_ip
         self.DATACENTER_PORT = 5557
         self.FILE_TRANSFER_PORT = 5558
         self.BROADCAST_IP = '192.168.56.255'
         self.BROADCAST_PORT = 5555
-        self.IP = parseIp()
+        self.IP = manual_ip if manual_ip is not None else parseIp()
         self.PORT = 5556
         self.SOCKET_TIMEOUT = 0.1
         self.MAX_CONNECTIONS = 10

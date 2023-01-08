@@ -13,6 +13,7 @@ if __name__ == '__main__':
                         help='Time limit for the bully algorithm. Node claims to be the coordinator (leader) if neighbors with higher id do not respond until this timeout expires.',
                         type=float,
                         default=10)
+    parser.add_argument('--manual_ip', required=False, help='Manually set the IP of this node', type=str, default=None)
     args = parser.parse_args()
 
     node = Node(
@@ -21,5 +22,6 @@ if __name__ == '__main__':
         tasks=args.tasks,
         message_delay=args.message_delay,
         hold_each_message=args.hold_each_message,
-        bully_timeout=args.bully_timeout
+        bully_timeout=args.bully_timeout,
+        manual_ip=args.manual_ip
     )

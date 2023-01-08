@@ -14,14 +14,15 @@ from Task import Task
 
 
 class Node:
-    def __init__(self, data_center_ip, real_audio, tasks, message_delay, hold_each_message, bully_timeout):
+    def __init__(self, data_center_ip, real_audio, tasks, message_delay, hold_each_message, bully_timeout, manual_ip):
         self.log = self.initLogger()
         self.hold_each_message = hold_each_message
         self.bully_timeout = bully_timeout
         self.REAL_AUDIO = real_audio
+        self.manual_ip = manual_ip
         self.message_delay = message_delay
         self.state = None
-        self.network = Network(self, data_center_ip)
+        self.network = Network(self, data_center_ip, manual_ip)
         self.log.debug(f'----------------------------------------')
         self.log.debug(f'Initializing node {self.network.IP}...')
         self.sender = MessageSender(self.network)
@@ -143,7 +144,7 @@ class Node:
             if task.state == 'NEW':
                 task.setBeingProcessed()
                 return task.id
-            elif task.state == 'PROCESSING' and task.getDuration() > 20:
+            elif task.state == 'PROCESSING' and task.getDuration() > 60 if self.REAL_AUDIO else 20:
                 self.log.debug(f'({self.logicalClock}) {self.TAG}Task {task.id} is taking too long to process - {task.getDuration()}')
                 task.setBeingProcessed()
                 return task.id
