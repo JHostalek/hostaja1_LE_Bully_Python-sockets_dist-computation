@@ -65,10 +65,9 @@ class Node:
             self.askForTask()
 
     def checkElection(self):
-        self.lock.acquire()
+        # sleep for random number of seconds from 5 to 15
+        time.sleep(random.randint(5, 15))
         if self.leader is None and self.state != 'ELECTION' and len(self.neighbors) >= self.MINIMUM_NEIGHBORS:
-            self.state = "ELECTION"
-            self.lock.release()
             self.log.debug(f'({self.logicalClock}) {self.TAG}STARTING ELECTIONS - neighbors: {self.neighbors}')
             self.startElection()
 
@@ -113,6 +112,7 @@ class Node:
 
     # --------------------------------------------------------------------------------------------------------------
     def startElection(self):
+        self.state = "ELECTION"
         self.sender.sendElectionMessage()
         time.sleep(self.bully_timeout)
         if self.state == "ELECTION" and self.leader is None:
